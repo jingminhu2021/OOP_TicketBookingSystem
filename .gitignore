@@ -33,7 +33,7 @@ build/
 .vscode/
 
 ### properties ###
-TicketBookingSystem/src/main/resources/application.properties
+# TicketBookingSystem/src/main/resources/application.properties
 
 ## Terraform ###
 .terraform/
