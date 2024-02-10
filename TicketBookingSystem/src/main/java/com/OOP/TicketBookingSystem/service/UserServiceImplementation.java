@@ -1,5 +1,8 @@
 package com.OOP.TicketBookingSystem.service;
 
+import java.math.BigInteger; 
+import java.security.MessageDigest; 
+import java.security.NoSuchAlgorithmException; 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,8 @@ public class UserServiceImplementation implements UserService {
     
     @Override
     public boolean createUser(User user){
+        user.setPassword(getHash(user.getPassword()));
+
         if(user instanceof Customer){
             customerRepo.save((Customer) user);
             return true;
@@ -43,7 +48,6 @@ public class UserServiceImplementation implements UserService {
         }
         return false;
     }   
-
 
     @Override
     public User getUserById(int id) {
@@ -58,5 +62,32 @@ public class UserServiceImplementation implements UserService {
     @Override
     public List<User> getAllUsers() {
         return userRepo.findAll();
+    }
+
+    @Override
+    public String getHash(String password){
+        try{
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            // digest() method called 
+            // to calculate message digest of an input 
+            // and return array of byte 
+            byte[] messageDigest = md.digest(password.getBytes()); 
+
+            // Convert byte array into signum representation 
+            BigInteger no = new BigInteger(1, messageDigest); 
+
+            // Convert message digest into hex value 
+            String hashtext = no.toString(16); 
+
+            while (hashtext.length() < 32) { 
+                hashtext = "0" + hashtext; 
+            } 
+
+            return hashtext; 
+
+        }catch (NoSuchAlgorithmException e){
+            System.out.println("Exception thrown for incorrect algorithm: " + e); 
+            return null; 
+        }
     }
 }

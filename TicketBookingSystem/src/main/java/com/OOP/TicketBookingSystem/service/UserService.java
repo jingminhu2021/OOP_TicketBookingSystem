@@ -13,4 +13,6 @@ public interface UserService {
     public User getUserByEmail(String email);
 
     public List<User> getAllUsers();
+
+    public String getHash(String password);
 }
