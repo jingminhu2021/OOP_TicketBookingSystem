@@ -2,6 +2,7 @@ package com.OOP.TicketBookingSystem.controller;
 
 import java.util.List;
 
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,8 @@ import com.OOP.TicketBookingSystem.model.Event_Manager;
 import com.OOP.TicketBookingSystem.model.Ticketing_Officer;
 import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.service.UserService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/user")
@@ -35,6 +38,21 @@ public class UserController {
     @RequestMapping("/createTicketingOfficer")
     public boolean createUser(@RequestBody Ticketing_Officer ticketing_Officer){
         return userService.createUser(ticketing_Officer);
+    }
+
+    @RequestMapping("/login")
+    public User login(@RequestBody String body){
+        
+        ObjectMapper mapper = new ObjectMapper();
+        try{
+            JsonNode jsonNode = mapper.readTree(body);
+            return userService.login(jsonNode);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+        
     }
 
     @GetMapping("/get")

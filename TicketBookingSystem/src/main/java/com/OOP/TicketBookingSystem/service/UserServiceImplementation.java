@@ -16,6 +16,7 @@ import com.OOP.TicketBookingSystem.repository.CustomerRepo;
 import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
 import com.OOP.TicketBookingSystem.repository.TicketingOfficerRepo;
 import com.OOP.TicketBookingSystem.repository.UserRepo;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Service
 public class UserServiceImplementation implements UserService {
@@ -35,25 +36,47 @@ public class UserServiceImplementation implements UserService {
     @Override
     public boolean createUser(User user){
         String email = user.getEmail();
+        String emailregex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
 
-        if(userRepo.findByEmail(email) == null){
+        if(userRepo.findByEmail(email) == null && email.matches(emailregex)){
 
             user.setPassword(getHash(user.getPassword()));
 
             if(user instanceof Customer){
                 customerRepo.save((Customer) user);
                 return true;
+
             }else if (user instanceof Event_Manager){
                 eventManagerRepo.save((Event_Manager) user);
                 return true;
+
             }else if (user instanceof Ticketing_Officer){
                 ticketingOfficerRepo.save((Ticketing_Officer) user);
                 return true;
+
             }
         }
 
         return false;
     }   
+
+    @Override
+    public User login(JsonNode body){
+        
+        String email = body.get("email").textValue();
+        User user = userRepo.findByEmail(email);
+        
+        if(user != null){
+            String password = getHash(body.get("password").textValue());
+            String hashedPassword = user.getPassword();
+            System.out.println(password + " " + hashedPassword);
+            if( hashedPassword.equals(password) ){
+                return user;
+            }
+        }
+
+        return null;
+    }
 
     @Override
     public User getUserById(int id) {
