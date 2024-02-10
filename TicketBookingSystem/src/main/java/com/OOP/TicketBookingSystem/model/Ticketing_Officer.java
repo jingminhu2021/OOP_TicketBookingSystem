@@ -5,14 +5,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Ticketing_Officer extends User{
-    @Column
-    private String role = "Ticketing_Officer";
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
+    public Ticketing_Officer(){
+        super("Ticketing_Officer");
     }
 }

@@ -30,23 +30,29 @@ public class UserServiceImplementation implements UserService {
     private TicketingOfficerRepo ticketingOfficerRepo;
     
     @Override
-    public Customer createUser(Customer customer){
-        return customerRepo.save(customer);
-    }
+    public boolean createUser(User user){
+        if(user instanceof Customer){
+            customerRepo.save((Customer) user);
+            return true;
+        }else if (user instanceof Event_Manager){
+            eventManagerRepo.save((Event_Manager) user);
+            return true;
+        }else if (user instanceof Ticketing_Officer){
+            ticketingOfficerRepo.save((Ticketing_Officer) user);
+            return true;
+        }
+        return false;
+    }   
 
-    @Override
-    public Event_Manager createUser(Event_Manager eventManager){
-        return eventManagerRepo.save(eventManager);
-    }
-
-    @Override
-    public Ticketing_Officer createUser(Ticketing_Officer ticketingOfficer){
-        return ticketingOfficerRepo.save(ticketingOfficer);
-    }
 
     @Override
     public User getUserById(int id) {
         return userRepo.findById(id).get();
+    }
+
+    @Override
+    public User getUserByEmail(String email){
+        return userRepo.findByEmail(email);
     }
 
     @Override
