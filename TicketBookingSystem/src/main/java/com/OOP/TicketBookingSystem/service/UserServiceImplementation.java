@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest; 
 import java.security.NoSuchAlgorithmException; 
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,10 +38,12 @@ public class UserServiceImplementation implements UserService {
     public boolean createUser(User user){
         String email = user.getEmail();
         String emailregex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
-
+        
         if(userRepo.findByEmail(email) == null && email.matches(emailregex)){
 
-            user.setPassword(getHash(user.getPassword()));
+            String salt = getSaltString();
+            user.setSalt(salt);
+            user.setPassword(getHash(user.getPassword(), salt));
 
             if(user instanceof Customer){
                 customerRepo.save((Customer) user);
@@ -67,9 +70,9 @@ public class UserServiceImplementation implements UserService {
         User user = userRepo.findByEmail(email);
         
         if(user != null){
-            String password = getHash(body.get("password").textValue());
+            String password = getHash(body.get("password").textValue(), user.getSalt());
             String hashedPassword = user.getPassword();
-            System.out.println(password + " " + hashedPassword);
+
             if( hashedPassword.equals(password) ){
                 return user;
             }
@@ -94,13 +97,13 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public String getHash(String password){
+    public String getHash(String password, String salt){
         try{
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             // digest() method called 
             // to calculate message digest of an input 
             // and return array of byte 
-            byte[] messageDigest = md.digest(password.getBytes()); 
+            byte[] messageDigest = md.digest((password+salt).getBytes()); 
 
             // Convert byte array into signum representation 
             BigInteger no = new BigInteger(1, messageDigest); 
@@ -118,5 +121,18 @@ public class UserServiceImplementation implements UserService {
             System.out.println("Exception thrown for incorrect algorithm: " + e); 
             return null; 
         }
+    }
+
+    protected String getSaltString() {
+        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder salt = new StringBuilder();
+        Random rnd = new Random();
+        while (salt.length() < 18) { // length of the random string.
+            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+            salt.append(SALTCHARS.charAt(index));
+        }
+        String saltStr = salt.toString();
+        return saltStr;
+
     }
 }

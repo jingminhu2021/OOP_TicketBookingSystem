@@ -19,6 +19,7 @@ public class User {
     private String password;
     @Column
     private String role;
+    private String salt;
 
     public User(String role) {
         this.role = role;
@@ -62,6 +63,14 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+    
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
 }

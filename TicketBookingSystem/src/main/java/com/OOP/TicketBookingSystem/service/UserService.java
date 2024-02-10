@@ -17,5 +17,5 @@ public interface UserService {
 
     public List<User> getAllUsers();
 
-    public String getHash(String password);
+    public String getHash(String password, String salt);
 }
