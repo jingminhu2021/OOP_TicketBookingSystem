@@ -34,18 +34,24 @@ public class UserServiceImplementation implements UserService {
     
     @Override
     public boolean createUser(User user){
-        user.setPassword(getHash(user.getPassword()));
+        String email = user.getEmail();
 
-        if(user instanceof Customer){
-            customerRepo.save((Customer) user);
-            return true;
-        }else if (user instanceof Event_Manager){
-            eventManagerRepo.save((Event_Manager) user);
-            return true;
-        }else if (user instanceof Ticketing_Officer){
-            ticketingOfficerRepo.save((Ticketing_Officer) user);
-            return true;
+        if(userRepo.findByEmail(email) == null){
+
+            user.setPassword(getHash(user.getPassword()));
+
+            if(user instanceof Customer){
+                customerRepo.save((Customer) user);
+                return true;
+            }else if (user instanceof Event_Manager){
+                eventManagerRepo.save((Event_Manager) user);
+                return true;
+            }else if (user instanceof Ticketing_Officer){
+                ticketingOfficerRepo.save((Ticketing_Officer) user);
+                return true;
+            }
         }
+
         return false;
     }   
 

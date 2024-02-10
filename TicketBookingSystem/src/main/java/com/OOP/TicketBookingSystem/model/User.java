@@ -1,5 +1,6 @@
 package com.OOP.TicketBookingSystem.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,9 +11,13 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column
     private String name;
+    @Column(unique=true)
     private String email;
+    @Column
     private String password;
+    @Column
     private String role;
 
     public User(String role) {
