@@ -32,8 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
-### properties ###
-TicketBookingSystem/src/main/resources/application.properties
-
 ## Terraform ###
 .terraform/
+
+## environment variable ###
+.env

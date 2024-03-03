@@ -5,8 +5,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException; 
 import java.util.List;
 import java.util.Random;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Customer;
@@ -17,7 +19,6 @@ import com.OOP.TicketBookingSystem.repository.CustomerRepo;
 import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
 import com.OOP.TicketBookingSystem.repository.TicketingOfficerRepo;
 import com.OOP.TicketBookingSystem.repository.UserRepo;
-import com.fasterxml.jackson.databind.JsonNode;
 
 @Service
 public class UserServiceImplementation implements UserService {
@@ -44,20 +45,25 @@ public class UserServiceImplementation implements UserService {
             String salt = getSaltString();
             user.setSalt(salt);
             user.setPassword(getHash(user.getPassword(), salt));
-
-            if(user instanceof Customer){
-                customerRepo.save((Customer) user);
-                return true;
-
-            }else if (user instanceof Event_Manager){
-                eventManagerRepo.save((Event_Manager) user);
-                return true;
-
-            }else if (user instanceof Ticketing_Officer){
-                ticketingOfficerRepo.save((Ticketing_Officer) user);
-                return true;
-
+            try{
+                if(user instanceof Customer){
+                    customerRepo.save((Customer) user);
+                    return true;
+    
+                }else if (user instanceof Event_Manager){
+                    eventManagerRepo.save((Event_Manager) user);
+                    return true;
+    
+                }else if (user instanceof Ticketing_Officer){
+                    ticketingOfficerRepo.save((Ticketing_Officer) user);
+                    return true;
+                }
+            }catch (IllegalArgumentException e){
+                System.err.println(e);
+            }catch (OptimisticLockingFailureException e){
+                System.err.println(e);
             }
+            
         }
 
         return false;
@@ -96,8 +102,7 @@ public class UserServiceImplementation implements UserService {
         return userRepo.findAll();
     }
 
-    @Override
-    public String getHash(String password, String salt){
+    protected String getHash(String password, String salt){
         try{
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             // digest() method called 

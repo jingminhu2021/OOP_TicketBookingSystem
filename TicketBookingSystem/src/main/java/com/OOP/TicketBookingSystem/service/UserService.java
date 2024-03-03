@@ -1,9 +1,9 @@
 package com.OOP.TicketBookingSystem.service;
 
 import java.util.List;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import com.OOP.TicketBookingSystem.model.User;
-import com.fasterxml.jackson.databind.JsonNode;
 
 public interface UserService {
 
@@ -17,5 +17,4 @@ public interface UserService {
 
     public List<User> getAllUsers();
 
-    public String getHash(String password, String salt);
 }
