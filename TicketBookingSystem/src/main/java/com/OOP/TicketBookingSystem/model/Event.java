@@ -26,48 +26,71 @@ public class Event {
     private int numberOfTicket;
     @Column
     private String eventManagerName;
+    @Column
+    private String description;
 
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
+
     public String getEventName() {
         return eventName;
     }
+
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
+
     public String getVenue() {
         return venue;
     }
+
     public void setVenue(String venue) {
         this.venue = venue;
     }
+
     public LocalDateTime getDateTime() {
         return dateTime;
     }
+
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
+
     public BigDecimal getTicketPrice() {
         return ticketPrice;
     }
+
     public void setTicketPrice(BigDecimal ticketPrice) {
         this.ticketPrice = ticketPrice;
     }
+
     public int getNumberOfTicket() {
         return numberOfTicket;
     }
+
     public void setNumberOfTicket(int numberOfTicket) {
         this.numberOfTicket = numberOfTicket;
     }
+
     public String getEventManagerName() {
         return eventManagerName;
     }
+
     public void setEventManagerName(String eventManagerName) {
         this.eventManagerName = eventManagerName;
     }
-    
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }

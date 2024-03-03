@@ -1,6 +1,8 @@
 package com.OOP.TicketBookingSystem.controller;
 
 import java.util.List;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +15,6 @@ import com.OOP.TicketBookingSystem.model.Event_Manager;
 import com.OOP.TicketBookingSystem.model.Ticketing_Officer;
 import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.service.UserService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/user")
@@ -23,32 +23,32 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping("/createCustomer")
-    public boolean createUser(@RequestBody Customer customer){
+    public boolean createUser(@RequestBody Customer customer) {
         return userService.createUser(customer);
     }
 
     @RequestMapping("/createEventManager")
-    public boolean createUser(@RequestBody Event_Manager eventManager){
+    public boolean createUser(@RequestBody Event_Manager eventManager) {
         return userService.createUser(eventManager);
     }
 
     @RequestMapping("/createTicketingOfficer")
-    public boolean createUser(@RequestBody Ticketing_Officer ticketing_Officer){
+    public boolean createUser(@RequestBody Ticketing_Officer ticketing_Officer) {
         return userService.createUser(ticketing_Officer);
     }
 
     @RequestMapping("/login")
-    public User login(@RequestBody String body){
-        
+    public User login(@RequestBody String body) {
+
         ObjectMapper mapper = new ObjectMapper();
-        try{
+        try {
             JsonNode jsonNode = mapper.readTree(body);
             return userService.login(jsonNode);
-        } catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
         return null;
-        
+
     }
 
     @GetMapping("/get")
@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @GetMapping("/getEmail")
-    public User getUserByEmail(String email){
+    public User getUserByEmail(String email) {
         return userService.getUserByEmail(email);
     }
 
