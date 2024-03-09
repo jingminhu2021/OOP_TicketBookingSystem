@@ -36,8 +36,9 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @getMapping("/setTicketManager"){
-        public void setTicketManager(int id){
-        return userService.setTicketManager(id);
+    @PreAuthorize("hasRole('Event_Manager')")
+    @GetMapping("/setTicketManager")
+    public void setTicketManager(int id) {
+        userService.setTicketManager(id);
     }
 }
