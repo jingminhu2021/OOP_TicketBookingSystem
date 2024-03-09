@@ -120,7 +120,8 @@ public class EventServiceImplementation implements EventService {
         if (!events.isEmpty()) {
             node.put("message", "Event found");
             node.put("status", true);
-            node.put("events", mapper.valueToTree(events));
+            // node.put("events", mapper.valueToTree(events));
+            node.set("events", mapper.valueToTree(events));
         }
 
         return node;
