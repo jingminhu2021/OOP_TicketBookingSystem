@@ -102,6 +102,12 @@ public class UserServiceImplementation implements UserService {
         return userRepo.findAll();
     }
 
+    @Override
+    public void setTicketManager(int id) {
+        userRepo.setTicketManager(id); 
+        return;
+    }
+
     protected String getHash(String password, String salt){
         try{
             MessageDigest md = MessageDigest.getInstance("SHA-256");

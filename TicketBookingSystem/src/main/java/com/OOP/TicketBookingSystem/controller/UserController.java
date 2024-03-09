@@ -65,4 +65,9 @@ public class UserController {
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
+
+    @getMapping("/setTicketManager"){
+        public void setTicketManager(int id){
+        return userService.setTicketManager(id);
+    }
 }
