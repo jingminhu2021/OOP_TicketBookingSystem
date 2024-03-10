@@ -33,8 +33,8 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public void setTicketManager(int id) {
-        userRepo.setTicketManager(id); 
+    public void setTicketOfficer(int id) {
+        userRepo.setTicketOfficer(id); 
         return;
     }
 
