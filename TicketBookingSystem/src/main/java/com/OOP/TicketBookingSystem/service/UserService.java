@@ -15,4 +15,6 @@ public interface UserService {
 
     public void setTicketManager(int id);
 
+    public User getLoggedInUser();
+
 }

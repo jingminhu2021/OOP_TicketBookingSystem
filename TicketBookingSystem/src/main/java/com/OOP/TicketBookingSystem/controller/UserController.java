@@ -41,4 +41,10 @@ public class UserController {
     public void setTicketManager(int id) {
         userService.setTicketManager(id);
     }
+    
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/getLoggedInUser")
+    public User getLoggedInUser() {
+        return userService.getLoggedInUser();
+    }
 }
