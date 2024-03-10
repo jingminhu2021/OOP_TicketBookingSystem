@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @getMapping("/setTicketManager"){
-        public void setTicketManager(int id){
-        return userService.setTicketManager(id);
+    public void setTicketOfficer(int id){
+        return ;
     }
 }

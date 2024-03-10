@@ -17,6 +17,6 @@ public interface UserService {
 
     public List<User> getAllUsers();
 
-    public void setTicketManager(int id);
+    public void setTicketOfficer(int id);
 
 }
