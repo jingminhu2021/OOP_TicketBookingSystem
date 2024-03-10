@@ -1,9 +1,6 @@
 package com.OOP.TicketBookingSystem.controller;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,11 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,7 +54,7 @@ public class SecurityController {
     private BCryptPasswordEncoder encoder;
 
     @PostMapping("/login")
-    public JwtResponse login(@RequestBody LoginRequest request){
+    public JwtResponse login(@ModelAttribute LoginRequest request){
 
     
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
@@ -78,7 +74,7 @@ public class SecurityController {
     }
 
     @PostMapping("/createNewUser")
-    public ResponseEntity createNewUser(@RequestBody RegisterRequest request){
+    public ResponseEntity createNewUser(@ModelAttribute RegisterRequest request){
         String email = request.getEmail();
         Optional<User> userOptional = userRepo.findByOptEmail(email);
         if(userOptional.isPresent()){

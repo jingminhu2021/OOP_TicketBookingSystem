@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +20,7 @@ public class EventController {
 
     @PreAuthorize("hasRole('Event_Manager')")
     @RequestMapping("/createEvent")
-    public JsonNode createEvent(@RequestBody Event event) {
+    public JsonNode createEvent(@ModelAttribute Event event) {
 
         try {
             return eventService.createEvent(event);
@@ -32,7 +32,7 @@ public class EventController {
     
     @PreAuthorize("hasRole('Event_Manager')")
     @RequestMapping("/updateEvent")
-    public JsonNode updateEvent(@RequestBody Event event) {
+    public JsonNode updateEvent(@ModelAttribute Event event) {
         try {
             return eventService.updateEvent(event);
         } catch (Exception e) {
@@ -43,7 +43,7 @@ public class EventController {
 
     @PreAuthorize("hasRole('Event_Manager')")
     @RequestMapping("/viewEventByEventManager")
-    public JsonNode viewEventByEventManager(@RequestBody String body) {
+    public JsonNode viewEventByEventManager(@ModelAttribute String body) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);

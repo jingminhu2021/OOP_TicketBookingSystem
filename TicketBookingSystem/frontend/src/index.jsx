@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
 import Home from './pages/home.jsx';
+import Logout from './components/logout.jsx';
+
 
 import "./css/style.blue.css";
 import "./css/style.blue.min.css";
@@ -33,7 +35,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
     </BrowserRouter>
   )

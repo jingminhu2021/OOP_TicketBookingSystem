@@ -3,11 +3,9 @@ package com.OOP.TicketBookingSystem.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,12 +20,12 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/get")
-    public User getUserById(int id) {
+    public User getUserById(@ModelAttribute int id) {
         return userService.getUserById(id);
     }
 
     @GetMapping("/getEmail")
-    public User getUserByEmail(String email) {
+    public User getUserByEmail(@ModelAttribute String email) {
         return userService.getUserByEmail(email);
     }
     
@@ -38,7 +36,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('Event_Manager')")
     @GetMapping("/setTicketManager")
-    public void setTicketManager(int id) {
+    public void setTicketManager(@ModelAttribute int id) {
         userService.setTicketManager(id);
     }
     

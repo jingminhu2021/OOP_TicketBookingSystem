@@ -1,7 +1,22 @@
 import React from "react";
+import Login from "./login";
 import { Link } from "react-router-dom";
 
 function Navbar(){
+
+  function checkUser(){
+    if (sessionStorage.getItem('token') != null){
+      return(
+        <li className="nav-item"><a className="nav-link" href="/logout"> <i className="fas fa-user me-1 text-gray fw-normal"></i>Logout</a></li>
+      )
+    }else{
+      return(
+        // <li className="nav-item"><a className="nav-link" href="#!"> <i className="fas fa-user me-1 text-gray fw-normal"></i>Login</a></li>
+        <Login />
+      )
+    }
+  }
+
     return(
         <header className="header bg-white">
         <div className="container px-lg-3">
@@ -25,7 +40,7 @@ function Navbar(){
               <ul className="navbar-nav ms-auto">               
                 <li className="nav-item"><a className="nav-link" href="cart.html"> <i className="fas fa-dolly-flatbed me-1 text-gray"></i>Cart<small className="text-gray fw-normal">(2)</small></a></li>
                 <li className="nav-item"><a className="nav-link" href="#!"> <i className="far fa-heart me-1"></i><small className="text-gray fw-normal"> (0)</small></a></li>
-                <li className="nav-item"><a className="nav-link" href="#!"> <i className="fas fa-user me-1 text-gray fw-normal"></i>Login</a></li>
+                {checkUser()}
               </ul>
             </div>
           </nav>
