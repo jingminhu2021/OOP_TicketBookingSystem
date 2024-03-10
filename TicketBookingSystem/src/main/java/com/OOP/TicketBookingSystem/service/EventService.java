@@ -19,4 +19,6 @@ public interface EventService {
     public JsonNode updateEvent(Event event);
 
     public JsonNode viewEventByEventManager(JsonNode body);
+
+    public JsonNode cancelEventByManager(JsonNode body);
 }

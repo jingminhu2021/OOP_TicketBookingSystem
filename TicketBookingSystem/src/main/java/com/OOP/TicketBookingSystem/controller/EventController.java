@@ -54,4 +54,16 @@ public class EventController {
         return null;
     }
 
+    @PreAuthorize("hasRole('Event_Manager')")
+    @RequestMapping("/cancelEventByManager")
+    public JsonNode cancelEvent(@ModelAttribute String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.readTree(body);
+            return eventService.cancelEventByManager(jsonNode);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+    }
 }

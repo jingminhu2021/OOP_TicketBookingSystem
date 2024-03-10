@@ -28,6 +28,8 @@ public class Event {
     private String eventManagerName;
     @Column
     private String description;
+    @Column(columnDefinition = "varchar(255) default 'Active'")
+    private String status;
 
     public int getId() {
         return id;

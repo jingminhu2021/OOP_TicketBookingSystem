@@ -126,4 +126,39 @@ public class EventServiceImplementation implements EventService {
 
         return node;
     }
+
+    @Override
+    public JsonNode cancelEventByManager(JsonNode body) {
+        //To do:
+        // 1) check if event belong to the manager
+        // 2) check if event is not already cancelled
+        // 3) check if event is not already started
+        // 4) update the event status to cancelled
+        // 5) process refund to the customers (put in another function)
+        // 6) send email to the customers
+
+        // Data expectation
+        // 1) event_manager_name vs requested event manager name
+        // 2) status
+        // 3) date time
+
+        int id = body.get("id").intValue();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+
+        node.put("message", "Event not found");
+        node.put("status", false);
+
+        if (eventRepo.findById(id).orElse(null) != null) {
+            try {
+                eventRepo.deleteById(id);
+                node.put("message", "Successfully deleted Event");
+                node.put("status", true);
+            } catch (IllegalArgumentException e) {
+                node.put("message", e.toString());
+            }
+        }
+
+        return node;
+    }
 }
