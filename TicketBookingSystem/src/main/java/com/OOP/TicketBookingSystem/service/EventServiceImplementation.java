@@ -1,5 +1,6 @@
 package com.OOP.TicketBookingSystem.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -130,30 +131,48 @@ public class EventServiceImplementation implements EventService {
     @Override
     public JsonNode cancelEventByManager(JsonNode body) {
         //To do:
-        // 1) check if event belong to the manager
-        // 2) check if event is not already cancelled
-        // 3) check if event is not already started
-        // 4) update the event status to cancelled
+        // 1) check if event belong to the manager - done
+        // 2) check if event is not already cancelled - done
+        // 3) check if event is not already started - done
+        // 4) update the event status to cancelled - done
         // 5) process refund to the customers (put in another function)
         // 6) send email to the customers
 
         // Data expectation
-        // 1) event_manager_name vs requested event manager name
-        // 2) status
-        // 3) date time
+        // 1) requested event manager name
+        // 2) event_id
 
-        int id = body.get("id").intValue();
+        
+        int event_id = body.get("id").intValue();
+        String eventManagerName = body.get("eventManagerName").textValue();
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
         node.put("message", "Event not found");
         node.put("status", false);
 
-        if (eventRepo.findById(id).orElse(null) != null) {
+        if (eventRepo.findById(event_id).orElse(null) != null) {
             try {
-                eventRepo.deleteById(id);
-                node.put("message", "Successfully deleted Event");
-                node.put("status", true);
+                Event event = eventRepo.findById(event_id).get();
+                // check if event belong to the manager
+                if(event.getEventManagerName().equals(eventManagerName)){
+                    // check if event is not already started
+                    if(LocalDateTime.now().isAfter(event.getDateTime())){
+                        node.put("message", "Event already started");
+                    }else{
+                        // check if event is not already cancelled
+                        if(event.getStatus().equals("Cancelled")){
+                            node.put("message", "Event already cancelled");
+                        }else{
+                            event.setStatus("Cancelled");
+                            eventRepo.save(event);
+                            node.put("message", "Event successfully cancelled");
+                            node.put("status", true);
+                        }
+                    }
+                }else{
+                    node.put("message", "Invalid Event Manager");
+                }
             } catch (IllegalArgumentException e) {
                 node.put("message", e.toString());
             }
