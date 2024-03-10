@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,12 +20,12 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/get")
-    public User getUserById(@ModelAttribute int id) {
+    public User getUserById(@RequestBody int id) {
         return userService.getUserById(id);
     }
 
     @GetMapping("/getEmail")
-    public User getUserByEmail(@ModelAttribute String email) {
+    public User getUserByEmail(@RequestBody String email) {
         return userService.getUserByEmail(email);
     }
     
@@ -36,7 +36,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('Event_Manager')")
     @GetMapping("/setTicketManager")
-    public void setTicketManager(@ModelAttribute int id) {
+    public void setTicketManager(@RequestBody int id) {
         userService.setTicketManager(id);
     }
     
