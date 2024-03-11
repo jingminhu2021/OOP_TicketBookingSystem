@@ -26,31 +26,32 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
     @Override
     public JsonNode createTicketType(Ticket_Type ticket_type) {
         String eventCat = ticket_type.getEventCat();
+        String eventName = ticket_type.getEventName();
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
-        node.put("message", "Ticket Category already existed");
+        node.put("message", "Event does not exist");
         node.put("status", false);
 
-        // Check if event category already created for that particular event
-        if ((ticketTypeRepo.findByEventCat(eventCat) == null)) {
-            try {
-                ticketTypeRepo.save(ticket_type);
-                node.put("message", "Successfully created Ticket Type");
-                node.put("status", true);
+        // Check if event existed in the event table
+        if (eventRepo.findByExactEvent(eventName) != null){
+            // Check if event category already created for that particular event
+            if ((ticketTypeRepo.findByEventCat(eventCat, eventName) == null)) {
+                try {
+                    ticketTypeRepo.save(ticket_type);
+                    node.put("message", "Successfully created Ticket Type");
+                    node.put("status", true);
 
-                // Testing
-                // node.put("eventId", ticket_type.getEventId());
-                // node.put("getEventCat", ticket_type.getEventCat());
-                // node.put("getEventPrice", ticket_type.getEventPrice());
-                // node.put("getNumberOfTix", ticket_type.getNumberOfTix());
+                } catch (IllegalArgumentException e) {
+                    node.put("message", e.toString());
 
-            } catch (IllegalArgumentException e) {
-                node.put("message", e.toString());
-
-            } catch (OptimisticLockingFailureException e) {
-                node.put("message", e.toString());
+                } catch (OptimisticLockingFailureException e) {
+                    node.put("message", e.toString());
+                }
+            }
+            else {
+                node.put("message", "Ticket Category already existed");
             }
         }
 
