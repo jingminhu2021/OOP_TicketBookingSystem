@@ -1,7 +1,6 @@
 package com.OOP.TicketBookingSystem.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,94 +12,54 @@ import jakarta.persistence.Id;
 public class Ticket_Type {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int ticketTypeId;
     @Column
-    private String eventName;
+    private int eventId;
     @Column
-    private String venue;
+    private String eventCat;
     @Column
-    private LocalDateTime dateTime;
+    private BigDecimal eventPrice;
     @Column
-    private BigDecimal ticketPrice;
-    @Column
-    private int numberOfTicket;
-    @Column
-    private String eventManagerName;
-    @Column
-    private String description;
-    @Column(columnDefinition = "varchar(9) default 'Active'")
-    private String status="Active";
+    private int numberOfTix;
 
-    public int getId() {
-        return id;
+    public int getTicketTypeId() {
+        return ticketTypeId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setTicketTypeId(int ticketTypeId) {
+        this.ticketTypeId = ticketTypeId;
     }
 
-    public String getEventName() {
-        return eventName;
+    public int getEventId() {
+        return eventId;
     }
 
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
     }
 
-    public String getVenue() {
-        return venue;
+    public String getEventCat() {
+        return eventCat;
     }
 
-    public void setVenue(String venue) {
-        this.venue = venue;
+    public void setEventCat(String eventCat) {
+        this.eventCat = eventCat;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public BigDecimal getEventPrice() {
+        return eventPrice;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setEventPrice(BigDecimal eventPrice) {
+        this.eventPrice = eventPrice;
     }
 
-    public BigDecimal getTicketPrice() {
-        return ticketPrice;
+    public int getNumberOfTix() {
+        return numberOfTix;
     }
 
-    public void setTicketPrice(BigDecimal ticketPrice) {
-        this.ticketPrice = ticketPrice;
-    }
-
-    public int getNumberOfTicket() {
-        return numberOfTicket;
-    }
-
-    public void setNumberOfTicket(int numberOfTicket) {
-        this.numberOfTicket = numberOfTicket;
-    }
-
-    public String getEventManagerName() {
-        return eventManagerName;
-    }
-
-    public void setEventManagerName(String eventManagerName) {
-        this.eventManagerName = eventManagerName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setNumberOfTix(int numberOfTix) {
+        this.numberOfTix = numberOfTix;
     }
 
 }
