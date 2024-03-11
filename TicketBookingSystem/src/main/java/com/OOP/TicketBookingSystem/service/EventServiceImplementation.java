@@ -37,6 +37,11 @@ public class EventServiceImplementation implements EventService {
         node.put("message", "Event already existed");
         node.put("status", false);
 
+        if (LocalDateTime.now().plusDays(2).isAfter(event.getDateTime())){ 
+            node.put("message", "Event date must be at least 2 days from today");
+            return node;
+        }
+
         if ((eventRepo.findByExactEvent(eventName) == null)) {
             if (eventManagerRepo.findByName(managerName) != null) {
                 try {
@@ -79,16 +84,23 @@ public class EventServiceImplementation implements EventService {
         // Todo add check if event manager match
         int id = event.getId();
         String eventName = event.getEventName();
-        System.out.println(id);
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
         node.put("message", "Event not found");
         node.put("status", false);
+        if(!eventRepo.findById(id).get().getDateTime().isEqual(event.getDateTime())){ //check if date is changed
+            if (LocalDateTime.now().plusDays(2).isAfter(event.getDateTime())){ //if change then we should check if the new date is at least 2 days from today
+                node.put("message", "Event date must be at least 2 days from today");
+                return node;
+            }
+        }
 
         if (eventRepo.findById(id).orElse(null) != null) {
-            if (eventRepo.findByExactEvent(eventName) == null) {
+            int event_id = eventRepo.findByExactEvent(eventName).getId();
+
+            if (event_id == id) {
                 try {
                     eventRepo.save(event);
                     node.put("message", "Successfully updated Event");
@@ -99,7 +111,6 @@ public class EventServiceImplementation implements EventService {
 
                 } catch (OptimisticLockingFailureException e) {
                     node.put("message", e.toString());
-
                 }
             } else {
                 node.put("message", "Event name already exist");

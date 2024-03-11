@@ -32,6 +32,7 @@ public class EventController {
     public JsonNode createEvent(@RequestBody Event event) {
         User user = userService.getLoggedInUser();
         String managerName = user.getName();
+        
         try {
             return eventService.createEvent(event, managerName);
         } catch (Exception e) {
@@ -43,7 +44,9 @@ public class EventController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/updateEvent")
     public JsonNode updateEvent(@RequestBody Event event) {
-        
+        User user = userService.getLoggedInUser();
+        String managerName = user.getName();
+        event.setEventManagerName(managerName);
         try {
             return eventService.updateEvent(event);
         } catch (Exception e) {
