@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.OOP.TicketBookingSystem.model.User;
+import com.OOP.TicketBookingSystem.model.Ticket;
 import com.OOP.TicketBookingSystem.service.EmailService;
 import com.OOP.TicketBookingSystem.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class UserController {
     @Autowired
     private UserService userService;
-
+    
     @Autowired
     private EmailService emailService;
 
@@ -62,5 +63,11 @@ public class UserController {
             System.err.println(e);
         }
         return null;
+    }
+
+    @PreAuthorize("hasRole('Ticket_Officer')")
+    @GetMapping("/verifyTicket")
+    public boolean verifyTicket(@RequestBody int ticketId, int userId){
+        return userService.verifyTicket(ticketId, userId);
     }
 }

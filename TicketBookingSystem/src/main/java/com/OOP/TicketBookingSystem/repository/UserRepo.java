@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.OOP.TicketBookingSystem.model.Ticket;
 import com.OOP.TicketBookingSystem.model.User;
 
 @Repository
@@ -22,4 +23,7 @@ public interface UserRepo extends JpaRepository<User, Integer> {
     @Modifying
     @Query (value = "UPDATE User u set u.dtype='Ticketing_Officer' where u.id = :id", nativeQuery = true)
     public void setTicketOfficer(@Param("id")int id);
+
+    @Query(value = "SELECT * FROM ticket WHERE id=:ticketId and userId=:userId", nativeQuery = true)
+    public Ticket verifyTicket(@Param("ticketId") int ticketId, @Param("userId") int userId);
 }

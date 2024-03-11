@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.repository.UserRepo;
+import com.OOP.TicketBookingSystem.model.Ticket;
 
 @Service
 public class UserServiceImplementation implements UserService{
@@ -43,6 +44,14 @@ public class UserServiceImplementation implements UserService{
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         return getUserByEmail(email);
+    }
+
+    @Override
+    public boolean verifyTicket(int userId, int ticketId) {
+        if(userRepo.verifyTicket(userId, ticketId) instanceof Ticket){
+            return true;
+        } 
+        return false;
     }
 
 }

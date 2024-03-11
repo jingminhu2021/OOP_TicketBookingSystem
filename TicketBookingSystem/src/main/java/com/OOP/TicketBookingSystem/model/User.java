@@ -75,5 +75,4 @@ public class User {
     public void setWallet(BigDecimal wallet) {
         this.wallet = wallet;
     }
-
 }

@@ -24,6 +24,8 @@ public class Ticket {
     private BigDecimal totalCost;
     @Column
     private LocalDateTime bookingDateTime;
+    @Column
+    private int userId;
 
     // Getters
     public int getId() {
@@ -43,6 +45,10 @@ public class Ticket {
     }
     public LocalDateTime getBookingDateTime() {
         return bookingDateTime;
+    }
+
+    public int getUserId() {
+        return userId;
     }
     
     // Setters
