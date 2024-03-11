@@ -59,7 +59,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    // @PreAuthorize("hasRole('Event_Manager')")
+    @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/setTicketOfficer")
     public JsonNode setTicketOfficer(@RequestBody String body) {
         ObjectMapper mapper = new ObjectMapper();
@@ -67,8 +67,8 @@ public class UserController {
         try{
             JsonNode jsonNode = mapper.readTree(body);
             int userId = jsonNode.get("userId").asInt();
-            
-            return userService.setTicketOfficer(userId);
+            int eventId = jsonNode.get("eventId").asInt();
+            return userService.setTicketOfficer(userId, eventId);
         } catch (Exception e) {
             System.err.println(e);
         }

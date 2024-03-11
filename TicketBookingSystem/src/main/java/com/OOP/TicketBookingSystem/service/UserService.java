@@ -14,7 +14,7 @@ public interface UserService {
 
     public List<User> getAllUsers();
 
-    public JsonNode setTicketOfficer(int id);
+    public JsonNode setTicketOfficer(int userId, int eventId);
 
     public User getLoggedInUser();
 

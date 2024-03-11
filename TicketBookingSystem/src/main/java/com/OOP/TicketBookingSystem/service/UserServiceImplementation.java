@@ -13,12 +13,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.OOP.TicketBookingSystem.model.Ticket;
+import com.OOP.TicketBookingSystem.model.Ticket_Officer_Restriction;
+import com.OOP.TicketBookingSystem.repository.TicketOfficerRestrictionRepo;
 
 @Service
 public class UserServiceImplementation implements UserService{
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private TicketOfficerRestrictionRepo ticketOfficerRestrictionRepo;
 
     @Override
     public User getUserById(int id) {
@@ -37,14 +42,13 @@ public class UserServiceImplementation implements UserService{
 
     @Transactional
     @Override
-    public JsonNode setTicketOfficer(int id) {
-
+    public JsonNode setTicketOfficer(int userId, int eventId) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
         node.put("message", "No user found");
         node.put("status", false);
-        User user = getUserById(id);
+        User user = getUserById(userId);
         
         if (user != null){
             
@@ -52,9 +56,15 @@ public class UserServiceImplementation implements UserService{
                 node.put("message", "User is already a Ticket Officer");
             } else {
                 try {
-                    userRepo.setTicketOfficer(id);
+                    Ticket_Officer_Restriction restriction = new Ticket_Officer_Restriction();
+                    restriction.setUserId(userId);
+                    restriction.setEventId(eventId);
+                    ticketOfficerRestrictionRepo.save(restriction);
+                    userRepo.setTicketOfficer(userId);
+
                     node.put("message", "Successfully updated User to Ticket Officer");
                     node.put("status", true);
+                    
                 } catch (Exception e){
                     node.put("message", e.toString());
                 }
