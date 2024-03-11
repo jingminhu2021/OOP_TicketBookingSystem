@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.repository.UserRepo;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.OOP.TicketBookingSystem.model.Ticket;
 
 @Service
@@ -32,9 +35,28 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public void setTicketOfficer(int id) {
-        userRepo.setTicketOfficer(id); 
-        return;
+    public JsonNode setTicketOfficer(int id) {
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+
+        node.put("message", "No user found");
+        node.put("status", false);
+
+        if (userRepo.findById(id).orElse(null) == null){
+            User user = getUserById(id);
+            if (user.getClass().getSimpleName() == "Ticket_Officer"){
+                node.put("message", "User is already a Ticket Officer");
+            } else {
+                try {
+                    userRepo.setTicketOfficer(id);
+                    node.put("message", "Successfully updated User to Ticket Officer");
+                } catch (Exception e){
+                    node.put("message", e.toString());
+                }
+            }
+        }
+        return node;
     }
 
     @Override

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class UserController {
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private EmailService emailService;
 
@@ -52,10 +52,15 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PreAuthorize("hasRole('Event_Manager')")
-    @GetMapping("/setTicketManager")
-    public void setTicketOfficer(@RequestBody int id) {
-        userService.setTicketOfficer(id);
+    // @PreAuthorize("hasRole('Event_Manager')")
+    @PostMapping("/setTicketOfficer")
+    public JsonNode setTicketOfficer(@RequestBody int userId) {
+        try{
+            return userService.setTicketOfficer(userId);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
     }
     
     @PreAuthorize("hasRole('USER')")
