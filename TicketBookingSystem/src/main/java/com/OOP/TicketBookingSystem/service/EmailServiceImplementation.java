@@ -15,22 +15,20 @@ public class EmailServiceImplementation implements EmailService{
     @Autowired
     private JavaMailSender emailSender;
 
-    public JsonNode sendEmail(JsonNode body) {
-        String to = body.get("to").asText();
-        String subject = body.get("subject").asText();
-        String text = body.get("text").asText();
+    public JsonNode sendEmail(String email, String subject, String message) {
+
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
-
         try{
-            SimpleMailMessage message = new SimpleMailMessage();
+            SimpleMailMessage mail = new SimpleMailMessage();
 
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(text);
-            emailSender.send(message);
+            mail.setTo(email);
+            mail.setSubject(subject);
+            mail.setText(message);
+            emailSender.send(mail);
+
             node.put("message", "Email sent");
             node.put("status", true);
         }catch(Exception e){

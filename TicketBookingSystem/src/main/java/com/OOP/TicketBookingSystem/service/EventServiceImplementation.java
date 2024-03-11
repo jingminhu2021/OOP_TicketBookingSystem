@@ -24,6 +24,9 @@ public class EventServiceImplementation implements EventService {
     @Autowired
     private EventManagerRepo eventManagerRepo;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
     public JsonNode createEvent(Event event) {
         String eventName = event.getEventName();
@@ -148,8 +151,8 @@ public class EventServiceImplementation implements EventService {
         ObjectNode node = mapper.createObjectNode();
 
         node.put("message", "Event not found");
-        node.put("status", false);
-
+        boolean status = false;
+        
         if (eventRepo.findById(event_id).orElse(null) != null) {
             try {
                 Event event = eventRepo.findById(event_id).get();
@@ -166,7 +169,7 @@ public class EventServiceImplementation implements EventService {
                             event.setStatus("Cancelled");
                             eventRepo.save(event);
                             node.put("message", "Event successfully cancelled");
-                            node.put("status", true);
+                            status = true;
                         }
                     }
                 }else{
@@ -177,6 +180,20 @@ public class EventServiceImplementation implements EventService {
             }
         }
 
+        if(status){
+            // send email to the customers
+            // get all the emails of the customers who bought the ticket
+
+            // String [] emails = eventRepo.getCustomerEmails(event_id);
+            Event event = eventRepo.findById(event_id).get();
+            String subject = String.format("[Notice] %s Cancellation", event.getEventName());
+            String message = String.format("The event %s has been cancelled. We are sorry for the inconvenience. Your ticket will be refunded.%n Regards, Event Manager",event.getEventName());
+            // for(String email: emails){
+            //     emailService.sendEmail(email,subject,message);
+            // }
+        }
+
+        node.put("status", status);
         return node;
     }
 
