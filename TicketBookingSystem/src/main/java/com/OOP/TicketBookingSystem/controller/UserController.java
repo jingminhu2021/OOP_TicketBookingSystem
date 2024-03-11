@@ -61,8 +61,13 @@ public class UserController {
 
     // @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/setTicketOfficer")
-    public JsonNode setTicketOfficer(@RequestBody int userId) {
+    public JsonNode setTicketOfficer(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        
         try{
+            JsonNode jsonNode = mapper.readTree(body);
+            int userId = jsonNode.get("id").asInt();
+            
             return userService.setTicketOfficer(userId);
         } catch (Exception e) {
             System.err.println(e);

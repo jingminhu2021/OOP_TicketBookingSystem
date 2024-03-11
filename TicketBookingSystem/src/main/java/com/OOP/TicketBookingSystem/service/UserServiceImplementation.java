@@ -42,9 +42,10 @@ public class UserServiceImplementation implements UserService{
 
         node.put("message", "No user found");
         node.put("status", false);
-
-        if (userRepo.findById(id).orElse(null) == null){
-            User user = getUserById(id);
+        User user = getUserById(id);
+        
+        if (user != null){
+            
             if (user.getClass().getSimpleName() == "Ticket_Officer"){
                 node.put("message", "User is already a Ticket Officer");
             } else {
