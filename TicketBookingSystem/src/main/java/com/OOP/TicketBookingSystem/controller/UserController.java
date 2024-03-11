@@ -11,13 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.OOP.TicketBookingSystem.model.User;
+import com.OOP.TicketBookingSystem.service.EmailService;
 import com.OOP.TicketBookingSystem.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping("/get")
     public User getUserById(@RequestBody int id) {
@@ -44,5 +50,17 @@ public class UserController {
     @GetMapping("/getLoggedInUser")
     public User getLoggedInUser() {
         return userService.getLoggedInUser();
+    }
+
+    @GetMapping("/sendEmail")
+    public JsonNode sendEmail(@RequestBody String email) {
+        ObjectMapper mapper = new ObjectMapper();
+        try{
+            JsonNode jsonNode = mapper.readTree(email);
+            return emailService.sendEmail(jsonNode);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
     }
 }
