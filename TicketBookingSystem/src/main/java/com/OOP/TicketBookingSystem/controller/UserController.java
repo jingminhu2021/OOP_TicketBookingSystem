@@ -36,8 +36,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('Event_Manager')")
     @GetMapping("/setTicketManager")
-    public void setTicketManager(@RequestBody int id) {
-        userService.setTicketManager(id);
+    public void setTicketOfficer(@RequestBody int id) {
+        userService.setTicketOfficer(id);
     }
     
     @PreAuthorize("hasRole('USER')")
