@@ -28,9 +28,8 @@ public class EventServiceImplementation implements EventService {
     private EmailService emailService;
 
     @Override
-    public JsonNode createEvent(Event event) {
+    public JsonNode createEvent(Event event, String managerName) {
         String eventName = event.getEventName();
-        String eventManagerName = event.getEventManagerName();
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
@@ -39,8 +38,9 @@ public class EventServiceImplementation implements EventService {
         node.put("status", false);
 
         if ((eventRepo.findByExactEvent(eventName) == null)) {
-            if (eventManagerRepo.findByName(eventManagerName) != null) {
+            if (eventManagerRepo.findByName(managerName) != null) {
                 try {
+                    event.setEventManagerName(managerName);
                     eventRepo.save(event);
                     node.put("message", "Successfully created Event");
                     node.put("status", true);
@@ -110,13 +110,13 @@ public class EventServiceImplementation implements EventService {
     }
 
     @Override
-    public JsonNode viewEventByEventManager(JsonNode body) {
-        String eventManagerName = body.get("eventManagerName").textValue();
+    public JsonNode viewEventByEventManager(String ManagerName) {
+        
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         ObjectNode node = mapper.createObjectNode();
 
-        List<Event> events = eventRepo.findByEventManager(eventManagerName);
+        List<Event> events = eventRepo.findByEventManager(ManagerName);
 
         node.put("message", "No event found");
         node.put("status", false);
@@ -124,7 +124,6 @@ public class EventServiceImplementation implements EventService {
         if (!events.isEmpty()) {
             node.put("message", "Event found");
             node.put("status", true);
-            // node.put("events", mapper.valueToTree(events));
             node.set("events", mapper.valueToTree(events));
         }
 

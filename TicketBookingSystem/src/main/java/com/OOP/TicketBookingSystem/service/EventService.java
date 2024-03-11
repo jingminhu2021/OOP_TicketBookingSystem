@@ -8,7 +8,7 @@ import com.OOP.TicketBookingSystem.model.Event_Manager;
 
 public interface EventService {
 
-    public JsonNode createEvent(Event event);
+    public JsonNode createEvent(Event event, String managerName);
 
     public Event getEventById(int id);
 
@@ -18,7 +18,7 @@ public interface EventService {
 
     public JsonNode updateEvent(Event event);
 
-    public JsonNode viewEventByEventManager(JsonNode body);
+    public JsonNode viewEventByEventManager(String managerName);
 
     public JsonNode cancelEventByManager(JsonNode body);
 
