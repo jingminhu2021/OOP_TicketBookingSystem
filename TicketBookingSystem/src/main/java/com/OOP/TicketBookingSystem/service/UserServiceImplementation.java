@@ -54,6 +54,8 @@ public class UserServiceImplementation implements UserService{
             
             if (user.getClass().getSimpleName() == "Ticket_Officer"){
                 node.put("message", "User is already a Ticket Officer");
+            } else if (user.getClass().getSimpleName() == "Event_Manager"){
+                node.put("message", "User is an Event Manager, unable to set as Ticket Officer");
             } else {
                 try {
                     Ticket_Officer_Restriction restriction = new Ticket_Officer_Restriction();
@@ -64,7 +66,7 @@ public class UserServiceImplementation implements UserService{
 
                     node.put("message", "Successfully updated User to Ticket Officer");
                     node.put("status", true);
-                    
+
                 } catch (Exception e){
                     node.put("message", e.toString());
                 }
