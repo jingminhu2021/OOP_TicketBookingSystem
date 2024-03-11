@@ -66,7 +66,7 @@ public class UserController {
         
         try{
             JsonNode jsonNode = mapper.readTree(body);
-            int userId = jsonNode.get("id").asInt();
+            int userId = jsonNode.get("userId").asInt();
             
             return userService.setTicketOfficer(userId);
         } catch (Exception e) {
