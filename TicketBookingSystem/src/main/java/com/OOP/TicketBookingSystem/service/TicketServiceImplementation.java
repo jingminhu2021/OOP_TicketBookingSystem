@@ -32,7 +32,6 @@ public class TicketServiceImplementation implements TicketService {
 
     @Override
     public JsonNode bookTicket(Ticket ticket) {
-        System.out.println("Booking Ticket");
         String userEmail = ticket.getUserEmail();
         String eventName = ticket.getEventName();
         int purchaseTickets = ticket.getNumberOfTickets();
@@ -60,7 +59,18 @@ public class TicketServiceImplementation implements TicketService {
                         // Check if user has enough money
                         if (user.getWallet().compareTo(totalCost) >= 0) {
                             try {
+                                // Book ticket
                                 ticketRepo.save(ticket);
+
+                                // Update remaining event tickets
+                                event.setNumberOfTicket(event.getNumberOfTicket() - purchaseTickets);
+                                eventRepo.save(event);
+
+                                // Update user wallet
+                                user.setWallet(user.getWallet().subtract(totalCost));
+                                userRepo.save(user);
+
+                                // Print message
                                 node.put("message", "Successfully booked Ticket");
                                 node.put("status", true);
                             } catch (IllegalArgumentException e) {
@@ -69,6 +79,9 @@ public class TicketServiceImplementation implements TicketService {
                             } catch (OptimisticLockingFailureException e) {
                                 node.put("message", e.toString());
                             }
+                        }
+                        else {
+                            node.put("message", "Wallet has insufficient funds");
                         }
                     }
                     else {

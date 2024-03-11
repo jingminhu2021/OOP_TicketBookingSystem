@@ -9,6 +9,6 @@ import com.OOP.TicketBookingSystem.model.Ticket;
 
 @Repository
 public interface TicketRepo extends JpaRepository<Ticket, Integer> {
-    @Query(value = "SELECT * FROM ticket WHERE email=?",nativeQuery=true)
+    @Query(value = "SELECT * FROM ticket WHERE email=?", nativeQuery=true)
     public Ticket findByEmail(String email);
 }

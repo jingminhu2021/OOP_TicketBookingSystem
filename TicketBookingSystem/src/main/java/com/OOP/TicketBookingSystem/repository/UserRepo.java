@@ -16,7 +16,7 @@ public interface UserRepo extends JpaRepository<User, Integer> {
     @Query(value = "SELECT * FROM users WHERE email=?",nativeQuery=true)
     public Optional<User> findByOptEmail(String email);
     
-    // @Query(value = "SELECT * FROM users WHERE email=?",nativeQuery=true)
+    @Query(value = "SELECT * FROM users WHERE email=?",nativeQuery=true)
     public User findByEmail(String email);
 
     @Modifying
