@@ -24,10 +24,12 @@ public class EventServiceImplementation implements EventService {
     @Autowired
     private EventManagerRepo eventManagerRepo;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
-    public JsonNode createEvent(Event event) {
+    public JsonNode createEvent(Event event, String managerName) {
         String eventName = event.getEventName();
-        String eventManagerName = event.getEventManagerName();
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
@@ -35,9 +37,15 @@ public class EventServiceImplementation implements EventService {
         node.put("message", "Event already existed");
         node.put("status", false);
 
+        if (LocalDateTime.now().plusDays(2).isAfter(event.getDateTime())){ 
+            node.put("message", "Event date must be at least 2 days from today");
+            return node;
+        }
+
         if ((eventRepo.findByExactEvent(eventName) == null)) {
-            if (eventManagerRepo.findByName(eventManagerName) != null) {
+            if (eventManagerRepo.findByName(managerName) != null) {
                 try {
+                    event.setEventManagerName(managerName);
                     eventRepo.save(event);
                     node.put("message", "Successfully created Event");
                     node.put("status", true);
@@ -76,16 +84,23 @@ public class EventServiceImplementation implements EventService {
         // Todo add check if event manager match
         int id = event.getId();
         String eventName = event.getEventName();
-        System.out.println(id);
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
         node.put("message", "Event not found");
         node.put("status", false);
+        if(!eventRepo.findById(id).get().getDateTime().isEqual(event.getDateTime())){ //check if date is changed
+            if (LocalDateTime.now().plusDays(2).isAfter(event.getDateTime())){ //if change then we should check if the new date is at least 2 days from today
+                node.put("message", "Event date must be at least 2 days from today");
+                return node;
+            }
+        }
 
         if (eventRepo.findById(id).orElse(null) != null) {
-            if (eventRepo.findByExactEvent(eventName) == null) {
+            int event_id = eventRepo.findByExactEvent(eventName).getId();
+
+            if (event_id == id) {
                 try {
                     eventRepo.save(event);
                     node.put("message", "Successfully updated Event");
@@ -96,7 +111,6 @@ public class EventServiceImplementation implements EventService {
 
                 } catch (OptimisticLockingFailureException e) {
                     node.put("message", e.toString());
-
                 }
             } else {
                 node.put("message", "Event name already exist");
@@ -107,13 +121,13 @@ public class EventServiceImplementation implements EventService {
     }
 
     @Override
-    public JsonNode viewEventByEventManager(JsonNode body) {
-        String eventManagerName = body.get("eventManagerName").textValue();
+    public JsonNode viewEventByEventManager(String ManagerName) {
+        
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         ObjectNode node = mapper.createObjectNode();
 
-        List<Event> events = eventRepo.findByEventManager(eventManagerName);
+        List<Event> events = eventRepo.findByEventManager(ManagerName);
 
         node.put("message", "No event found");
         node.put("status", false);
@@ -121,7 +135,6 @@ public class EventServiceImplementation implements EventService {
         if (!events.isEmpty()) {
             node.put("message", "Event found");
             node.put("status", true);
-            // node.put("events", mapper.valueToTree(events));
             node.set("events", mapper.valueToTree(events));
         }
 
@@ -148,8 +161,8 @@ public class EventServiceImplementation implements EventService {
         ObjectNode node = mapper.createObjectNode();
 
         node.put("message", "Event not found");
-        node.put("status", false);
-
+        boolean status = false;
+        
         if (eventRepo.findById(event_id).orElse(null) != null) {
             try {
                 Event event = eventRepo.findById(event_id).get();
@@ -166,7 +179,7 @@ public class EventServiceImplementation implements EventService {
                             event.setStatus("Cancelled");
                             eventRepo.save(event);
                             node.put("message", "Event successfully cancelled");
-                            node.put("status", true);
+                            status = true;
                         }
                     }
                 }else{
@@ -177,6 +190,20 @@ public class EventServiceImplementation implements EventService {
             }
         }
 
+        if(status){
+            // send email to the customers
+            // get all the emails of the customers who bought the ticket
+
+            // String [] emails = eventRepo.getCustomerEmails(event_id);
+            Event event = eventRepo.findById(event_id).get();
+            String subject = String.format("[Notice] %s Cancellation", event.getEventName());
+            String message = String.format("The event %s has been cancelled. We are sorry for the inconvenience. Your ticket will be refunded.%n Regards, Event Manager",event.getEventName());
+            // for(String email: emails){
+            //     emailService.sendEmail(email,subject,message);
+            // }
+        }
+
+        node.put("status", status);
         return node;
     }
 

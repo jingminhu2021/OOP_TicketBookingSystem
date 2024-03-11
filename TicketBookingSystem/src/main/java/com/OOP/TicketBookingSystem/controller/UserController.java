@@ -59,17 +59,17 @@ public class UserController {
         return userService.getLoggedInUser();
     }
 
-    @GetMapping("/sendEmail")
-    public JsonNode sendEmail(@RequestBody String email) {
-        ObjectMapper mapper = new ObjectMapper();
-        try{
-            JsonNode jsonNode = mapper.readTree(email);
-            return emailService.sendEmail(jsonNode);
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-        return null;
-    }
+    // @GetMapping("/sendEmail")
+    // public JsonNode sendEmail(@RequestBody String email) {
+    //     ObjectMapper mapper = new ObjectMapper();
+    //     try{
+    //         JsonNode jsonNode = mapper.readTree(email);
+    //         return emailService.sendEmail(jsonNode);
+    //     } catch (Exception e) {
+    //         System.err.println(e);
+    //     }
+    //     return null;
+    // }
 
     @PreAuthorize("hasRole('Ticket_Officer')")
     @GetMapping("/verifyTicket")

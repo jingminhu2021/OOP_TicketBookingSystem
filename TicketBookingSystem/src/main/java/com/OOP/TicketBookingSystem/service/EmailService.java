@@ -4,6 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public interface EmailService {
 
-    public JsonNode sendEmail(JsonNode body);
+    public JsonNode sendEmail(String email, String subject, String message);
 
 }
