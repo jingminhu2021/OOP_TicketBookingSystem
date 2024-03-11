@@ -29,9 +29,16 @@ public class UserController {
     private EmailService emailService;
 
     @PostMapping("/get")
-    public User getUserById(@RequestBody String id) {
-        int int_id = Integer.parseInt(id);
-        return userService.getUserById(int_id);
+    public User getUserById(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        try{
+            JsonNode jsonNode = mapper.readTree(body);
+            int id = jsonNode.get("id").asInt();
+            return userService.getUserById(id);
+        }catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
     }
 
     @PostMapping("/getEmail")
