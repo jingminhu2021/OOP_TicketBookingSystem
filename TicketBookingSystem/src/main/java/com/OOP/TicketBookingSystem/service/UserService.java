@@ -4,6 +4,7 @@ import java.util.List;
 
 
 import com.OOP.TicketBookingSystem.model.User;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public interface UserService {
 
@@ -13,7 +14,7 @@ public interface UserService {
 
     public List<User> getAllUsers();
 
-    public void setTicketOfficer(int id);
+    public JsonNode setTicketOfficer(int id);
 
     public User getLoggedInUser();
 
