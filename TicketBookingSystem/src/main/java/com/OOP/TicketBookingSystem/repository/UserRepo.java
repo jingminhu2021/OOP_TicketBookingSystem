@@ -21,7 +21,7 @@ public interface UserRepo extends JpaRepository<User, Integer> {
     public User findByEmail(String email);
 
     @Modifying
-    @Query (value = "UPDATE User u set u.dtype='Ticketing_Officer' where u.id = :id", nativeQuery = true)
+    @Query (value = "UPDATE users u SET u.dtype='Ticketing_Officer' where u.id = :id", nativeQuery = true)
     public void setTicketOfficer(@Param("id")int id);
 
     @Query(value = "SELECT * FROM ticket WHERE id=:ticketId and userId=:userId", nativeQuery = true)
