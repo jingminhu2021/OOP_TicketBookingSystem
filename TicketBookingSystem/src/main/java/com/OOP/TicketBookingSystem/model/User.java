@@ -1,5 +1,13 @@
 package com.OOP.TicketBookingSystem.model;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -24,6 +32,8 @@ public class User {
     @Column
     @JsonIgnore
     private String password;
+    @Column(columnDefinition = "decimal(10, 2) default 1000.00")
+    private BigDecimal wallet;
 
 
     public int getId() {
@@ -56,6 +66,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public BigDecimal getWallet() {
+        return wallet;
+    }
+
+    public void setWallet(BigDecimal wallet) {
+        this.wallet = wallet;
     }
 
 }
