@@ -45,7 +45,7 @@ function Login(){
                 var status = response.request.status;
                 console.log(data);
 
-                if (status != 200) {
+                if (status !== 200) {
                     console.log(response);
                     console.log("here");
                     setIncorrect("d-block");
