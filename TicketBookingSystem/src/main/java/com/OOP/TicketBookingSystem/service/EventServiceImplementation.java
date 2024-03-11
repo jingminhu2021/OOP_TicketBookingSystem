@@ -179,4 +179,28 @@ public class EventServiceImplementation implements EventService {
 
         return node;
     }
+
+    @Override
+    public JsonNode viewEvent(JsonNode body) {
+        // Obtain event name
+        String eventName = body.get("eventName").textValue();
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        ObjectNode node = mapper.createObjectNode();
+
+        Event event = eventRepo.findByExactEvent(eventName);
+
+        node.put("message", "No event found");
+        node.put("status", false);
+
+        // Check if event exists
+        if (event != null) {
+            node.put("message", "Event found");
+            node.put("status", true);
+            node.set("event", mapper.valueToTree(event));
+        }
+
+        return node;
+    }
 }
