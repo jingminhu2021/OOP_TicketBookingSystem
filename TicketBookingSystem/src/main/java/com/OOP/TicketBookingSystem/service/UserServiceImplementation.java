@@ -16,8 +16,6 @@ public class UserServiceImplementation implements UserService{
     @Autowired
     private UserRepo userRepo;
 
-    
-
     @Override
     public User getUserById(int id) {
         return userRepo.findById(id).get();
