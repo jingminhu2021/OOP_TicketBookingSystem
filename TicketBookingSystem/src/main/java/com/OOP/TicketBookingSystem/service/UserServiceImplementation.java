@@ -54,6 +54,7 @@ public class UserServiceImplementation implements UserService{
                 try {
                     userRepo.setTicketOfficer(id);
                     node.put("message", "Successfully updated User to Ticket Officer");
+                    node.put("status", true);
                 } catch (Exception e){
                     node.put("message", e.toString());
                 }
