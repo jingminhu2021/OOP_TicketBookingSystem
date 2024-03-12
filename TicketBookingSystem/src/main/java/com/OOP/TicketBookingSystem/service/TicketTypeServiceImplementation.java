@@ -33,24 +33,33 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
         node.put("status", false);
 
         // Check if event existed in the event table
-        if (eventRepo.findById(eventId).orElse(null) != null){
-            // Check if event category already created for that particular event
-            if ((ticketTypeRepo.findByEventCat(eventCat, eventId) == null)) {
-                try {
-                    ticketTypeRepo.save(ticket_type);
-                    node.put("message", "Successfully created Ticket Type");
-                    node.put("status", true);
+        if (eventRepo.findById(eventId).orElse(null) == null){
+            return node;
+        }
 
-                } catch (IllegalArgumentException e) {
-                    node.put("message", e.toString());
+        // Check if event is cancelled
+        String status = eventRepo.findById(eventId).get().getStatus();
+        if (status.equals("Cancelled")){
+            node.put("message", "Event is cancelled");
+            return node;
+        }
 
-                } catch (OptimisticLockingFailureException e) {
-                    node.put("message", e.toString());
-                }
-            }
-            else {
-                node.put("message", "Ticket Category already existed");
-            }
+        // Check if event category already created for that particular event
+        if ((ticketTypeRepo.findByEventCat(eventCat, eventId) != null)) {
+            node.put("message", "Ticket Category already existed");
+            return node;
+        }
+
+        try {
+            ticketTypeRepo.save(ticket_type);
+            node.put("message", "Successfully created Ticket Type");
+            node.put("status", true);
+
+        } catch (IllegalArgumentException e) {
+            node.put("message", e.toString());
+
+        } catch (OptimisticLockingFailureException e) {
+            node.put("message", e.toString());
         }
 
         return node;
