@@ -21,15 +21,13 @@ public class Event {
     @Column
     private LocalDateTime dateTime;
     @Column
-    private BigDecimal ticketPrice;
-    @Column
-    private int numberOfTicket;
-    @Column
     private String eventManagerName;
     @Column
     private String description;
     @Column(columnDefinition = "varchar(9) default 'Active'")
     private String status="Active";
+    @Column
+    private String eventType;
 
     public int getId() {
         return id;
@@ -63,22 +61,6 @@ public class Event {
         this.dateTime = dateTime;
     }
 
-    public BigDecimal getTicketPrice() {
-        return ticketPrice;
-    }
-
-    public void setTicketPrice(BigDecimal ticketPrice) {
-        this.ticketPrice = ticketPrice;
-    }
-
-    public int getNumberOfTicket() {
-        return numberOfTicket;
-    }
-
-    public void setNumberOfTicket(int numberOfTicket) {
-        this.numberOfTicket = numberOfTicket;
-    }
-
     public String getEventManagerName() {
         return eventManagerName;
     }
@@ -102,5 +84,15 @@ public class Event {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    
 
 }

@@ -42,24 +42,27 @@ public class EventServiceImplementation implements EventService {
             return node;
         }
 
-        if ((eventRepo.findByExactEvent(eventName) == null)) {
-            if (eventManagerRepo.findByName(managerName) != null) {
-                try {
-                    event.setEventManagerName(managerName);
-                    eventRepo.save(event);
-                    node.put("message", "Successfully created Event");
-                    node.put("status", true);
-                } catch (IllegalArgumentException e) {
-                    node.put("message", e.toString());
-
-                } catch (OptimisticLockingFailureException e) {
-                    node.put("message", e.toString());
-                }
-            } else {
-                node.put("message", "Invalid Event Manager");
-            }
+        if (eventRepo.findByExactEvent(eventName) != null) {
+            node.put("message", "Event already exists");
+            return node;
         }
-
+        
+        if (eventManagerRepo.findByName(managerName) == null) {
+            node.put("message", "Invalid Event Manager");
+            return node;
+        }
+        
+        try {
+            event.setEventManagerName(managerName);
+            eventRepo.save(event);
+            node.put("message", "Successfully created Event");
+            node.put("status", true);
+        } catch (IllegalArgumentException e) {
+            node.put("message", e.toString());
+        } catch (OptimisticLockingFailureException e) {
+            node.put("message", e.toString());
+        }
+        
         return node;
     }
 
@@ -90,31 +93,33 @@ public class EventServiceImplementation implements EventService {
 
         node.put("message", "Event not found");
         node.put("status", false);
-        if(!eventRepo.findById(id).get().getDateTime().isEqual(event.getDateTime())){ //check if date is changed
-            if (LocalDateTime.now().plusDays(2).isAfter(event.getDateTime())){ //if change then we should check if the new date is at least 2 days from today
-                node.put("message", "Event date must be at least 2 days from today");
-                return node;
-            }
+
+
+        Event existingEvent = eventRepo.findById(id).orElse(null); //check if event exist
+        if (existingEvent == null) {
+            return node;
         }
 
-        if (eventRepo.findById(id).orElse(null) != null) {
-            int event_id = eventRepo.findByExactEvent(eventName).getId();
+        if (!existingEvent.getDateTime().isEqual(event.getDateTime()) //check if event date is at least 2 days from today
+            && LocalDateTime.now().plusDays(2).isAfter(event.getDateTime())) {
+            node.put("message", "Event date must be at least 2 days from today");
+            return node;
+        }
 
-            if (event_id == id) {
-                try {
-                    eventRepo.save(event);
-                    node.put("message", "Successfully updated Event");
-                    node.put("status", true);
+        Event eventWithSameName = eventRepo.findByExactEvent(eventName); //check if event name already exist and not the same event
+        if (eventWithSameName != null && eventWithSameName.getId() != id) {
+            node.put("message", "Event name already exist");
+            return node;
+        }
 
-                } catch (IllegalArgumentException e) {
-                    node.put("message", e.toString());
-
-                } catch (OptimisticLockingFailureException e) {
-                    node.put("message", e.toString());
-                }
-            } else {
-                node.put("message", "Event name already exist");
-            }
+        try {
+            eventRepo.save(event);
+            node.put("message", "Successfully updated Event");
+            node.put("status", true);
+        } catch (IllegalArgumentException e) {
+            node.put("message", e.toString());
+        } catch (OptimisticLockingFailureException e) {
+            node.put("message", e.toString());
         }
 
         return node;
