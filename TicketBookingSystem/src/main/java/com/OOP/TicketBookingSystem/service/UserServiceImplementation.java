@@ -51,25 +51,30 @@ public class UserServiceImplementation implements UserService{
         User user = getUserById(userId);
         
         if (user != null){
-            
-            if (user.getClass().getSimpleName() == "Ticket_Officer"){
+            String userClass = user.getClass().getSimpleName();
+
+            if (userClass == "Ticket_Officer"){
                 node.put("message", "User is already a Ticket Officer");
-            } else if (user.getClass().getSimpleName() == "Event_Manager"){
+                return node;
+
+            } else if (userClass == "Event_Manager"){
                 node.put("message", "User is an Event Manager, unable to set as Ticket Officer");
-            } else {
-                try {
-                    Ticket_Officer_Restriction restriction = new Ticket_Officer_Restriction();
-                    restriction.setUserId(userId);
-                    restriction.setEventId(eventId);
-                    ticketOfficerRestrictionRepo.save(restriction);
-                    userRepo.setTicketOfficer(userId);
+                return node;
+                
+            }
 
-                    node.put("message", "Successfully updated User to Ticket Officer");
-                    node.put("status", true);
+            try {
+                Ticket_Officer_Restriction restriction = new Ticket_Officer_Restriction();
+                restriction.setUserId(userId);
+                restriction.setEventId(eventId);
+                ticketOfficerRestrictionRepo.save(restriction);
+                userRepo.setTicketOfficer(userId);
 
-                } catch (Exception e){
-                    node.put("message", e.toString());
-                }
+                node.put("message", "Successfully updated User to Ticket Officer");
+                node.put("status", true);
+
+            } catch (Exception e){
+                node.put("message", e.toString());
             }
         }
         return node;

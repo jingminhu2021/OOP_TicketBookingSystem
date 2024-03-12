@@ -166,41 +166,42 @@ public class EventServiceImplementation implements EventService {
         ObjectNode node = mapper.createObjectNode();
 
         node.put("message", "Event not found");
-        boolean status = false;
+        node.put("status", false);
         
-        if (eventRepo.findById(event_id).orElse(null) != null) {
-            try {
-                Event event = eventRepo.findById(event_id).get();
-                // check if event belong to the manager
-                if(event.getEventManagerName().equals(eventManagerName)){
-                    // check if event is not already started
-                    if(LocalDateTime.now().isAfter(event.getDateTime())){
-                        node.put("message", "Event already started");
-                    }else{
-                        // check if event is not already cancelled
-                        if(event.getStatus().equals("Cancelled")){
-                            node.put("message", "Event already cancelled");
-                        }else{
-                            event.setStatus("Cancelled");
-                            eventRepo.save(event);
-                            node.put("message", "Event successfully cancelled");
-                            status = true;
-                        }
-                    }
-                }else{
-                    node.put("message", "Invalid Event Manager");
-                }
-            } catch (IllegalArgumentException e) {
-                node.put("message", e.toString());
-            }
+        Event event = eventRepo.findById(event_id).orElse(null);
+        if (event == null) {
+            return node;
         }
-
-        if(status){
+        
+        if (!event.getEventManagerName().equals(eventManagerName)) {
+            node.put("message", "Invalid Event Manager");
+            return node;
+        }
+        
+        if (LocalDateTime.now().isAfter(event.getDateTime())) {
+            node.put("message", "Event already started");
+            return node;
+        }
+        
+        if (event.getStatus().equals("Cancelled")) {
+            node.put("message", "Event already cancelled");
+            return node;
+        }
+        
+        try {
+            event.setStatus("Cancelled");
+            eventRepo.save(event);
+            node.put("message", "Event successfully cancelled");
+            node.put("status", true);
+        } catch (IllegalArgumentException e) {
+            node.put("message", e.toString());
+        }
+        
+        if(node.get("status").asBoolean()){
             // send email to the customers
             // get all the emails of the customers who bought the ticket
 
             // String [] emails = eventRepo.getCustomerEmails(event_id);
-            Event event = eventRepo.findById(event_id).get();
             String subject = String.format("[Notice] %s Cancellation", event.getEventName());
             String message = String.format("The event %s has been cancelled. We are sorry for the inconvenience. Your ticket will be refunded.%n Regards, Event Manager",event.getEventName());
             // for(String email: emails){
@@ -208,7 +209,6 @@ public class EventServiceImplementation implements EventService {
             // }
         }
 
-        node.put("status", status);
         return node;
     }
 
