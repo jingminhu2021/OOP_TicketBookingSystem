@@ -1,6 +1,5 @@
 package com.OOP.TicketBookingSystem.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
