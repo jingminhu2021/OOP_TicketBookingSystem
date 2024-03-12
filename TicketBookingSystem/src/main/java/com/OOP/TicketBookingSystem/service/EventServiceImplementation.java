@@ -171,19 +171,13 @@ public class EventServiceImplementation implements EventService {
         Event event = eventRepo.findById(event_id).orElse(null);
         if (event == null) {
             return node;
-        }
-        
-        if (!event.getEventManagerName().equals(eventManagerName)) {
+        }else if (!event.getEventManagerName().equals(eventManagerName)) {
             node.put("message", "Invalid Event Manager");
             return node;
-        }
-        
-        if (LocalDateTime.now().isAfter(event.getDateTime())) {
+        }else if (LocalDateTime.now().isAfter(event.getDateTime())) {
             node.put("message", "Event already started");
             return node;
-        }
-        
-        if (event.getStatus().equals("Cancelled")) {
+        }else if (event.getStatus().equals("Cancelled")) {
             node.put("message", "Event already cancelled");
             return node;
         }
