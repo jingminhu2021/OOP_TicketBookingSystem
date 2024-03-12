@@ -1,5 +1,6 @@
 package com.OOP.TicketBookingSystem.service;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
 import com.OOP.TicketBookingSystem.model.Event_Manager;
+import com.OOP.TicketBookingSystem.model.Ticket_Type;
 import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
 
@@ -86,6 +88,7 @@ public class EventServiceImplementation implements EventService {
     public JsonNode updateEvent(Event event) {
         // Todo add check if event manager match
         int id = event.getId();
+        System.out.println(id);
         String eventName = event.getEventName();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -94,10 +97,23 @@ public class EventServiceImplementation implements EventService {
         node.put("message", "Event not found");
         node.put("status", false);
 
-
         Event existingEvent = eventRepo.findById(id).orElse(null); //check if event exist
         if (existingEvent == null) {
             return node;
+        }
+
+        Field[] fields = Event.class.getDeclaredFields();
+        for (Field field : fields) { // Loop through all fields
+            field.setAccessible(true);
+            try {
+                Object newValue = field.get(event);
+                Object oldValue = field.get(existingEvent);
+                if (newValue == null) { // if new value is null, set it to the old value
+                    field.set(event, oldValue); 
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
 
         if (!existingEvent.getDateTime().isEqual(event.getDateTime()) //check if event date is at least 2 days from today

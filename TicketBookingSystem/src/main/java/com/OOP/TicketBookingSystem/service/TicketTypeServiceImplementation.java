@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.lang.reflect.Field;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
+import com.OOP.TicketBookingSystem.model.Event;
 import com.OOP.TicketBookingSystem.model.Ticket_Type;
 import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
@@ -60,6 +62,71 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
 
         } catch (OptimisticLockingFailureException e) {
             node.put("message", e.toString());
+        }
+
+        return node;
+    }
+
+    public JsonNode updateTicketType(Ticket_Type ticket_type) {
+        int ticketTypeId = ticket_type.getTicketTypeId();
+        int eventId = ticket_type.getEventId();
+        
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+
+        node.put("message", "Event does not exist");
+        node.put("status", false);
+
+        // Check if event existed in the event table
+        Event event = eventRepo.findById(eventId).orElse(null);
+        if (event != null){
+            String status = event.getStatus();
+            // Check if event is cancelled
+            if (status.equals("Cancelled")){
+                node.put("message", "Event is " + status);
+                return node;
+            }
+
+            // Check if ticket type existed in the ticket type table
+            if (ticketTypeRepo.findById(ticketTypeId).orElse(null) != null) {
+
+                Ticket_Type originalTicketType = ticketTypeRepo.findById(ticketTypeId).get();
+                
+                Field[] fields = Ticket_Type.class.getDeclaredFields();
+                
+                for (Field field : fields) { // Loop through all fields
+                    
+                    field.setAccessible(true);
+                    try {
+                        Object newValue = field.get(ticket_type);    
+                        Object oldValue = field.get(originalTicketType);
+
+                        if (newValue == null) { // If the new value is null, then set the old value
+                            field.set(ticket_type, oldValue); 
+                        }
+                    } catch (IllegalAccessException e) {
+                        node.put("message", e.toString());
+                        return node;
+                    }
+                }
+
+                try {
+                    
+                    ticketTypeRepo.save(ticket_type);
+                    node.put("message", "Successfully updated Ticket Type");
+                    node.put("status", true);
+
+                } catch (IllegalArgumentException e) {
+                    node.put("message", e.toString());
+
+                } catch (OptimisticLockingFailureException e) {
+                    node.put("message", e.toString());
+                }
+            }
+            else {
+                node.put("message", "Ticket Type does not exist");
+            }
         }
 
         return node;
