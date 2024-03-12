@@ -34,4 +34,16 @@ public class TicketTypeController {
         return null;
     }
 
+    @PreAuthorize("hasRole('Event_Manager')")
+    @PostMapping("/updateTicketType")
+    public JsonNode updateTicketType(@RequestBody Ticket_Type event) {
+    
+        try {
+            return eventService.updateTicketType(event);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+    }
+
 }

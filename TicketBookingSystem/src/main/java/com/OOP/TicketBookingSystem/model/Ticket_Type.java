@@ -17,10 +17,12 @@ public class Ticket_Type {
     private int eventId;
     @Column
     private String eventCat;
-    @Column
+    @Column(columnDefinition = "decimal(38, 2) default 0.00")
     private BigDecimal eventPrice;
+    @Column(columnDefinition = "decimal(10, 2) default 0.00")
+    private BigDecimal cancellationFeePercentage;
     @Column
-    private int numberOfTix;
+    private Integer numberOfTix;
 
     public int getTicketTypeId() {
         return ticketTypeId;
@@ -60,6 +62,14 @@ public class Ticket_Type {
 
     public void setNumberOfTix(int numberOfTix) {
         this.numberOfTix = numberOfTix;
+    }
+
+    public BigDecimal getCancellationFeePercentage() {
+        return cancellationFeePercentage;
+    }
+
+    public void setCancellationFeePercentage(BigDecimal cancellationFeePercentage) {
+        this.cancellationFeePercentage = cancellationFeePercentage;
     }
 
 }
