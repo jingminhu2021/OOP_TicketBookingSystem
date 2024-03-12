@@ -12,7 +12,7 @@ import com.OOP.TicketBookingSystem.repository.UserRepo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.OOP.TicketBookingSystem.model.Ticket;
+import com.OOP.TicketBookingSystem.model.Transaction;
 import com.OOP.TicketBookingSystem.model.Ticket_Officer_Restriction;
 import com.OOP.TicketBookingSystem.repository.TicketOfficerRestrictionRepo;
 
@@ -89,7 +89,7 @@ public class UserServiceImplementation implements UserService{
 
     @Override
     public boolean verifyTicket(int userId, int ticketId) {
-        if(userRepo.verifyTicket(userId, ticketId) instanceof Ticket){
+        if(userRepo.verifyTicket(userId, ticketId) instanceof Transaction){
             return true;
         } 
         return false;
