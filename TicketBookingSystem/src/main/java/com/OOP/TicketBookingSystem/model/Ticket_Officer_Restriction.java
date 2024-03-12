@@ -15,21 +15,27 @@ public class Ticket_Officer_Restriction {
     private int userId;
     @Column
     private int eventId;
+
     public int getId() {
         return id;
     }
+
     public void setId(int id) {
         this.id = id;
     }
+
     public int getUserId() {
         return userId;
     }
+
     public void setUserId(int userId) {
         this.userId = userId;
     }
+
     public int getEventId() {
         return eventId;
     }
+    
     public void setEventId(int eventId) {
         this.eventId = eventId;
     }
