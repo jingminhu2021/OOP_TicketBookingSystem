@@ -203,5 +203,11 @@ public class TransactionServiceImplementation implements TransactionService {
             node.put("message", e.toString());
         }
 
-    return node;
-}}
+        return node;
+    }
+
+    @Override
+    public List<Transaction> bookingHistory(int user_id){
+        return transactionRepo.findbyUserId(user_id);
+    }
+}

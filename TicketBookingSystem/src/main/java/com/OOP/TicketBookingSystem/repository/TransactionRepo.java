@@ -18,4 +18,7 @@ public interface TransactionRepo extends JpaRepository<Transaction, Integer> {
 
     @Query(value = "SELECT COALESCE(MAX(transaction_id), 0) FROM transaction", nativeQuery=true)
     public int getMaxTransactionId();
+
+    @Query(value = "SELECT * FROM transaction WHERE user_id=?", nativeQuery=true)
+    public List<Transaction> findbyUserId(int userId);
 }
