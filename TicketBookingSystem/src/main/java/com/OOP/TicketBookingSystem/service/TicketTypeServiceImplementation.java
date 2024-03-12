@@ -24,7 +24,7 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
     @Override
     public JsonNode createTicketType(Ticket_Type ticket_type) {
         String eventCat = ticket_type.getEventCat();
-        String eventName = ticket_type.getEventName();
+        int eventId = ticket_type.getEventId();
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
@@ -33,9 +33,9 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
         node.put("status", false);
 
         // Check if event existed in the event table
-        if (eventRepo.findByExactEvent(eventName) != null){
+        if (eventRepo.findEventById(eventId) != null){
             // Check if event category already created for that particular event
-            if ((ticketTypeRepo.findByEventCat(eventCat, eventName) == null)) {
+            if ((ticketTypeRepo.findByEventCat(eventCat, eventId) == null)) {
                 try {
                     ticketTypeRepo.save(ticket_type);
                     node.put("message", "Successfully created Ticket Type");

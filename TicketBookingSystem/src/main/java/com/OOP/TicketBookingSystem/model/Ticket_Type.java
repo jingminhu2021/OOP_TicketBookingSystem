@@ -14,7 +14,7 @@ public class Ticket_Type {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ticketTypeId;
     @Column
-    private String eventName;
+    private int eventId;
     @Column
     private String eventCat;
     @Column
@@ -30,12 +30,12 @@ public class Ticket_Type {
         this.ticketTypeId = ticketTypeId;
     }
 
-    public String getEventName() {
-        return eventName;
+    public int getEventId() {
+        return eventId;
     }
 
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
     }
 
     public String getEventCat() {

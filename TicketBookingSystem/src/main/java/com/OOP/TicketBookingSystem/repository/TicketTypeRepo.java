@@ -10,6 +10,6 @@ import com.OOP.TicketBookingSystem.model.Ticket_Type;
 @Repository
 public interface TicketTypeRepo extends JpaRepository<Ticket_Type, Integer> {
     
-    @Query(value = "SELECT * FROM ticket_type WHERE event_cat=? AND event_name=?", nativeQuery = true)
-    public Ticket_Type findByEventCat(String eventCat, String eventName);
+    @Query(value = "SELECT * FROM ticket_type WHERE event_cat=? AND event_id=?", nativeQuery = true)
+    public Ticket_Type findByEventCat(String eventCat, int eventId);
 }
