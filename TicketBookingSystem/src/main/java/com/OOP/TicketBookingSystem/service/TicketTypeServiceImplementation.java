@@ -33,7 +33,7 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
         node.put("status", false);
 
         // Check if event existed in the event table
-        if (eventRepo.findEventById(eventId) != null){
+        if (eventRepo.findById(eventId).orElse(null) != null){
             // Check if event category already created for that particular event
             if ((ticketTypeRepo.findByEventCat(eventCat, eventId) == null)) {
                 try {
