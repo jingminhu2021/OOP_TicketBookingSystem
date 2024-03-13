@@ -91,7 +91,7 @@ public class UserController {
     //     return null;
     // }
 
-    // @PreAuthorize("hasRole('Ticket_Officer')")
+    @PreAuthorize("hasRole('Ticket_Officer')")
     @GetMapping("/verifyTicket")
     public JsonNode verifyTicket(@RequestBody String body){
         ObjectMapper mapper = new ObjectMapper();
