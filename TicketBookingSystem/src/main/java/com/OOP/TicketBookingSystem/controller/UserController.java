@@ -91,9 +91,22 @@ public class UserController {
     //     return null;
     // }
 
-    @PreAuthorize("hasRole('Ticket_Officer')")
+    // @PreAuthorize("hasRole('Ticket_Officer')")
     @GetMapping("/verifyTicket")
-    public boolean verifyTicket(@RequestBody int ticketId, int userId){
-        return userService.verifyTicket(ticketId, userId);
+    public JsonNode verifyTicket(@RequestBody String body){
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            JsonNode jsonNode = mapper.readTree(body);
+            int userId = jsonNode.get("userId").asInt();
+            int eventId = jsonNode.get("eventId").asInt();
+            int ticketId = jsonNode.get("ticketId").asInt();
+            int ticketOfficerId = jsonNode.get("ticketOfficerId").asInt();
+            int ticketTypeId = jsonNode.get("ticketTypeId").asInt();
+            return userService.verifyTicket(userId, eventId, ticketId, ticketOfficerId, ticketTypeId);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
     }
 }

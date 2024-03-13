@@ -3,7 +3,9 @@ package com.OOP.TicketBookingSystem.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.OOP.TicketBookingSystem.model.Transaction;
@@ -21,4 +23,11 @@ public interface TransactionRepo extends JpaRepository<Transaction, Integer> {
 
     @Query(value = "SELECT * FROM transaction WHERE user_id=?", nativeQuery=true)
     public List<Transaction> findbyUserId(int userId);
+
+    @Query(value = "SELECT * FROM transaction WHERE ticket_id=?", nativeQuery=true)
+    public Transaction findByTicketId(int ticketId);
+
+    @Modifying
+    @Query (value = "UPDATE transaction t SET t.status='redeemed' where t.user_id=:userId and t.ticket_id=:ticketId and t.ticket_type_id=:ticketTypeId", nativeQuery = true)
+    public void updateTicketStatus(@Param("userId")int userId, @Param("ticketId")int ticketId, @Param("ticketTypeId") int ticketTypeId);
 }

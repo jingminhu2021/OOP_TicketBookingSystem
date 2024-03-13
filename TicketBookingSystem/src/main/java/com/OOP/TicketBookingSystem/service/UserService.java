@@ -18,4 +18,6 @@ public interface UserService {
 
     public User getLoggedInUser();
 
+    public JsonNode verifyTicket(int userId, int eventId, int ticketId, int ticketOfficerId, int ticketTypeId);
+
 }

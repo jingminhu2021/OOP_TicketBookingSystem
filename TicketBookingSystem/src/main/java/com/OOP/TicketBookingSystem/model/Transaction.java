@@ -25,6 +25,9 @@ public class Transaction {
     private String userEmail;
     @Column
     private int userId;
+    @Column
+    private String status;
+
 
     // Getters
     public int getTicketId() {
@@ -48,6 +51,10 @@ public class Transaction {
     public int getUserId() {
         return userId;
     }
+
+    public String getStatus() {
+        return status;
+    }
     
     // Setters
     public void setTicketId(int ticketId) {
@@ -70,6 +77,10 @@ public class Transaction {
     }
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
     
 }
