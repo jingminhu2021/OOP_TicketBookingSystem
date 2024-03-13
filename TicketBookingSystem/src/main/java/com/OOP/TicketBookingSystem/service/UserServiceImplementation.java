@@ -87,12 +87,4 @@ public class UserServiceImplementation implements UserService{
         return getUserByEmail(email);
     }
 
-    @Override
-    public boolean verifyTicket(int userId, int ticketId) {
-        if(userRepo.verifyTicket(userId, ticketId) instanceof Transaction){
-            return true;
-        } 
-        return false;
-    }
-
 }

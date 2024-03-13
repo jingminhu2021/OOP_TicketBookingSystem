@@ -18,6 +18,4 @@ public interface UserService {
 
     public User getLoggedInUser();
 
-    public boolean verifyTicket(int userId, int ticketId);
-
 }

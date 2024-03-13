@@ -22,7 +22,4 @@ public interface UserRepo extends JpaRepository<User, Integer> {
     @Modifying
     @Query (value = "UPDATE users u SET u.dtype='Ticketing_Officer' where u.id = :id", nativeQuery = true)
     public void setTicketOfficer(@Param("id")int id);
-
-    @Query(value = "SELECT * FROM ticket WHERE id=:ticketId and userId=:userId", nativeQuery = true)
-    public Transaction verifyTicket(@Param("ticketId") int ticketId, @Param("userId") int userId);
 }
