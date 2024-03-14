@@ -97,32 +97,39 @@ public class UserServiceImplementation implements UserService{
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
-        node.put("message", "No user found");
         node.put("status", false);
         User user = getUserById(userId);
-        
-        if (user!= null){
-            Transaction transaction = transactionRepo.findByTicketId(ticketId);
-            if (transaction==null){
-                node.put("message", "No ticket found");
-            } else {
-                Ticket_Officer_Restriction ticketOfficerRestriction = ticketOfficerRestrictionRepo.findByEventIdAndUserId(eventId, ticketOfficerId);
-                if (ticketOfficerRestriction==null){
-                    node.put("message", "Ticket officer does not have permission to validate ticket for this event");
-                } else {
-                    if (transaction.getStatus().equals("redeemed")){
-                        node.put("message", "Ticket already redeemed");
-                    } else if (transaction.getUserId()!=userId){
-                        node.put("message", "User does not own this ticket");
-                    } else {
-                        transactionRepo.updateTicketStatus(userId, ticketId, ticketTypeId);
-                        node.put("message", "Successfully redeemed ticket");
-                        node.put("status", true);
-                        return node;                       
-                    }
-                }
-            }
+        if (user==null){
+            node.put("message", "No user found");
+            return node;
         }
-        return node;
+
+        Transaction transaction = transactionRepo.findByTicketId(ticketId);
+        if (transaction==null){
+            node.put("message", "Transaction not found")
+            return node;
+        }
+
+        Ticket_Officer_Restriction ticketOfficerRestriction = ticketOfficerRestrictionRepo.findByEventIdAndUserId(eventId, ticketOfficerId);
+        if (ticketOfficerRestriction==null){
+            node.put("message", "Ticket officer does not have permission to validate ticket for this event");
+            return node;
+        }
+        
+        if (transaction.getStatus().equals("redeemed")){
+            node.put("message", "Ticket already redeemed");
+            return node;
+        }
+
+        if (transaction.getUserId()!=userId){
+            node.put("message", "User does not own this ticket");
+            return node;
+        }
+
+        transactionRepo.updateTicketStatus(userId, ticketId, ticketTypeId);
+        transactionRepo.updateTicketStatus(userId, ticketId, ticketTypeId);
+        node.put("message", "Successfully redeemed ticket");
+        node.put("status", true);
+        return node; 
     }
 }
