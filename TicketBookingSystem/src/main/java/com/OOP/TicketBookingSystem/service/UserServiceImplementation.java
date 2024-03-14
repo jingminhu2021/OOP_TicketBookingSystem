@@ -106,7 +106,7 @@ public class UserServiceImplementation implements UserService{
 
         Transaction transaction = transactionRepo.findByTicketId(ticketId);
         if (transaction==null){
-            node.put("message", "Transaction not found")
+            node.put("message", "Transaction not found");
             return node;
         }
 
@@ -125,11 +125,14 @@ public class UserServiceImplementation implements UserService{
             node.put("message", "User does not own this ticket");
             return node;
         }
-
-        transactionRepo.updateTicketStatus(userId, ticketId, ticketTypeId);
-        transactionRepo.updateTicketStatus(userId, ticketId, ticketTypeId);
-        node.put("message", "Successfully redeemed ticket");
-        node.put("status", true);
-        return node; 
+        try {
+            transactionRepo.updateTicketStatus(userId, ticketId, ticketTypeId);
+            node.put("message", "Successfully redeemed ticket");
+            node.put("status", true);
+            return node; 
+        } catch (Exception e) {
+            node.put("message", e.toString());
+            return node;
+        }
     }
 }
