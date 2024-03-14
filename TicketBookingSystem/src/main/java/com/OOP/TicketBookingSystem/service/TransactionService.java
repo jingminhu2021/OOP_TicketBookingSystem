@@ -12,4 +12,5 @@ public interface TransactionService {
 
     public List<Transaction> bookingHistory(int user_id);
     
+    public JsonNode onSiteBookTicket(JsonNode body);
 }

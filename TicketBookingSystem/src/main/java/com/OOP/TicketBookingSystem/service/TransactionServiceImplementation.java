@@ -12,6 +12,8 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
+import com.OOP.TicketBookingSystem.model.Ticket_Officer_Restriction;
+import com.OOP.TicketBookingSystem.repository.TicketOfficerRestrictionRepo;
 import com.OOP.TicketBookingSystem.model.Ticket_Type;
 import com.OOP.TicketBookingSystem.model.Transaction;
 import com.OOP.TicketBookingSystem.model.User;
@@ -36,6 +38,9 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Autowired
     private TicketTypeRepo ticketTypeRepo;
+
+    @Autowired
+    private TicketOfficerRestrictionRepo ticketOfficerRestrictionRepo;
 
     @Override
     public JsonNode bookTicket(JsonNode body) {
@@ -209,5 +214,36 @@ public class TransactionServiceImplementation implements TransactionService {
     @Override
     public List<Transaction> bookingHistory(int user_id){
         return transactionRepo.findbyUserId(user_id);
+    }
+
+    @Override
+    public JsonNode onSiteBookTicket(JsonNode body){
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+        node.put("status", false);
+
+        LocalDateTime dateNow = LocalDateTime.now();
+        String eventName = body.get("eventName").textValue();
+        Event event = eventRepo.findByExactEvent(eventName);
+        int eventId = event.getId();
+        LocalDateTime dateEvent = event.getDateTime();
+        int ticketOfficerId = body.get("ticketOfficerId").asInt();
+
+        if (!dateEvent.toLocalDate().isEqual(dateNow.toLocalDate())){
+            node.put("message", "Can only process on-site sales on event day");
+            return node;
+        }
+
+        Ticket_Officer_Restriction ticketOfficerRestriction = ticketOfficerRestrictionRepo.findByEventIdAndUserId(eventId, ticketOfficerId);
+        if (ticketOfficerRestriction==null){
+            node.put("message", "Ticket Officer has no permissions to sell tickets");
+            return node;
+        }
+
+        bookTicket(body);
+        node.put("message", "Successfully booked on-site ticket");
+        node.put("status", true);
+        return node;
     }
 }
