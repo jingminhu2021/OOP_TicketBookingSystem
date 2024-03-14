@@ -1,6 +1,7 @@
 package com.OOP.TicketBookingSystem.service;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,6 +20,8 @@ import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
 import com.OOP.TicketBookingSystem.model.Transaction;
 import com.OOP.TicketBookingSystem.repository.TransactionRepo;
+import com.OOP.TicketBookingSystem.model.Ticket_Type;
+import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
 
 @Service
 public class EventServiceImplementation implements EventService {
@@ -33,6 +36,9 @@ public class EventServiceImplementation implements EventService {
 
     @Autowired
     private TransactionRepo transactionRepo;
+
+    @Autowired
+    private TicketTypeRepo ticketTypeRepo;
 
     @Override
     public JsonNode createEvent(Event event, String managerName) {
@@ -282,9 +288,24 @@ public class EventServiceImplementation implements EventService {
             return node;
         }
 
+        // Get the total revenue
+        BigDecimal totalRevenue = BigDecimal.ZERO;
+        List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(eventId);
+
+        // Add prices of each ticket
+        for (Transaction t : transaction) {
+            for (Ticket_Type ticketType : ticketTypes) {
+                if (t.getTicketTypeId() == ticketType.getTicketTypeId()) {
+                    totalRevenue = totalRevenue.add(ticketType.getEventPrice());
+                    break;
+                }
+            }
+        }
+
         node.put("message", "Event found");
         node.put("status", true);
         node.put("ticketsSold", noOfTicketsSold);
+        node.put("totalRevenue", totalRevenue);
 
         return node;
     }

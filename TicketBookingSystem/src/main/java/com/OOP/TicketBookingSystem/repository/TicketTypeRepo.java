@@ -20,4 +20,7 @@ public interface TicketTypeRepo extends JpaRepository<Ticket_Type, Integer> {
 
     @Query(value = "SELECT event_cat FROM ticket_type WHERE event_id=?", nativeQuery = true)
     public List<String> getEventCats(int eventId);
+
+    @Query(value = "SELECT * FROM ticket_type WHERE event_id=?", nativeQuery = true)
+    public List<Ticket_Type> findByEventId(int eventId);
 }
