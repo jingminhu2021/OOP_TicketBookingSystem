@@ -27,6 +27,9 @@ public interface TransactionRepo extends JpaRepository<Transaction, Integer> {
     @Query(value = "SELECT * FROM transaction WHERE ticket_id=?", nativeQuery=true)
     public Transaction findByTicketId(int ticketId);
 
+    @Query(value = "SELECT * FROM transaction WHERE event_id=?", nativeQuery=true)
+    public List<Transaction> findByEventId(int eventId);
+
     @Modifying
     @Query (value = "UPDATE transaction t SET t.status='redeemed' where t.user_id=:userId and t.ticket_id=:ticketId and t.ticket_type_id=:ticketTypeId", nativeQuery = true)
     public void updateTicketStatus(@Param("userId")int userId, @Param("ticketId")int ticketId, @Param("ticketTypeId") int ticketTypeId);

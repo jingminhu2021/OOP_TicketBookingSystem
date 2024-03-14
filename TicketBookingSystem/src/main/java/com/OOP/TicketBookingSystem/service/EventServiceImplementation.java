@@ -17,6 +17,8 @@ import com.OOP.TicketBookingSystem.model.Event_Manager;
 import com.OOP.TicketBookingSystem.model.Ticket_Type;
 import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
+import com.OOP.TicketBookingSystem.model.Transaction;
+import com.OOP.TicketBookingSystem.repository.TransactionRepo;
 
 @Service
 public class EventServiceImplementation implements EventService {
@@ -28,6 +30,9 @@ public class EventServiceImplementation implements EventService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private TransactionRepo transactionRepo;
 
     @Override
     public JsonNode createEvent(Event event, String managerName) {
@@ -242,6 +247,44 @@ public class EventServiceImplementation implements EventService {
             node.put("status", true);
             node.set("event", mapper.valueToTree(event));
         }
+
+        return node;
+    }
+
+    @Override
+    public JsonNode viewSalesStatistics(JsonNode body) {
+        // Obtain event name
+        String eventName = body.get("eventName").textValue();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+
+        Event event = eventRepo.findByExactEvent(eventName);
+
+        node.put("message", "No event found");
+        node.put("status", false);
+
+        // Check if event exists
+        if (event == null) {
+            return node;
+        }
+
+        // Get the event id
+        int eventId = event.getId();
+
+        // Obtain number of tickets sold
+        List<Transaction> transaction = transactionRepo.findByEventId(eventId);
+        int noOfTicketsSold = transaction.size();
+
+        // Check if any tickets sold
+        if (noOfTicketsSold == 0) {
+            node.put("message", "No tickets sold");
+            return node;
+        }
+
+        node.put("message", "Event found");
+        node.put("status", true);
+        node.put("ticketsSold", noOfTicketsSold);
 
         return node;
     }
