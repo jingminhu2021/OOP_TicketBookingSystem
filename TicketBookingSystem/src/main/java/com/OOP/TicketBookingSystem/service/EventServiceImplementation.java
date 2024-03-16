@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -257,10 +258,12 @@ public class EventServiceImplementation implements EventService {
         return node;
     }
 
+    // Individual event sales statistics
     @Override
     public JsonNode viewSalesStatistics(JsonNode body) {
         // Obtain event name
         String eventName = body.get("eventName").textValue();
+        String eventManagerName = body.get("eventManagerName").textValue();
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
@@ -272,6 +275,11 @@ public class EventServiceImplementation implements EventService {
 
         // Check if event exists
         if (event == null) {
+            return node;
+        }
+
+        if (!event.getEventManagerName().equals(eventManagerName)) {
+            node.put("message", "Invalid Event Manager");
             return node;
         }
 
@@ -308,5 +316,69 @@ public class EventServiceImplementation implements EventService {
         node.put("totalRevenue", totalRevenue);
 
         return node;
+    }
+
+    // View all events sales statistics
+    @Override
+    public JsonNode viewAllSalesStatistics(JsonNode body) {
+        String eventManagerName = body.get("eventManagerName").textValue();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+        ArrayNode arrayNode = mapper.createArrayNode();
+
+        List<Event> events = eventRepo.findByEventManager(eventManagerName);
+
+        node.put("message", "No events found");
+        node.put("status", false);
+
+        // Check if any events exist
+        if (events.isEmpty()) {
+            return node;
+        }
+
+        // Loop through each event
+        for (Event event : events) {
+            BigDecimal totalRevenue = BigDecimal.ZERO;
+
+            int eventId = event.getId();
+
+            // Obtain number of tickets sold
+            List<Transaction> transaction = transactionRepo.findByEventId(eventId);
+            int noOfTicketsSold = transaction.size();
+
+            node = mapper.createObjectNode();
+
+            // Check if any tickets sold
+            if (noOfTicketsSold == 0) {
+                node.put("message", event.getEventName());
+                node.put("ticketsSold", noOfTicketsSold);
+                node.put("totalRevenue", totalRevenue);
+                node.put("status", true);
+                arrayNode.add(node);
+                continue;
+            }
+
+            // Get the total revenue
+            List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(eventId);
+
+            // Add prices of each ticket
+            for (Transaction t : transaction) {
+                for (Ticket_Type ticketType : ticketTypes) {
+                    if (t.getTicketTypeId() == ticketType.getTicketTypeId()) {
+                        totalRevenue = totalRevenue.add(ticketType.getEventPrice());
+                        break;
+                    }
+                }
+            }
+
+            node.put("message", event.getEventName());
+            node.put("ticketsSold", noOfTicketsSold);
+            node.put("totalRevenue", totalRevenue);
+            node.put("status", true);
+            arrayNode.add(node);
+        }
+
+        return arrayNode;
     }
 }
