@@ -249,11 +249,15 @@ public class EventServiceImplementation implements EventService {
         node.put("status", false);
 
         // Check if event exists
-        if (event != null) {
-            node.put("message", "Event found");
-            node.put("status", true);
-            node.set("event", mapper.valueToTree(event));
+        if (event == null) {
+            return node;
         }
+
+        // Return event + ticket types
+        node.put("message", "Event found");
+        node.put("status", true);
+        node.set("event", mapper.valueToTree(event));
+        node.set("ticketTypes", mapper.valueToTree(ticketTypeRepo.findByEventId(event.getId())));
 
         return node;
     }

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -130,5 +132,17 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
         }
 
         return node;
+    }
+
+    @Override
+    public List<Ticket_Type> viewTicketTypes(JsonNode body) {
+        // Get event
+        String eventName = body.get("eventName").textValue();
+        Event event = eventRepo.findByExactEvent(eventName);
+
+        // Get all ticket types for the event
+        List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(event.getId());   
+
+        return ticketTypes;
     }
 }
