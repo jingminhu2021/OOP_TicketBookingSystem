@@ -217,19 +217,16 @@ public class TransactionServiceImplementation implements TransactionService {
     }
 
     @Override
-    public JsonNode onSiteBookTicket(JsonNode body){
+    public JsonNode onSiteBookTicket(String userEmail, String eventName, List<String> eventCats, List<Integer> eachCatTickets, int ticketOfficerId){
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
         node.put("status", false);
 
         LocalDateTime dateNow = LocalDateTime.now();
-        String eventName = body.get("eventName").textValue();
         Event event = eventRepo.findByExactEvent(eventName);
         int eventId = event.getId();
         LocalDateTime dateEvent = event.getDateTime();
-        int ticketOfficerId = body.get("ticketOfficerId").asInt();
-
         if (!dateEvent.toLocalDate().isEqual(dateNow.toLocalDate())){
             node.put("message", "Can only process on-site sales on event day");
             return node;
@@ -241,7 +238,14 @@ public class TransactionServiceImplementation implements TransactionService {
             return node;
         }
 
+        ObjectMapper mapper2 = new ObjectMapper();
+        ObjectNode body = mapper.createObjectNode();
+        node.put("userEmail", userEmail);
+        node.put("eventName", eventName);
+        node.put("eventCats", eventCats);
+        node.put("eachCatTickets", eachCatTickets);
         bookTicket(body);
+        
         node.put("message", "Successfully booked on-site ticket");
         node.put("status", true);
         return node;

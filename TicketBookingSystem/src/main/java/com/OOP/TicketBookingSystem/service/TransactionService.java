@@ -12,5 +12,5 @@ public interface TransactionService {
 
     public List<Transaction> bookingHistory(int user_id);
     
-    public JsonNode onSiteBookTicket(JsonNode body);
+    public JsonNode onSiteBookTicket(String userEmail, String eventName, List<String> eventCats, List<Integer> eachCatTickets, int ticketOfficerId);
 }
