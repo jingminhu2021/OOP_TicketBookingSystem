@@ -42,6 +42,9 @@ public class TransactionServiceImplementation implements TransactionService {
     @Autowired
     private TicketOfficerRestrictionRepo ticketOfficerRestrictionRepo;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
     public JsonNode bookTicket(JsonNode body) {
         // JSON input: userEmail, eventName, eventCats, eachCatTickets
@@ -250,4 +253,123 @@ public class TransactionServiceImplementation implements TransactionService {
         node.put("status", true);
         return node;
     }
+
+    @Override
+    public JsonNode sendTicketDetailsEmail(String email, int transaction_id) {
+        // Fetch transaction details for the given email and transaction ID
+        List<Transaction> transactions = transactionRepo.findByEmailAndTransactionId(email, transaction_id);
+        User user = userRepo.findByEmail(email);
+
+        // Constructing the message
+        StringBuilder messageBuilder = new StringBuilder();
+
+        // Email styles
+        String emailStyle = "font-family: Arial, sans-serif; font-size: 14px;";
+
+        // Header styles
+        String headerStyle = "background-color: #f8f9fa; padding: 20px;";
+
+        // Table styles
+        String tableStyle = "border-collapse: collapse; width: 100%;";
+        String thStyle = "border: 1px solid #dddddd; text-align: left; padding: 8px;";
+        String tdStyle = "border: 1px solid #dddddd; text-align: left; padding: 8px;";
+
+        messageBuilder.append("<div style=\"").append(emailStyle).append("\">");
+        messageBuilder.append("<div style=\"").append(headerStyle).append("\">");
+        messageBuilder.append("<h2 style='color:#007bff;text-align: center;'>Ticket Purchase Confirmation</h2>");
+        messageBuilder.append("</div>");
+
+        messageBuilder.append("<div style=\"padding: 20px;\">");
+        messageBuilder.append("<p>Dear ").append(user.getName()).append(",</p>");
+        messageBuilder.append("<p>Thank you for your purchase! Below are the details of your tickets:</p>");
+        int transactionId = transactions.get(0).getTransactionId();
+        messageBuilder.append("<p><strong>Transaction ID: </strong>").append(transactionId).append("</p>");
+        // Extract booking date
+        LocalDateTime bookingDateTime = transactions.get(0).getBookingDateTime();
+        // Format the booking date and time 
+        String formattedBookingDateTime = bookingDateTime.format(DateTimeFormatter.ofPattern("MM-dd-yyyy, hh:mma (EEEE)"));
+        messageBuilder.append("<p><strong>Time of booking: </strong>").append(formattedBookingDateTime).append("</p>");
+        messageBuilder.append("<p><strong>You have purchased:</strong> ").append(transactions.size()).append(" ticket(s).</p><br>");
+
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (Transaction transaction : transactions) {
+            int ticketId = transaction.getTicketId();
+
+            // Adding a row for ticket details with a nested table for event details
+            messageBuilder.append("<table style=\"").append(tableStyle).append("\">");
+            messageBuilder.append("<tr>");
+            messageBuilder.append("<th style=\"").append(thStyle).append("; background-color: #f0f0f0;\">Ticket ID</th>");
+            messageBuilder.append("<td style=\"").append(tdStyle).append("; background-color: #ffffff;\">").append(ticketId).append("</td>");
+            messageBuilder.append("</tr>");
+            messageBuilder.append("<tr>");
+            messageBuilder.append("<th style=\"").append(thStyle).append("; background-color: #f0f0f0;\">Event Details</th>");
+            messageBuilder.append("<td style=\"").append(tdStyle).append("; background-color: #ffffff;\">");
+            // Start of nested table for event details
+            messageBuilder.append("<table style=\"").append(tableStyle).append("; background-color: #f8f8f8;\">");
+            // Add headers for event details
+            messageBuilder.append("<tr>");
+            messageBuilder.append("<th style=\"").append(thStyle).append("\">Event Name</th>");
+            messageBuilder.append("<th style=\"").append(thStyle).append("\">Venue</th>");
+            messageBuilder.append("<th style=\"").append(thStyle).append("\">Date and Time</th>");
+            messageBuilder.append("<th style=\"").append(thStyle).append("\">Event Manager</th>");
+            messageBuilder.append("<th style=\"").append(thStyle).append("\">Description</th>");
+            messageBuilder.append("<th style=\"").append(thStyle).append("\">Event Type</th>");
+            messageBuilder.append("<th style=\"").append(thStyle).append("\">Price</th>");
+            messageBuilder.append("</tr>");
+            
+            // Fetch event details for the transaction
+            Event event = eventRepo.findByEventId(transaction.getEventId());
+            String eventName = event.getEventName();
+            String venue = event.getVenue();
+            LocalDateTime eventDateTime = event.getDateTime();
+            // Format the event date and time 
+            String formattedEventDateTime = eventDateTime.format(DateTimeFormatter.ofPattern("MM-dd-yyyy, hh:mma (EEEE)"));
+            String eventManagerName = event.getEventManagerName();
+            String description = event.getDescription();
+            int ticket_type_id = transaction.getTicketTypeId();
+            int eventId = transaction.getEventId();
+            // Get ticket type name
+            String eventCat = ticketTypeRepo.findByTicketTypeId(ticket_type_id).getEventCat();
+            // Get ticket cat price of event
+            BigDecimal eventPrice = ticketTypeRepo.findByEventCat(eventCat, eventId).getEventPrice();
+            totalPrice = totalPrice.add(eventPrice);
+            
+            // Add data row for event details
+            messageBuilder.append("<tr>");
+            messageBuilder.append("<td style=\"").append(tdStyle).append("\">").append(eventName).append("</td>");
+            messageBuilder.append("<td style=\"").append(tdStyle).append("\">").append(venue).append("</td>");
+            messageBuilder.append("<td style=\"").append(tdStyle).append("\">").append(formattedEventDateTime).append("</td>");
+            messageBuilder.append("<td style=\"").append(tdStyle).append("\">").append(eventManagerName).append("</td>");
+            messageBuilder.append("<td style=\"").append(tdStyle).append("\">").append(description).append("</td>");
+            messageBuilder.append("<td style=\"").append(tdStyle).append("\">").append(eventCat).append("</td>");
+            messageBuilder.append("<td style=\"").append(tdStyle).append("\">").append("$ "+eventPrice).append("</td>");
+            messageBuilder.append("</tr>");
+            // End of nested table for event details
+            messageBuilder.append("</table>");
+            messageBuilder.append("</td>");
+            messageBuilder.append("</tr>");
+            messageBuilder.append("</table>").append("<br>");
+
+        }
+
+        messageBuilder.append("<div style=\"").append(headerStyle).append("\">");
+        messageBuilder.append("<h2 style='text-align: center;color: black'>Total Price: $ "+totalPrice+"<br></h2>");
+        messageBuilder.append("</div><br>");
+
+        messageBuilder.append("<p>If there are any issues with your booking, please contact 91234567 immediately.</p>");
+        messageBuilder.append("<p>Thank you for choosing our services!</p>");
+        messageBuilder.append("<p>Best regards,<br>(Company Name)</p>");
+        messageBuilder.append("</div>");
+        messageBuilder.append("</div>");
+
+        String message = messageBuilder.toString();
+
+        // Subject for the email
+        String subject = "Your Ticket Purchase Confirmation";
+
+        // Sending the email
+        // return emailService.sendEmail("hujingmin123@gmail.com", subject, message); // for testing - change to ur own email to receive it to ur email.
+        return emailService.sendEmail(email, subject, message);
+    }
+
 }

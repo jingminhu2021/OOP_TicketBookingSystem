@@ -20,4 +20,6 @@ public interface EventRepo extends JpaRepository<Event, Integer> {
     @Query(value = "SELECT * FROM event where event_name LIKE CONCAT('%', :name, '%')", nativeQuery = true)
     public List<Event> findBySimilarEvent(@Param("name") String name);
 
+    @Query(value = "SELECT * FROM event WHERE id=?", nativeQuery = true)
+    public Event findByEventId(int id);
 }

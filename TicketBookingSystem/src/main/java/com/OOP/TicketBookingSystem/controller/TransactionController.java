@@ -1,5 +1,6 @@
 package com.OOP.TicketBookingSystem.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 // import org.hibernate.mapping.List;
 
@@ -83,4 +84,20 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
     }
     return null;
     }
+
+    @PostMapping("/sendTicketDetailsEmail")
+    public JsonNode sendTicketDetailsEmail(@RequestBody String body){
+        ObjectMapper mapper = new ObjectMapper();
+        try{
+            JsonNode jsonNode = mapper.readTree(body);
+            String email = jsonNode.get("email").asText();
+            int transactionId = jsonNode.get("TransactionId").asInt();
+            return transactionService.sendTicketDetailsEmail(email, transactionId);
+        }
+        catch (Exception e){
+            System.err.println(e);
+        }
+        return null;
+    }
+    
 }
