@@ -392,9 +392,8 @@ public class TransactionServiceImplementation implements TransactionService {
         String subject = "Your Ticket Purchase Confirmation";
 
         // Sending the email
-        return emailService.sendEmailForTicketComfirm("hujingmin123@gmail.com", subject, message, ls); // for testing - change to ur own email to receive it to ur email.
-        // return emailService.sendEmail(email, subject, message);
+        // return emailService.sendEmailForTicketComfirm("hujingmin123@gmail.com", subject, message, ls); // for testing - change to ur own email to receive it to ur email.
+        return emailService.sendEmail(email, subject, message);
     }
-
 
 }
