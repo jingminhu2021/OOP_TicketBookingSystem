@@ -1,6 +1,8 @@
 package com.OOP.TicketBookingSystem.service;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -8,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
@@ -24,6 +28,15 @@ import com.OOP.TicketBookingSystem.repository.UserRepo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
 
 @Service
 public class TransactionServiceImplementation implements TransactionService {
@@ -292,6 +305,8 @@ public class TransactionServiceImplementation implements TransactionService {
         messageBuilder.append("<p><strong>You have purchased:</strong> ").append(transactions.size()).append(" ticket(s).</p><br>");
 
         BigDecimal totalPrice = BigDecimal.ZERO;
+        List<Integer> ls = new ArrayList<>();
+
         for (Transaction transaction : transactions) {
             int ticketId = transaction.getTicketId();
 
@@ -333,6 +348,9 @@ public class TransactionServiceImplementation implements TransactionService {
             // Get ticket cat price of event
             BigDecimal eventPrice = ticketTypeRepo.findByEventCat(eventCat, eventId).getEventPrice();
             totalPrice = totalPrice.add(eventPrice);
+
+            // add ticketId to ls
+            ls.add(ticketId);
             
             // Add data row for event details
             messageBuilder.append("<tr>");
@@ -346,6 +364,12 @@ public class TransactionServiceImplementation implements TransactionService {
             messageBuilder.append("</tr>");
             // End of nested table for event details
             messageBuilder.append("</table>");
+            messageBuilder.append("</td>");
+            messageBuilder.append("</tr>");
+            // Add Barcode
+            messageBuilder.append("<tr>");
+            messageBuilder.append("<td>");
+            messageBuilder.append("<img src='cid:"+ticketId+"' alt='"+ticketId+"'/>");
             messageBuilder.append("</td>");
             messageBuilder.append("</tr>");
             messageBuilder.append("</table>").append("<br>");
@@ -368,8 +392,28 @@ public class TransactionServiceImplementation implements TransactionService {
         String subject = "Your Ticket Purchase Confirmation";
 
         // Sending the email
-        // return emailService.sendEmail("hujingmin123@gmail.com", subject, message); // for testing - change to ur own email to receive it to ur email.
-        return emailService.sendEmail(email, subject, message);
+        return emailService.sendEmailForTicketComfirm("hujingmin123@gmail.com", subject, message, ls); // for testing - change to ur own email to receive it to ur email.
+        // return emailService.sendEmail(email, subject, message);
     }
+
+    // private void addInlineImage(StringBuilder messageBuilder, String imagePath) {
+    //     try {
+    //         // Read the image file and convert it to a byte array
+    //         Path path = Paths.get(imagePath);
+    //         byte[] imageBytes = Files.readAllBytes(path);
+    
+    //         // Encode the byte array to Base64
+    //         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+    
+    //         // Create the image tag with the Base64-encoded image data
+    //         String imgTag = "<img src=\"data:image/jpeg;base64," + base64Image + "\" alt=\"Ticket Barcode\">";
+    //         messageBuilder.append(imgTag);
+    
+    //     } catch (IOException e) {
+    //         // Handle the exception
+    //         e.printStackTrace();
+    //     }
+    // }
+    
 
 }
