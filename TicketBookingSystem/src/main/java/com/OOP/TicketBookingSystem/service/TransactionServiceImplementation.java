@@ -396,24 +396,5 @@ public class TransactionServiceImplementation implements TransactionService {
         // return emailService.sendEmail(email, subject, message);
     }
 
-    // private void addInlineImage(StringBuilder messageBuilder, String imagePath) {
-    //     try {
-    //         // Read the image file and convert it to a byte array
-    //         Path path = Paths.get(imagePath);
-    //         byte[] imageBytes = Files.readAllBytes(path);
-    
-    //         // Encode the byte array to Base64
-    //         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-    
-    //         // Create the image tag with the Base64-encoded image data
-    //         String imgTag = "<img src=\"data:image/jpeg;base64," + base64Image + "\" alt=\"Ticket Barcode\">";
-    //         messageBuilder.append(imgTag);
-    
-    //     } catch (IOException e) {
-    //         // Handle the exception
-    //         e.printStackTrace();
-    //     }
-    // }
-    
 
 }
