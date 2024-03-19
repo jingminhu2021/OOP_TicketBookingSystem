@@ -21,7 +21,9 @@ import com.OOP.TicketBookingSystem.model.Ticket_Type;
 import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
 import com.OOP.TicketBookingSystem.model.Transaction;
+import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.repository.TransactionRepo;
+import com.OOP.TicketBookingSystem.repository.UserRepo;
 import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
 
 @Service
@@ -37,6 +39,9 @@ public class EventServiceImplementation implements EventService {
 
     @Autowired
     private TransactionRepo transactionRepo;
+
+    @Autowired
+    private UserRepo userRepo;
 
     @Autowired
     private TicketTypeRepo ticketTypeRepo;
@@ -97,15 +102,20 @@ public class EventServiceImplementation implements EventService {
     }
 
     @Override
-    public List<String> getCustomerEmails(int event_id){
-        List<String> emails = new ArrayList<String>();
+    public List<Transaction> getTransaction(int event_id){
+        
         List<Transaction> transactions = transactionRepo.findByEventId(event_id);
 
-        for(Transaction transaction : transactions){
-            emails.add(transaction.getUserEmail());
-        }
+        return transactions;
+    }
 
-        return emails;
+    @Override
+    public List<String> getCustomerEmails(List<Transaction> transactions){
+        List<String> email = new ArrayList<>();
+        for(Transaction transaction: transactions){
+            email.add(transaction.getUserEmail());
+        }
+        return email;
     }
 
     @Override
@@ -187,24 +197,14 @@ public class EventServiceImplementation implements EventService {
     }
 
     @Override
-    public JsonNode cancelEventByManager(JsonNode body) {    // @Override
-        // public List<String> getCustomerEmails(int event_id){
-        //     List<String> emails = new ArrayList<String>();
-        //     List<transaction> transactions = transactionRepo.findByEventId(event_id);
-    
-        //     for(Transaction transaction : transactions){
-        //         emails.add(transaction.getEmail());
-        //     }
-    
-        //     return emails;
-        // }
+    public JsonNode cancelEventByManager(JsonNode body) {    
         //To do:
         // 1) check if event belong to the manager - done
         // 2) check if event is not already cancelled - done
         // 3) check if event is not already started - done
         // 4) update the event status to cancelled - done
         // 5) process refund to the customers (put in another function)
-        // 6) send email to the customers
+        // 6) send email to the customers - done
 
         // Data expectation
         // 1) requested event manager name
@@ -244,16 +244,62 @@ public class EventServiceImplementation implements EventService {
         if(node.get("status").asBoolean()){
             // send email to the customers
             // get all the emails of the customers who bought the ticket
+            List<Transaction> transactions = this.getTransaction(event_id);
+            List<Transaction> nonCancelled = new ArrayList<>();
 
-            // String [] emails = eventRepo.getCustomerEmails(event_id);
+            for(Transaction transaction: transactions){
+                if(transaction.getStatus().equals("active")){
+                    transaction.setStatus("cancelled");
+                    transactionRepo.save(transaction);
+                    nonCancelled.add(transaction);
+                }
+            }
+            
+            List<String> emails = this.getCustomerEmails(nonCancelled);
+
+            //refund
+            systemRefund(nonCancelled, true);
+
+            //Send Email
             String subject = String.format("[Notice] %s Cancellation", event.getEventName());
             String message = String.format("The event %s has been cancelled. We are sorry for the inconvenience. Your ticket will be refunded.%n Regards, Event Manager",event.getEventName());
-            // for(String email: emails){
-            //     emailService.sendEmail(email,subject,message);
-            // }
+            for(String email: emails){
+                emailService.sendEmail(email,subject,message);
+            }
+            
         }
 
         return node;
+    }
+
+    @Override
+    public boolean systemRefund(List<Transaction> transactions, boolean eventManager){
+        try{
+            for(Transaction transaction : transactions){
+
+                int ticketTypeID = transaction.getTicketTypeId();
+                Ticket_Type ticketType = ticketTypeRepo.findByTicketTypeId(ticketTypeID);
+                BigDecimal price = ticketType.getEventPrice();
+                String email = transaction.getUserEmail();
+                User user = userRepo.findByEmail(email);
+                BigDecimal wallet = user.getWallet();
+
+                if(!eventManager){ //if not cancel by event manager, then we will need to deduct the cancellation fee
+                    BigDecimal cancellationFeePercentage = ticketType.getCancellationFeePercentage();
+                    if(!cancellationFeePercentage.equals(BigDecimal.ZERO)){
+                        BigDecimal cancellationFee = price.divide(cancellationFeePercentage);
+                        price = price.subtract(cancellationFee);
+                    }    
+                }
+
+                user.setWallet(wallet.add(price));
+                userRepo.save(user);
+            }   
+            return true; 
+        }catch(Exception e){
+            System.err.println(e);
+            return false;
+        }
     }
 
     @Override

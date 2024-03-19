@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import com.OOP.TicketBookingSystem.model.Event;
 import com.OOP.TicketBookingSystem.model.Event_Manager;
+import com.OOP.TicketBookingSystem.model.Transaction;
 
 public interface EventService {
 
@@ -16,11 +17,15 @@ public interface EventService {
 
     public List<Event> getAllEvents();
 
-    public List<String> getCustomerEmails(int event_id);
+    public List<Transaction> getTransaction(int event_id);
+
+    public List<String> getCustomerEmails(List<Transaction> transactions);
 
     public JsonNode updateEvent(Event event);
 
     public JsonNode viewEventByEventManager(String managerName);
+
+    public boolean systemRefund(List<Transaction> transactions, boolean eventManager);
 
     public JsonNode cancelEventByManager(JsonNode body);
 
