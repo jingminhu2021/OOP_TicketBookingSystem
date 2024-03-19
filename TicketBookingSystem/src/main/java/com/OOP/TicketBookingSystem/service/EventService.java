@@ -16,6 +16,8 @@ public interface EventService {
 
     public List<Event> getAllEvents();
 
+    public List<String> getCustomerEmails(int event_id);
+
     public JsonNode updateEvent(Event event);
 
     public JsonNode viewEventByEventManager(String managerName);

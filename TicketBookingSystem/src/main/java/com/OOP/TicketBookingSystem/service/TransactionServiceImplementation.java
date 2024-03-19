@@ -1,9 +1,7 @@
 package com.OOP.TicketBookingSystem.service;
 
 import java.math.BigDecimal;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,18 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
-import com.OOP.TicketBookingSystem.model.Ticket_Officer_Restriction;
 import com.OOP.TicketBookingSystem.repository.TicketOfficerRestrictionRepo;
 import com.OOP.TicketBookingSystem.model.Ticket_Type;
 import com.OOP.TicketBookingSystem.model.Transaction;
 import com.OOP.TicketBookingSystem.model.User;
+import com.OOP.TicketBookingSystem.model.Ticket_Officer_Restriction;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
 import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
 import com.OOP.TicketBookingSystem.repository.TransactionRepo;
@@ -37,18 +33,11 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
+
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 @Service
 public class TransactionServiceImplementation implements TransactionService {
