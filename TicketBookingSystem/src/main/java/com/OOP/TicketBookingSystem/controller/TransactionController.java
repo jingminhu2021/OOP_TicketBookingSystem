@@ -52,7 +52,7 @@ public class TransactionController {
     }
 
 
-@PreAuthorize("hasRole('Ticket_Officer')")
+@PreAuthorize("hasRole('Ticketing_Officer')")
 @PostMapping("/onSiteBookTicket")
 public JsonNode onSiteBookTicket(@RequestBody String body){
     ObjectMapper mapper = new ObjectMapper();
