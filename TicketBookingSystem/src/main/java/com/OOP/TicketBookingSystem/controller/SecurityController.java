@@ -103,13 +103,13 @@ public class SecurityController {
                 eventManagerRepo.save(eventManager);
                 return ResponseEntity.ok("success");
         
-            case "Ticketing_Officer":
-                Ticketing_Officer ticketingOfficer = new Ticketing_Officer();
-                ticketingOfficer.setEmail(email);
-                ticketingOfficer.setName(request.getName());
-                ticketingOfficer.setPassword(encoder.encode(request.getPassword()));
-                ticketingOfficerRepo.save(ticketingOfficer);
-                return ResponseEntity.ok("success");
+            // case "Ticketing_Officer":
+            //     Ticketing_Officer ticketingOfficer = new Ticketing_Officer();
+            //     ticketingOfficer.setEmail(email);
+            //     ticketingOfficer.setName(request.getName());
+            //     ticketingOfficer.setPassword(encoder.encode(request.getPassword()));
+            //     ticketingOfficerRepo.save(ticketingOfficer);
+            //     return ResponseEntity.ok("success");
         
             default:
                 // Handle the case where className does not match any of the above
