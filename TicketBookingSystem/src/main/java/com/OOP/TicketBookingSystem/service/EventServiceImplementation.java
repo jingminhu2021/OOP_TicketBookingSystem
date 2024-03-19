@@ -322,7 +322,7 @@ public class EventServiceImplementation implements EventService {
             return node;
         }
 
-        // Get the total revenue
+        // Get the total revenue and attendance
         BigDecimal totalRevenue = BigDecimal.ZERO;
         List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(eventId);
 
@@ -336,10 +336,18 @@ public class EventServiceImplementation implements EventService {
             }
         }
 
+        // Attendance rate
+        int totalTickets = 0;
+        for (Ticket_Type ticketType : ticketTypes) {
+            totalTickets = totalTickets + ticketType.getNumberOfTix();
+        }
+        double attendanceRate = (double)noOfTicketsSold / (double)totalTickets;
+
         node.put("message", "Event found");
         node.put("status", true);
         node.put("ticketsSold", noOfTicketsSold);
         node.put("totalRevenue", totalRevenue);
+        node.put("attendanceRate", attendanceRate);
 
         return node;
     }
