@@ -128,9 +128,6 @@ public class TransactionServiceImplementation implements TransactionService {
 
         // Check if valid event categories
         for (String cat : ticketTypeRepo.getEventCats(eventId)) {
-            System.out.println("++++++++++++++++++++++++++++++++");
-            System.out.println(eventCats);
-            System.out.println(ticketTypeRepo.getEventCats(eventId));
             if (!eventCats.contains(cat)) {
                 node.put("message", "Invalid event category");
                 return node;
