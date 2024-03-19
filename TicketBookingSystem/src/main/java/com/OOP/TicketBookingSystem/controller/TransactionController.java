@@ -61,24 +61,8 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
     ObjectMapper mapper = new ObjectMapper();
     try {
         JsonNode jsonNode = mapper.readTree(body);
-        // JSON input: userEmail, eventName, eventCats, eachCatTickets
-        String userEmail = jsonNode.get("userEmail").textValue();
-        String eventName = jsonNode.get("eventName").textValue();
-        List<String> eventCats = new ArrayList<String>();
-        if (body.get("eventCats").isArray()) {
-            for (JsonNode cat : body.get("eventCats")) {
-                eventCats.add(cat.textValue());
-            }
-        }
-        List<Integer> eachCatTickets = new ArrayList<Integer>();
-        if (body.get("eachCatTickets").isArray()) {
-            for (JsonNode ticketAmt : body.get("eachCatTickets")) {
-                eachCatTickets.add(ticketAmt.intValue());
-                totalTickets += ticketAmt.intValue();
-            }
-        }
-        int ticketOfficerId = body.get("ticketOfficerId").asInt();
-        return transactionService.onSiteBookTicket(userEmail, eventName, eventCats, eachCatTickets, ticketOfficerId);
+        return transactionService.onSiteBookTicket(jsonNode);
+
     } catch (Exception e) {
         System.err.println(e);
     }
