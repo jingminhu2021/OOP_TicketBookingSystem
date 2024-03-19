@@ -34,6 +34,10 @@ public interface TransactionRepo extends JpaRepository<Transaction, Integer> {
     @Query (value = "UPDATE transaction t SET t.status='redeemed' where t.user_id=:userId and t.ticket_id=:ticketId and t.ticket_type_id=:ticketTypeId", nativeQuery = true)
     public void updateTicketStatus(@Param("userId")int userId, @Param("ticketId")int ticketId, @Param("ticketTypeId") int ticketTypeId);
 
+    @Modifying
+    @Query (value = "UPDATE transaction t SET t.status='cancelled' where t.ticket_id=:ticketId", nativeQuery = true)
+    public void updateTicketStatus(@Param("ticketId")int ticketId);
+
     @Query(value = "SELECT * FROM transaction WHERE user_email=? AND transaction_id = ?", nativeQuery=true)
     public List<Transaction> findByEmailAndTransactionId(String email, int transaction_id);
 }
