@@ -1,8 +1,10 @@
 package com.OOP.TicketBookingSystem.service;
 
 import java.math.BigDecimal;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -11,6 +13,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -28,15 +31,24 @@ import com.OOP.TicketBookingSystem.repository.UserRepo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 @Service
 public class TransactionServiceImplementation implements TransactionService {
@@ -57,6 +69,9 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Override
     public JsonNode bookTicket(JsonNode body) {
@@ -124,6 +139,9 @@ public class TransactionServiceImplementation implements TransactionService {
 
         // Check if valid event categories
         for (String cat : ticketTypeRepo.getEventCats(eventId)) {
+            System.out.println("++++++++++++++++++++++++++++++++");
+            System.out.println(eventCats);
+            System.out.println(ticketTypeRepo.getEventCats(eventId));
             if (!eventCats.contains(cat)) {
                 node.put("message", "Invalid event category");
                 return node;
@@ -214,6 +232,14 @@ public class TransactionServiceImplementation implements TransactionService {
             // Update user wallet
             user.setWallet(user.getWallet().subtract(totalCost));
             userRepo.save(user);
+
+            // Create QR Code for each tickets purchased -->NOTE:(For now only store ticketId, im planning to store the url of a verifyTicket web page(Still creating))
+            List<Transaction> ls = transactionRepo.findByEmail(userEmail);
+            for (Transaction transaction: ls){
+                int ticketId = transaction.getTicketId();
+                String text = "ticketId: "+ticketId;
+                generateQRCode(ticketId, text);
+            }
 
             node.put("message", "Successfully booked ticket(s)");
             node.put("status", true);
@@ -364,16 +390,8 @@ public class TransactionServiceImplementation implements TransactionService {
             messageBuilder.append("</tr>");
             // End of nested table for event details
             messageBuilder.append("</table>");
-            messageBuilder.append("</td>");
-            messageBuilder.append("</tr>");
-            // Add Barcode
-            messageBuilder.append("<tr>");
-            messageBuilder.append("<td>");
             messageBuilder.append("<img src='cid:"+ticketId+"' alt='"+ticketId+"'/>");
-            messageBuilder.append("</td>");
-            messageBuilder.append("</tr>");
             messageBuilder.append("</table>").append("<br>");
-
         }
 
         messageBuilder.append("<div style=\"").append(headerStyle).append("\">");
@@ -393,7 +411,34 @@ public class TransactionServiceImplementation implements TransactionService {
 
         // Sending the email
         // return emailService.sendEmailForTicketComfirm("hujingmin123@gmail.com", subject, message, ls); // for testing - change to ur own email to receive it to ur email.
-        return emailService.sendEmail(email, subject, message);
+        return emailService.sendEmailForTicketComfirm(email, subject, message, ls);
     }
 
+    public void generateQRCode(int ticketId, String text) {
+        try {
+            // Get the resource representing the "resources/ticket_qrcodes" directory
+            Resource resource = resourceLoader.getResource("classpath:ticket_qrcodes/");
+            Path ticketQrcodesDir = resource.getFile().toPath();
+
+            // Construct the path for the QR code file
+            String qrCodeName = ticketId + ".png";
+            Path qrCodePath = ticketQrcodesDir.resolve(qrCodeName);
+
+            // Generate the QR code
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(
+                    text,
+                    BarcodeFormat.QR_CODE, 400, 400);
+
+            // Write the QR code image to the file
+            try (OutputStream outputStream = Files.newOutputStream(qrCodePath, StandardOpenOption.CREATE)) {
+                MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+            }
+
+            System.out.println("QR Code generated successfully at: " + qrCodePath);
+        } catch (IOException | WriterException e) {
+            System.err.println("Error generating QR Code: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

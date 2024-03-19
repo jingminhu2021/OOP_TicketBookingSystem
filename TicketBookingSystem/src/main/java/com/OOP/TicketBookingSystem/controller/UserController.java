@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -91,22 +92,20 @@ public class UserController {
     //     return null;
     // }
 
-    @PreAuthorize("hasRole('Ticket_Officer')")
+    @PreAuthorize("hasRole('Ticketing_Officer')")
     @GetMapping("/verifyTicket")
-    public JsonNode verifyTicket(@RequestBody String body){
-        ObjectMapper mapper = new ObjectMapper();
-
+    public JsonNode verifyTicket(@RequestParam int userId, 
+                                @RequestParam int eventId, 
+                                @RequestParam int ticketId, 
+                                @RequestParam int ticketOfficerId, 
+                                @RequestParam int ticketTypeId) {
         try {
-            JsonNode jsonNode = mapper.readTree(body);
-            int userId = jsonNode.get("userId").asInt();
-            int eventId = jsonNode.get("eventId").asInt();
-            int ticketId = jsonNode.get("ticketId").asInt();
-            int ticketOfficerId = jsonNode.get("ticketOfficerId").asInt();
-            int ticketTypeId = jsonNode.get("ticketTypeId").asInt();
             return userService.verifyTicket(userId, eventId, ticketId, ticketOfficerId, ticketTypeId);
         } catch (Exception e) {
             System.err.println(e);
         }
         return null;
     }
+
+
 }
