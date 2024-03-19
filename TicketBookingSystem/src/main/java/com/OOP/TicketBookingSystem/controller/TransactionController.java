@@ -100,4 +100,19 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
         return null;
     }
     
+    @PostMapping("/generateQRCode")
+    public JsonNode generateQRCode(@RequestBody String body){
+        ObjectMapper mapper = new ObjectMapper();
+        try{
+            JsonNode jsonNode = mapper.readTree(body);
+            int ticketId = jsonNode.get("ticketId").asInt();
+            String text = jsonNode.get("text").asText();
+            transactionService.generateQRCode(ticketId, text);
+        }
+        catch (Exception e){
+            System.err.println(e);
+        }
+        return null;
+    }
+
 }

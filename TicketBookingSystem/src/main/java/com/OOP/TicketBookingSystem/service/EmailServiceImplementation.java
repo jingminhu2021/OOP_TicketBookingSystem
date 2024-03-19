@@ -62,12 +62,13 @@ public class EmailServiceImplementation implements EmailService {
             helper.setText(message, true); // Set content as HTML
     
             // Loop through each ticket ID in the list and attach the corresponding image
-            for (int i = 0; i < ticketIds.size(); i++) {
-                int ticketId = ticketIds.get(i);
-                String imageContentId = ""+(i + 1); // Content-ID for the image
+            for (int cid: ticketIds) {
+                String imageContentId = "" + cid; // Content-ID for the image
+
+                System.out.println(imageContentId);
     
                 // Attach the image based on the ticket ID
-                String imagePath = "ticket_barcodes/" + ticketId + ".png";
+                String imagePath = "ticket_qrcodes/" + cid + ".png";
                 ClassPathResource imageResource = new ClassPathResource(imagePath);
                 helper.addInline(imageContentId, imageResource, "image/png");
             }
