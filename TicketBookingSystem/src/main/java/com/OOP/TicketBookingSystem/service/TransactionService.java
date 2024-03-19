@@ -16,5 +16,5 @@ public interface TransactionService {
 
     public JsonNode sendTicketDetailsEmail(String email, int transaction_id);
     
-    public void generateQRCode(int ticketId, String text);
+    public JsonNode generateQRCode(int ticketId, String text);
 }

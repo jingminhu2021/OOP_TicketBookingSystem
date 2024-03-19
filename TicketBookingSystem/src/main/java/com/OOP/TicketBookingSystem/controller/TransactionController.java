@@ -88,7 +88,7 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
             JsonNode jsonNode = mapper.readTree(body);
             int ticketId = jsonNode.get("ticketId").asInt();
             String text = jsonNode.get("text").asText();
-            transactionService.generateQRCode(ticketId, text);
+            return transactionService.generateQRCode(ticketId, text);
         }
         catch (Exception e){
             System.err.println(e);

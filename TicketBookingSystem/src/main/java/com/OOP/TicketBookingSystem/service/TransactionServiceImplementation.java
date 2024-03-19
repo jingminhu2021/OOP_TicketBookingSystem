@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import java.nio.file.Path;
-import org.springframework.core.io.Resource;
+import java.nio.file.Paths;
 
 @Service
 public class TransactionServiceImplementation implements TransactionService {
@@ -396,15 +396,18 @@ public class TransactionServiceImplementation implements TransactionService {
         return emailService.sendEmailForTicketComfirm(email, subject, message, ls);
     }
 
-    public void generateQRCode(int ticketId, String text) {
+    @Override
+    public JsonNode generateQRCode(int ticketId, String text) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode node = objectMapper.createObjectNode();
         try {
-            // Get the resource representing the "resources/ticket_qrcodes" directory
-            Resource resource = resourceLoader.getResource("classpath:ticket_qrcodes/");
-            Path ticketQrcodesDir = resource.getFile().toPath();
+            // Create a directory if it doesn't exist
+            Path qrCodeDir = Paths.get("src/main/resources/static/qrcodes");
+            Files.createDirectories(qrCodeDir);
 
             // Construct the path for the QR code file
             String qrCodeName = ticketId + ".png";
-            Path qrCodePath = ticketQrcodesDir.resolve(qrCodeName);
+            Path qrCodePath = qrCodeDir.resolve(qrCodeName);
 
             // Generate the QR code
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -416,11 +419,15 @@ public class TransactionServiceImplementation implements TransactionService {
             try (OutputStream outputStream = Files.newOutputStream(qrCodePath, StandardOpenOption.CREATE)) {
                 MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
             }
-
-            System.out.println("QR Code generated successfully at: " + qrCodePath);
+            String qrCodeFilePath = qrCodePath.toString();
+            node.put("success", true);
+            node.put("message", "QR Code generated successfully");
+            node.put("qrCodeFilePath", qrCodeFilePath);
         } catch (IOException | WriterException e) {
-            System.err.println("Error generating QR Code: " + e.getMessage());
-            e.printStackTrace();
+            node.put("success", false);
+            node.put("message", "Error generating QR Code: " + e.getMessage());
         }
+        return node;
     }
+
 }
