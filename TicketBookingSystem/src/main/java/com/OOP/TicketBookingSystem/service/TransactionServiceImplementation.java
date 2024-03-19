@@ -1,9 +1,7 @@
 package com.OOP.TicketBookingSystem.service;
 
 import java.math.BigDecimal;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,14 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
-import com.OOP.TicketBookingSystem.model.Ticket_Officer_Restriction;
 import com.OOP.TicketBookingSystem.repository.TicketOfficerRestrictionRepo;
 import com.OOP.TicketBookingSystem.model.Ticket_Type;
 import com.OOP.TicketBookingSystem.model.Transaction;
@@ -37,18 +32,11 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
+
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Base64;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 @Service
 public class TransactionServiceImplementation implements TransactionService {
@@ -258,40 +246,40 @@ public class TransactionServiceImplementation implements TransactionService {
         return transactionRepo.findbyUserId(user_id);
     }
 
-    @Override
-    public JsonNode onSiteBookTicket(String userEmail, String eventName, List<String> eventCats, List<Integer> eachCatTickets, int ticketOfficerId){
+    // @Override
+    // public JsonNode onSiteBookTicket(String userEmail, String eventName, List<String> eventCats, List<Integer> eachCatTickets, int ticketOfficerId){
 
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node = mapper.createObjectNode();
-        node.put("status", false);
+    //     ObjectMapper mapper = new ObjectMapper();
+    //     ObjectNode node = mapper.createObjectNode();
+    //     node.put("status", false);
 
-        LocalDateTime dateNow = LocalDateTime.now();
-        Event event = eventRepo.findByExactEvent(eventName);
-        int eventId = event.getId();
-        LocalDateTime dateEvent = event.getDateTime();
-        if (!dateEvent.toLocalDate().isEqual(dateNow.toLocalDate())){
-            node.put("message", "Can only process on-site sales on event day");
-            return node;
-        }
+    //     LocalDateTime dateNow = LocalDateTime.now();
+    //     Event event = eventRepo.findByExactEvent(eventName);
+    //     int eventId = event.getId();
+    //     LocalDateTime dateEvent = event.getDateTime();
+    //     if (!dateEvent.toLocalDate().isEqual(dateNow.toLocalDate())){
+    //         node.put("message", "Can only process on-site sales on event day");
+    //         return node;
+    //     }
 
-        Ticket_Officer_Restriction ticketOfficerRestriction = ticketOfficerRestrictionRepo.findByEventIdAndUserId(eventId, ticketOfficerId);
-        if (ticketOfficerRestriction==null){
-            node.put("message", "Ticket Officer has no permissions to sell tickets");
-            return node;
-        }
+    //     Ticket_Officer_Restriction ticketOfficerRestriction = ticketOfficerRestrictionRepo.findByEventIdAndUserId(eventId, ticketOfficerId);
+    //     if (ticketOfficerRestriction==null){
+    //         node.put("message", "Ticket Officer has no permissions to sell tickets");
+    //         return node;
+    //     }
 
-        ObjectMapper mapper2 = new ObjectMapper();
-        ObjectNode body = mapper.createObjectNode();
-        node.put("userEmail", userEmail);
-        node.put("eventName", eventName);
-        node.put("eventCats", eventCats);
-        node.put("eachCatTickets", eachCatTickets);
-        bookTicket(body);
+    //     ObjectMapper mapper2 = new ObjectMapper();
+    //     ObjectNode body = mapper.createObjectNode();
+    //     node.put("userEmail", userEmail);
+    //     node.put("eventName", eventName);
+    //     node.put("eventCats", eventCats);
+    //     node.put("eachCatTickets", eachCatTickets);
+    //     bookTicket(body);
         
-        node.put("message", "Successfully booked on-site ticket");
-        node.put("status", true);
-        return node;
-    }
+    //     node.put("message", "Successfully booked on-site ticket");
+    //     node.put("status", true);
+    //     return node;
+    // }
 
     @Override
     public JsonNode sendTicketDetailsEmail(String email, int transaction_id) {

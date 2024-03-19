@@ -3,6 +3,7 @@ package com.OOP.TicketBookingSystem.service;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +22,6 @@ import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
 import com.OOP.TicketBookingSystem.model.Transaction;
 import com.OOP.TicketBookingSystem.repository.TransactionRepo;
-import com.OOP.TicketBookingSystem.model.Ticket_Type;
 import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
 
 @Service
@@ -94,6 +94,18 @@ public class EventServiceImplementation implements EventService {
     @Override
     public List<Event> getAllEvents() {
         return eventRepo.findAll();
+    }
+
+    @Override
+    public List<String> getCustomerEmails(int event_id){
+        List<String> emails = new ArrayList<String>();
+        List<Transaction> transactions = transactionRepo.findByEventId(event_id);
+
+        for(Transaction transaction : transactions){
+            emails.add(transaction.getUserEmail());
+        }
+
+        return emails;
     }
 
     @Override
@@ -175,7 +187,17 @@ public class EventServiceImplementation implements EventService {
     }
 
     @Override
-    public JsonNode cancelEventByManager(JsonNode body) {
+    public JsonNode cancelEventByManager(JsonNode body) {    // @Override
+        // public List<String> getCustomerEmails(int event_id){
+        //     List<String> emails = new ArrayList<String>();
+        //     List<transaction> transactions = transactionRepo.findByEventId(event_id);
+    
+        //     for(Transaction transaction : transactions){
+        //         emails.add(transaction.getEmail());
+        //     }
+    
+        //     return emails;
+        // }
         //To do:
         // 1) check if event belong to the manager - done
         // 2) check if event is not already cancelled - done

@@ -20,7 +20,6 @@ import com.OOP.TicketBookingSystem.dto.LoginRequest;
 import com.OOP.TicketBookingSystem.dto.RegisterRequest;
 import com.OOP.TicketBookingSystem.model.Customer;
 import com.OOP.TicketBookingSystem.model.Event_Manager;
-import com.OOP.TicketBookingSystem.model.Ticketing_Officer;
 import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.repository.CustomerRepo;
 import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
