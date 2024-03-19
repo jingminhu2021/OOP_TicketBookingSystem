@@ -73,7 +73,7 @@ public class TransactionServiceImplementation implements TransactionService {
 
         int totalTickets = 0;
         // Get Transaction types and number of tickets to purchase in each category
-        // E.g. ["cat1", "cat2"] and [2, 3] -> buy 2 cat1, 3 cat2
+        // E.g. ["cat1", "cat2", "cat3"] and [2, 0, 3] -> buy 2 cat1, 3 cat3 (list all cats and no of tickets)
         List<String> eventCats = new ArrayList<String>();
         if (body.get("eventCats").isArray()) {
             for (JsonNode cat : body.get("eventCats")) {
