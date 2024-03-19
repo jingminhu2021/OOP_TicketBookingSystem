@@ -271,6 +271,10 @@ public class EventServiceImplementation implements EventService {
 
         return node;
     }
+    @Override
+    public boolean systemRefund(List<Transaction> transactions) {
+        return systemRefund(transactions, false);
+    }
 
     @Override
     public boolean systemRefund(List<Transaction> transactions, boolean eventManager){

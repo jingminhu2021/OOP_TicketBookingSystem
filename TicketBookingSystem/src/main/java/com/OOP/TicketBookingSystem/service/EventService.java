@@ -25,6 +25,8 @@ public interface EventService {
 
     public JsonNode viewEventByEventManager(String managerName);
 
+    public boolean systemRefund(List<Transaction> transactions);
+
     public boolean systemRefund(List<Transaction> transactions, boolean eventManager);
 
     public JsonNode cancelEventByManager(JsonNode body);
