@@ -1,31 +1,32 @@
 package com.OOP.TicketBookingSystem.service;
 
-import java.lang.reflect.Field;
+import java.io.FileWriter;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import com.opencsv.CSVWriter;
+
+import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
-import com.OOP.TicketBookingSystem.model.Event_Manager;
 import com.OOP.TicketBookingSystem.model.Ticket_Type;
-import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
 import com.OOP.TicketBookingSystem.model.Transaction;
-import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.repository.TransactionRepo;
-import com.OOP.TicketBookingSystem.repository.UserRepo;
 import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
 
+@Service
 public class ReportServiceImplementation implements ReportService{
 
     @Autowired
@@ -169,5 +170,39 @@ public class ReportServiceImplementation implements ReportService{
         return arrayNode;
     }
 
+
+    @Override
+    public String csvWriter(JsonNode body) throws IOException{
+    
+        List<String[]> rows = new ArrayList<>();
+        
+        boolean firstCheck = true;
+        for(JsonNode item : body){
+            if(firstCheck){
+                List<String> header = new ArrayList<>(); 
+                Iterator<String> fieldNames = item.fieldNames();
+                while (fieldNames.hasNext()) {
+                    String fieldName = fieldNames.next();
+                    header.add(fieldName);
+                }
+                
+                rows.add(header.toArray(new String[header.size()]));
+                firstCheck=false;
+            }
+
+            List<String> items = new ArrayList<>();
+            for(JsonNode value : item){
+                items.add(value.toString());
+            }
+            rows.add(items.toArray(new String[items.size()]));
+        }
+        UUID uuid = UUID.randomUUID();
+        String filepath = "src/main/resources/static/csv/event"+uuid+".csv";
+        CSVWriter writer = new CSVWriter(new FileWriter(filepath));
+        
+        writer.writeAll(rows);
+        writer.close();
+        return filepath;
+    }
     
 }

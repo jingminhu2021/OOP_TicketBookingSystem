@@ -5,7 +5,18 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -112,6 +123,55 @@ public class EventController {
         }
         return null;
     }
+
+    @PostMapping("/getCSV")
+    public ResponseEntity<InputStreamResource> getCSV(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        
+        try {
+            JsonNode jsonNode = mapper.readTree(body);
+            jsonNode = reportService.viewSalesStatistics(jsonNode);
+            String filePath = reportService.csvWriter(jsonNode);
+            return uploadCsv(filePath);
+        
+        } catch (Exception e) {
+            System.err.println(e);
+        } 
+
+        return null;
+    }
+
+    @PostMapping("/getAllCSV")
+    public ResponseEntity<InputStreamResource> getAllCSV(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        
+        try {
+            JsonNode jsonNode = mapper.readTree(body);
+            jsonNode = reportService.viewAllSalesStatistics(jsonNode);
+            String filePath = reportService.csvWriter(jsonNode);
+            return uploadCsv(filePath);
+
+        } catch (Exception e) {
+            System.err.println(e);
+        } 
+
+        return null;
+    }
+
+    private ResponseEntity<InputStreamResource> uploadCsv(String filePath) throws FileNotFoundException{
+        Path path = Paths.get(filePath);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=data.csv");
+
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(path.toFile()));
+        
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(path.toFile().length())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
+    }
+
     
     @GetMapping("/viewAllEvents")
     public List<Event> viewAllEvents() {
