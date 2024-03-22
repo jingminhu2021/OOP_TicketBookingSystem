@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.OOP.TicketBookingSystem.model.Event;
 import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.service.EventService;
+import com.OOP.TicketBookingSystem.service.ReportService;
 import com.OOP.TicketBookingSystem.service.UserService;
 
 @RestController
@@ -26,6 +27,9 @@ public class EventController {
 
     @Autowired
     private EventService eventService;
+
+    @Autowired
+    private ReportService reportService;
 
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/createEvent")
@@ -89,7 +93,7 @@ public class EventController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            return eventService.viewSalesStatistics(jsonNode);
+            return reportService.viewSalesStatistics(jsonNode);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -102,7 +106,7 @@ public class EventController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            return eventService.viewAllSalesStatistics(jsonNode);
+            return reportService.viewAllSalesStatistics(jsonNode);
         } catch (Exception e) {
             System.err.println(e);
         }

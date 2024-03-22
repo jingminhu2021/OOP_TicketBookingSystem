@@ -31,6 +31,12 @@ public class ReportServiceImplementation implements ReportService{
     @Autowired
     private EventRepo eventRepo;
 
+    @Autowired
+    private TransactionRepo transactionRepo;
+
+    @Autowired
+    private TicketTypeRepo ticketTypeRepo;
+
     // Individual event sales statistics
     @Override
     public JsonNode viewSalesStatistics(JsonNode body) {
