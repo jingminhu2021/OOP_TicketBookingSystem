@@ -47,6 +47,7 @@ public class ReportServiceImplementation implements ReportService{
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
+        ArrayNode arrayNode = mapper.createArrayNode();
 
         Event event = eventRepo.findByExactEvent(eventName);
 
@@ -102,8 +103,9 @@ public class ReportServiceImplementation implements ReportService{
         node.put("ticketsSold", noOfTicketsSold);
         node.put("totalRevenue", totalRevenue);
         node.put("attendanceRate", attendanceRate);
+        arrayNode.add(node);
 
-        return node;
+        return arrayNode;
     }
 
     // View all events sales statistics
@@ -192,7 +194,7 @@ public class ReportServiceImplementation implements ReportService{
 
             List<String> items = new ArrayList<>();
             for(JsonNode value : item){
-                items.add(value.toString());
+                items.add(value.asText());
             }
             rows.add(items.toArray(new String[items.size()]));
         }
