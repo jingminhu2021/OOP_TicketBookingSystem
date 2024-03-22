@@ -124,6 +124,7 @@ public class EventController {
         return null;
     }
 
+    @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/getCSV")
     public ResponseEntity<InputStreamResource> getCSV(@RequestBody String body) {
         ObjectMapper mapper = new ObjectMapper();
@@ -141,6 +142,7 @@ public class EventController {
         return null;
     }
 
+    @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/getAllCSV")
     public ResponseEntity<InputStreamResource> getAllCSV(@RequestBody String body) {
         ObjectMapper mapper = new ObjectMapper();

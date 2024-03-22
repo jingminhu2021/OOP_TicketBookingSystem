@@ -23,7 +23,6 @@ import com.OOP.TicketBookingSystem.model.Event_Manager;
 import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.repository.CustomerRepo;
 import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
-import com.OOP.TicketBookingSystem.repository.TicketingOfficerRepo;
 import com.OOP.TicketBookingSystem.repository.UserRepo;
 import com.OOP.TicketBookingSystem.security.JwtService;
 
@@ -44,9 +43,6 @@ public class SecurityController {
     
     @Autowired
     private EventManagerRepo eventManagerRepo;
-
-    @Autowired
-    private TicketingOfficerRepo ticketingOfficerRepo;
 
     @Autowired
     private BCryptPasswordEncoder encoder;

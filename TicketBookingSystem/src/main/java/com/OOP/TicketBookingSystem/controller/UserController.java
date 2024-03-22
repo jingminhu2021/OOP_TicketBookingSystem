@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.OOP.TicketBookingSystem.model.User;
-import com.OOP.TicketBookingSystem.service.EmailService;
 import com.OOP.TicketBookingSystem.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,9 +22,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class UserController {
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private EmailService emailService;
 
     @PostMapping("/get")
     public User getUserById(@RequestBody String body) {
@@ -79,18 +75,6 @@ public class UserController {
     public User getLoggedInUser() {
         return userService.getLoggedInUser();
     }
-
-    // @GetMapping("/sendEmail")
-    // public JsonNode sendEmail(@RequestBody String email) {
-    //     ObjectMapper mapper = new ObjectMapper();
-    //     try{
-    //         JsonNode jsonNode = mapper.readTree(email);
-    //         return emailService.sendEmail(jsonNode);
-    //     } catch (Exception e) {
-    //         System.err.println(e);
-    //     }
-    //     return null;
-    // }
 
     @PreAuthorize("hasRole('Ticketing_Officer')")
     @GetMapping("/verifyTicket")
