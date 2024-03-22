@@ -32,8 +32,4 @@ public interface EventService {
     public JsonNode cancelEventByManager(JsonNode body);
 
     public JsonNode viewEvent(JsonNode body);
-
-    public JsonNode viewSalesStatistics(JsonNode body);
-
-    public JsonNode viewAllSalesStatistics(JsonNode body);
 }
