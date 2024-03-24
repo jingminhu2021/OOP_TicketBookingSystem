@@ -1,6 +1,8 @@
 package com.OOP.TicketBookingSystem.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,8 +74,12 @@ public class UserController {
     
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/getLoggedInUser")
-    public User getLoggedInUser() {
-        return userService.getLoggedInUser();
+    public Map<String, Object> getLoggedInUser() {
+        User user = userService.getLoggedInUser();
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", user);
+        response.put("role", user.getClass().getSimpleName());
+        return response;
     }
 
     @PreAuthorize("hasRole('Ticketing_Officer')")

@@ -9,7 +9,7 @@ import com.OOP.TicketBookingSystem.model.Transaction;
 
 public interface EventService {
 
-    public JsonNode createEvent(Event event, String managerName);
+    public JsonNode createEvent(Event event, String managerName, String image);
 
     public Event getEventById(int id);
 

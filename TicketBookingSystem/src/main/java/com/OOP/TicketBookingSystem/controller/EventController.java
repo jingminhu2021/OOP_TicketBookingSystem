@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -44,15 +45,36 @@ public class EventController {
 
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/createEvent")
-    public JsonNode createEvent(@RequestBody Event event) {
+    public JsonNode createEvent(@RequestBody String body) {
         User user = userService.getLoggedInUser();
         String managerName = user.getName();
-        
+
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            return eventService.createEvent(event, managerName);
+            Event event = new Event();
+            JsonNode jsonNode = mapper.readTree(body);
+
+            String eventName = jsonNode.get("eventName").asText();
+            String eventType = jsonNode.get("eventType").asText();
+            String description = jsonNode.get("description").asText();
+            String venue = jsonNode.get("venue").asText();
+            LocalDateTime dateTime = LocalDateTime.parse(jsonNode.get("dateTime").asText());
+            String image = "";
+            if(jsonNode.get("image").textValue() != null) {
+                image = jsonNode.get("image").asText();
+            }
+        
+            event.setEventName(eventName);
+            event.setEventType(eventType);
+            event.setDescription(description);
+            event.setVenue(venue);
+            event.setDateTime(dateTime);
+
+            return eventService.createEvent(event, managerName, image);
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
+        
         return null;
     }
     

@@ -1,10 +1,17 @@
 package com.OOP.TicketBookingSystem.service;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Base64;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -46,39 +53,52 @@ public class EventServiceImplementation implements EventService {
     private TicketTypeRepo ticketTypeRepo;
 
     @Override
-    public JsonNode createEvent(Event event, String managerName) {
+    public JsonNode createEvent(Event event, String managerName, String image) {
         String eventName = event.getEventName();
-
+        
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
         node.put("message", "Event already existed");
         node.put("status", false);
 
-        if (LocalDateTime.now().plusDays(2).isAfter(event.getDateTime())){ 
+        if (LocalDateTime.now().plusDays(2).isAfter(event.getDateTime())){  //check if event date is at least 2 days from today
             node.put("message", "Event date must be at least 2 days from today");
             return node;
         }
 
-        if (eventRepo.findByExactEvent(eventName) != null) {
+        if (eventRepo.findByExactEvent(eventName) != null) { //check if event name already exist
             node.put("message", "Event already exists");
             return node;
         }
         
-        if (eventManagerRepo.findByName(managerName) == null) {
+        if (eventManagerRepo.findByName(managerName) == null) { //check if event manager exist
             node.put("message", "Invalid Event Manager");
             return node;
         }
         
         try {
-            event.setEventManagerName(managerName);
+            event.setEventManagerName(managerName); //set event manager name
+            if(image.equals("")){ //if no image is provided, set default image
+                event.setImage("src/main/resources/static/event_images/default.jpg");
+            }else{ //if image is provided, decode and save the image
+                String base64Image = image.split(",")[1]; //remove the data:image/png;base64, part
+                byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+                String path = "src/main/resources/static/event_images/" + eventName + ".jpg";
+            
+                Files.write(Paths.get(path), imageBytes);
+                event.setImage(path);
+            }
             eventRepo.save(event);
+            
             node.put("message", "Successfully created Event");
             node.put("status", true);
         } catch (IllegalArgumentException e) {
             node.put("message", e.toString());
         } catch (OptimisticLockingFailureException e) {
             node.put("message", e.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         
         return node;

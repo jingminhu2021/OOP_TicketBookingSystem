@@ -27,6 +27,8 @@ public class Event {
     private String status="Active";
     @Column
     private String eventType;
+    @Column
+    private String image;
 
     public int getId() {
         return id;
@@ -92,6 +94,12 @@ public class Event {
         this.eventType = eventType;
     }
 
-    
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
 }
