@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 function Navbar(){
 
   function checkUser(){
-    if (sessionStorage.getItem('token') != null){
+    // if (sessionStorage.getItem('token') != null){
+    if (localStorage.getItem('token') != null){
       return(
         <li className="nav-item"><a className="nav-link" href="/logout"> <i className="fas fa-user me-1 text-gray fw-normal"></i>Logout</a></li>
       )
