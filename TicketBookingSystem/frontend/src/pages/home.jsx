@@ -5,13 +5,13 @@ import UpdateEvent from '../components/updateEvent';
 import image from "../img/product-5.jpg";
 
 function Home() {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
+    // const queryString = window.location.search;
+    // const urlParams = new URLSearchParams(queryString);
 
     return (
             <div>
             <Navbar />
-            {UpdateEvent(urlParams.get('id'))}
+            {/* {UpdateEvent(urlParams.get('id'))} */}
             <div className="modal fade" id="productView" tabIndex="-1">
                 <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content overflow-hidden border-0">
