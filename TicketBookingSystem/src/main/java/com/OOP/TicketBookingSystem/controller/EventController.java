@@ -82,11 +82,11 @@ public class EventController {
     public JsonNode updateEvent(@RequestBody Event event) {
         User user = userService.getLoggedInUser();
         String managerName = user.getName();
-        event.setEventManagerName(managerName);
-        try {
+        
+        try {    
             return eventService.updateEvent(event, managerName);
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
         return null;
     }

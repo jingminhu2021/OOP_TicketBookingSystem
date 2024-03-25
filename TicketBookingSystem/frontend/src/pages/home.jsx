@@ -1,7 +1,6 @@
 import React from 'react';
 import Navbar from '../components/navbar';
 import UpdateEvent from '../components/updateEvent';
-import { BrowserRouter} from 'react-router-dom'
 
 import image from "../img/product-5.jpg";
 

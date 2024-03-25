@@ -98,7 +98,7 @@ public class EventServiceImplementation implements EventService {
         } catch (OptimisticLockingFailureException e) {
             node.put("message", e.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            node.put("message", e.toString());
         }
         
         return node;
@@ -186,14 +186,30 @@ public class EventServiceImplementation implements EventService {
             node.put("message", "Event name already exist");
             return node;
         }
-
+        String image = event.getImage();
+        
         try {
+            
+            if(image.equals("")){ //if no image is provided, set default image
+                event.setImage("src/main/resources/static/event_images/default.jpg");
+            }else{ //if image is provided, decode and save the image
+                String base64Image = image.split(",")[1]; //remove the data:image/png;base64, part
+                byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+                String path = "src/main/resources/static/event_images/" + eventName + ".jpg";
+            
+                Files.write(Paths.get(path), imageBytes);
+                event.setImage(path);
+            }
+            
+
             eventRepo.save(event);
             node.put("message", "Successfully updated Event");
             node.put("status", true);
         } catch (IllegalArgumentException e) {
             node.put("message", e.toString());
         } catch (OptimisticLockingFailureException e) {
+            node.put("message", e.toString());
+        } catch (IOException e) {
             node.put("message", e.toString());
         }
 
@@ -349,6 +365,15 @@ public class EventServiceImplementation implements EventService {
         // Check if event exists
         if (event == null) {
             return node;
+        }
+
+        String image = event.getImage();
+        try{
+            byte[] imageBytes = Files.readAllBytes(Paths.get(image));
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+            event.setImage("data:image/jpg;base64," + base64Image);
+        }catch(IOException e){
+            System.err.println(e);
         }
 
         // Return event + ticket types
