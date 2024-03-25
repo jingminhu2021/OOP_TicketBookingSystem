@@ -1,56 +1,94 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/navbar';
-import { BrowserRouter, useLocation } from 'react-router-dom'
+import { Form, Toast } from 'react-bootstrap';
 import axios from 'axios';
-import { Form, Modal, Alert, Button, Toast } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
+
+import CryptoJS from 'crypto-js';
 
 function VerifyTicket() {
     const token = sessionStorage.getItem('token');
-    // const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
     };
     const [userData, setUserData] = useState(null);
-
-    useEffect(() => {
-        console.log('Bearer ' + token);
-        const getUserData = async (token) => {
-            let api_endpoint_url = 'http://localhost:8080/user/getLoggedInUser';
-            const bodyParameters = {
-                key: "value"
-            };
-            try {
-                const response = await axios.post(api_endpoint_url, bodyParameters, config);
-                setUserData(response.data);
-                console.log(response.data.role)
-            } catch (error) {
-                console.error('Error occurred:', error);
-            }
-        };
-        if (token) {
-            getUserData(token);
-        }
-    }, []); // Empty dependency array ensures this effect runs only once
-
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const location = useLocation();
 
-    // Parse query parameters from URL
-    const searchParams = new URLSearchParams(location.search);
-    const userId = searchParams.get('userId') || '';
-    const eventId = searchParams.get('eventId') || '';
-    const ticketId = searchParams.get('ticketId') || '';
-    const ticketOfficerId = searchParams.get('ticketOfficerId') || '';
-    const ticketTypeId = searchParams.get('ticketTypeId') || '';
+    // Decrypt the encrypted URL using CryptoJS
+    const decryptUrl = (encryptedParams) => {
+        console.log('Encrypted URL:', encryptedParams);
+        const encryptionKey = "87D3402A2E67C6E8484C807EAA86F8DD";
+        try {
+            const decryptedBytes = CryptoJS.AES.decrypt(encryptedParams, encryptionKey);
+            const decryptedUrl = decryptedBytes.toString(CryptoJS.enc.Utf8);
+            console.lod('decryptedBytes :',decryptedBytes)
+            console.log('Decrypted URL:', decryptedUrl);
+            return decryptedUrl;
+        } catch (error) {
+            console.error('Error decrypting URL:', error);
+            return null;
+        }
+    };
 
     const [formData, setFormData] = useState({
-        userId: userId,
-        eventId: eventId,
-        ticketId: ticketId,
-        ticketOfficerId: ticketOfficerId,
-        ticketTypeId: ticketTypeId
+        userId: '',
+        eventId: '',
+        ticketId: '',
+        ticketOfficerId: '',
+        ticketTypeId: ''
     });
+
+    // Decrypt the encrypted params
+    const CryptoJS = require("crypto-js");
+    function decrypt(encryptedText) {
+        try {
+            const ENCRYPTION_KEY = "87D3402A2E67C6E8484C807EAA86F8DD";
+
+            // Decode the URL-encoded ciphertext
+            const decodedEncryptedText = decodeURIComponent(encryptedText);
+
+            const encryptedBytes = CryptoJS.enc.Base64.parse(decodedEncryptedText);
+            const cipherParams = CryptoJS.lib.CipherParams.create({
+                ciphertext: encryptedBytes
+            });
+    
+            const decryptedBytes = CryptoJS.AES.decrypt(
+                cipherParams,
+                CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY),
+                {
+                    mode: CryptoJS.mode.ECB,
+                    padding: CryptoJS.pad.Pkcs7
+                }
+            );
+    
+            return decryptedBytes.toString(CryptoJS.enc.Utf8);
+        } catch (error) {
+            console.error("Error decrypting:", error.message);
+            return null;
+        }
+    }
+
+    // Parse query parameters from URL
+    const searchParams = new URLSearchParams(location.search);
+    const encryptedParams = searchParams.toString() || '';
+    const encryptedText = encryptedParams;
+    // Decrypt the encrypted url parameters
+    const decryptedText = decrypt(encryptedText);
+
+    useEffect(() => {
+        if (decryptedText) {
+            const params = new URLSearchParams("?"+decryptedText);
+            setFormData({
+                userId: params.get('userId') || '',
+                eventId: params.get('eventId') || '',
+                ticketId: params.get('ticketId') || '',
+                ticketOfficerId: params.get('ticketOfficerId') || '',
+                ticketTypeId: params.get('ticketTypeId') || ''
+            });
+        }
+    }, [decryptedText]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;

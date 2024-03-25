@@ -3,6 +3,8 @@ package com.OOP.TicketBookingSystem.controller;
 
 import java.util.List;
 
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -17,9 +19,21 @@ import com.OOP.TicketBookingSystem.service.TransactionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+import java.net.URLEncoder;
+
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
+
     @Autowired
     private TransactionService transactionService;
 
@@ -80,6 +94,17 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
         }
         return null;
     }
+
+    private String encrypt(String plainText) throws Exception {
+        // Encryption key - 16 bytes (Assume: this key is kept secret)
+        final String encryptionKey = "87D3402A2E67C6E8484C807EAA86F8DD";
+
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        SecretKeySpec secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
+        return Base64.getEncoder().encodeToString(encryptedBytes);
+    }
     
     @PostMapping("/generateQRCode")
     public JsonNode generateQRCode(@RequestBody String body){
@@ -88,7 +113,16 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
             JsonNode jsonNode = mapper.readTree(body);
             int ticketId = jsonNode.get("ticketId").asInt();
             String text = jsonNode.get("text").asText();
-            return transactionService.generateQRCode(ticketId, text);
+            String domain = text.split("\\?")[0];
+            String query = text.split("\\?")[1];
+            System.err.println(domain);
+            System.err.println(query);
+            // Encrypt the query
+            String encryptedQuery = encrypt(query);
+            // URL encode the encrypted query
+            String encodedEncryptedQuery = URLEncoder.encode(encryptedQuery, "UTF-8");
+
+            return transactionService.generateQRCode(ticketId, domain + "?" + encodedEncryptedQuery);
         }
         catch (Exception e){
             System.err.println(e);
