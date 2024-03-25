@@ -1,5 +1,6 @@
 package com.OOP.TicketBookingSystem.controller;
 
+import java.util.Base64;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -7,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -210,7 +213,20 @@ public class EventController {
     
     @GetMapping("/viewAllEvents")
     public List<Event> viewAllEvents() {
-        return eventService.getAllEvents();
+
+        List<Event> events = eventService.getAllEvents();
+        for(Event event: events){
+            String image = event.getImage();
+            try{
+                byte[] imageBytes = Files.readAllBytes(Paths.get(image));
+                String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                event.setImage("data:image/jpg;base64," + base64Image);
+            }catch(IOException e){
+                System.err.println(e);
+            }
+        }
+
+        return events;
     }
 
     @GetMapping("/viewEvent")

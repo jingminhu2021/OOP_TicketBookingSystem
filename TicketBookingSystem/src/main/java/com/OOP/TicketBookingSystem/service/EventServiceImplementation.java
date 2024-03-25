@@ -117,6 +117,7 @@ public class EventServiceImplementation implements EventService {
 
     @Override
     public List<Event> getAllEvents() {
+
         return eventRepo.findAll();
     }
 
