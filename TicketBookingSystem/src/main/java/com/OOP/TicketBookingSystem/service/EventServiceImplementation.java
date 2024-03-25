@@ -335,13 +335,15 @@ public class EventServiceImplementation implements EventService {
     @Override
     public JsonNode viewEvent(JsonNode body) {
         // Obtain event name
-        String eventName = body.get("eventName").textValue();
+        int event_id = body.get("id").intValue();
+        // String eventName = body.get("eventName").textValue();
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         ObjectNode node = mapper.createObjectNode();
 
-        Event event = eventRepo.findByExactEvent(eventName);
+        // Event event = eventRepo.findByExactEvent(eventName);
+        Event event = eventRepo.findById(event_id).orElse(null);
 
         node.put("message", "No event found");
         node.put("status", false);

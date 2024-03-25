@@ -5,8 +5,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -207,6 +205,7 @@ public class EventController {
 
     @GetMapping("/viewEvent")
     public JsonNode viewEvent(@RequestBody String body) {
+        
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);

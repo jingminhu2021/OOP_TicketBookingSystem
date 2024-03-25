@@ -48,6 +48,16 @@ function AddEvent() {
         }
 
         const getEventData = async () => {
+            let api_endpoint_url = 'http://localhost:8080/event/viewEvent';
+            const bodyParameters = {
+                id: 1
+            };
+            try {
+                const response = await axios.get(api_endpoint_url, bodyParameters, config);
+                console.log(response.data);
+            } catch (error) {
+                console.error('Error occurred:', error);
+            }
         };
         
     }, []); // Empty dependency array ensures this effect runs only once
