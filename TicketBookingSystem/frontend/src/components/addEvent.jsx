@@ -38,6 +38,8 @@ function AddEvent() {
         
     }, []); // Empty dependency array ensures this effect runs only once
 
+    console.log(userData);
+
     const [show, setShow] = useState(false);
     const [formData, setFormData] = useState({
         event_name: '',
