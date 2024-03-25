@@ -50,60 +50,33 @@ public class ReportServiceImplementation implements ReportService{
         ArrayNode arrayNode = mapper.createArrayNode();
 
         Event event = eventRepo.findByExactEvent(eventName);
-
-        node.put("message", "No event found");
-        node.put("status", false);
-
-        // Check if event exists
-        if (event == null) {
-            return node;
-        }
-
-        if (!event.getEventManagerName().equals(eventManagerName)) {
-            node.put("message", "Invalid Event Manager");
-            return node;
-        }
-
-        // Get the event id
         int eventId = event.getId();
-
-        // Obtain number of tickets sold
         List<Transaction> transaction = transactionRepo.findByEventId(eventId);
-        int noOfTicketsSold = transaction.size();
-
-        // Check if any tickets sold
-        if (noOfTicketsSold == 0) {
-            node.put("message", "No tickets sold");
-            return node;
-        }
-
-        // Get the total revenue and attendance
-        BigDecimal totalRevenue = BigDecimal.ZERO;
         List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(eventId);
 
-        // Add prices of each ticket
-        for (Transaction t : transaction) {
-            for (Ticket_Type ticketType : ticketTypes) {
-                if (t.getTicketTypeId() == ticketType.getTicketTypeId()) {
+        for (Ticket_Type ticketType : ticketTypes) {
+            int attended = 0;
+            int ticketSold = 0;
+            BigDecimal totalRevenue = BigDecimal.ZERO;
+            String eventCat = ticketType.getEventCat();
+            int totalTickets = ticketType.getNumberOfTix();
+            node.put("Event", event.getEventName());
+            node.put("Category", eventCat);
+            node.put("Total ticket", totalTickets);
+            for (Transaction t : transaction){
+                if (ticketType.getTicketTypeId()==t.getTicketTypeId()){
+                    ticketSold++;
                     totalRevenue = totalRevenue.add(ticketType.getEventPrice());
-                    break;
+                    if (t.getStatus().equals("redeemed")){
+                        attended++;
+                    }
                 }
             }
+            node.put("Ticket sold", ticketSold);
+            node.put("Revenue", totalRevenue);
+            node.put("Customer attendance", attended);
+            arrayNode.add(node);
         }
-
-        // Attendance rate
-        int totalTickets = 0;
-        for (Ticket_Type ticketType : ticketTypes) {
-            totalTickets = totalTickets + ticketType.getNumberOfTix();
-        }
-        double attendanceRate = (double)noOfTicketsSold / (double)totalTickets;
-
-        node.put("message", "Event found");
-        node.put("status", true);
-        node.put("ticketsSold", noOfTicketsSold);
-        node.put("totalRevenue", totalRevenue);
-        node.put("attendanceRate", attendanceRate);
-        arrayNode.add(node);
 
         return arrayNode;
     }
