@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Modal, Alert, Button, Toast } from 'react-bootstrap';
 
-function AddEvent() {
+function UpdateEvent(id) {
     // const token = sessionStorage.getItem('token');
     const token = localStorage.getItem('token');
 
@@ -27,13 +27,11 @@ function AddEvent() {
 
     useEffect(() => {
         
-        console.log('Bearer ' + token);
-
         const getUserData = async (token) => {
             let api_endpoint_url = 'http://localhost:8080/user/getLoggedInUser';
             
             const bodyParameters = {
-                key: "value"
+                key: id
             };
             try {
                 const response = await axios.post(api_endpoint_url, bodyParameters, config);
@@ -48,17 +46,18 @@ function AddEvent() {
         }
 
         const getEventData = async () => {
-            let api_endpoint_url = 'http://localhost:8080/event/viewEvent';
-            const bodyParameters = {
-                id: 1
-            };
+            let api_endpoint_url = 'http://localhost:8080/event/viewEvent?id=' + id;
+            
             try {
-                const response = await axios.get(api_endpoint_url, bodyParameters, config);
+                const response = await axios.get(api_endpoint_url, config);
+                console.log("Here");
                 console.log(response.data);
             } catch (error) {
                 console.error('Error occurred:', error);
             }
         };
+        
+        getEventData();
         
     }, []); // Empty dependency array ensures this effect runs only once
 
@@ -195,4 +194,4 @@ function AddEvent() {
     
 }
 
-export default AddEvent;
+export default UpdateEvent;

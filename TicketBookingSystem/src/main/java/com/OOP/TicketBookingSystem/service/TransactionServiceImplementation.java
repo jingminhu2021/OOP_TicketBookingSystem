@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -58,9 +57,6 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Autowired
     private EmailService emailService;
-
-    @Autowired
-    private ResourceLoader resourceLoader;
 
     @Override
     public JsonNode bookTicket(JsonNode body) {

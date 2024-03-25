@@ -333,10 +333,8 @@ public class EventServiceImplementation implements EventService {
     }
 
     @Override
-    public JsonNode viewEvent(JsonNode body) {
-        // Obtain event name
-        int event_id = body.get("id").intValue();
-        // String eventName = body.get("eventName").textValue();
+    // public JsonNode viewEvent(JsonNode body) {
+    public JsonNode viewEvent(int event_id) {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.OOP.TicketBookingSystem.model.Event;
@@ -204,12 +205,10 @@ public class EventController {
     }
 
     @GetMapping("/viewEvent")
-    public JsonNode viewEvent(@RequestBody String body) {
+    public JsonNode viewEvent(@RequestParam int id) {
         
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            JsonNode jsonNode = mapper.readTree(body);
-            return eventService.viewEvent(jsonNode);
+            return eventService.viewEvent(id);
         } catch (Exception e) {
             System.err.println(e);
         }

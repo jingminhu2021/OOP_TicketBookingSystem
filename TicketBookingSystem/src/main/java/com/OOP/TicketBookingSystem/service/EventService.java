@@ -31,5 +31,5 @@ public interface EventService {
 
     public JsonNode cancelEventByManager(JsonNode body, String managerName);
 
-    public JsonNode viewEvent(JsonNode body);
+    public JsonNode viewEvent(int id);
 }
