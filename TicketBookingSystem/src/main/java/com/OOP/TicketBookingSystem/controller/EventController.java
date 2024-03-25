@@ -143,10 +143,13 @@ public class EventController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/viewAllSalesStatistics")
     public JsonNode viewAllSalesStatistics(@RequestBody String body) {
+        User user = userService.getLoggedInUser();
+        String managerName = user.getName();
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            return reportService.viewAllSalesStatistics(jsonNode);
+            return reportService.viewAllSalesStatistics(jsonNode, managerName);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -185,7 +188,7 @@ public class EventController {
         
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            jsonNode = reportService.viewAllSalesStatistics(jsonNode);
+            jsonNode = reportService.viewAllSalesStatistics(jsonNode, managerName);
             String filePath = reportService.csvWriter(jsonNode);
             return uploadCsv(filePath);
 

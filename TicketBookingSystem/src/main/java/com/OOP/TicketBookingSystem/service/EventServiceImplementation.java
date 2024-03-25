@@ -240,12 +240,12 @@ public class EventServiceImplementation implements EventService {
 
     @Override
     public JsonNode cancelEventByManager(JsonNode body, String managerName) {    
-        //To do:
+
         // 1) check if event belong to the manager - done
         // 2) check if event is not already cancelled - done
         // 3) check if event is not already started - done
         // 4) update the event status to cancelled - done
-        // 5) process refund to the customers (put in another function)
+        // 5) process refund to the customers - done
         // 6) send email to the customers - done
 
         // Data expectation

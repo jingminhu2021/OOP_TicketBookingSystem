@@ -84,14 +84,13 @@ public class ReportServiceImplementation implements ReportService{
 
     // View all events sales statistics
     @Override
-    public JsonNode viewAllSalesStatistics(JsonNode body) {
-        String eventManagerName = body.get("eventManagerName").textValue();
+    public JsonNode viewAllSalesStatistics(JsonNode body, String managerName) {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
         ArrayNode arrayNode = mapper.createArrayNode();
 
-        List<Event> events = eventRepo.findByEventManager(eventManagerName);
+        List<Event> events = eventRepo.findByEventManager(managerName);
 
         node.put("message", "No events found");
         node.put("status", false);

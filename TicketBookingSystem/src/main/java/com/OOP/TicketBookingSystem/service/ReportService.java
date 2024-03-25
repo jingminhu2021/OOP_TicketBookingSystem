@@ -8,7 +8,7 @@ public interface ReportService {
 
     public JsonNode viewSalesStatistics(JsonNode body, String managerName);
 
-    public JsonNode viewAllSalesStatistics(JsonNode body);
+    public JsonNode viewAllSalesStatistics(JsonNode body, String managerName);
 
     public String csvWriter(JsonNode body) throws IOException;
 }
