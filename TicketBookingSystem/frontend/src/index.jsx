@@ -34,8 +34,8 @@ import "./css/style.violet.min.css";
 import "./css/style.violet.min.css.map";
 
 export default function App() {
-  const token = sessionStorage.getItem('token');
-  // const token = localStorage.getItem('token');
+  // const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('token');
   const config = {
       headers: { Authorization: `Bearer ${token}` }
   };
