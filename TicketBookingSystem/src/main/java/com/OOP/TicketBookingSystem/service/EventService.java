@@ -21,7 +21,7 @@ public interface EventService {
 
     public List<String> getCustomerEmails(List<Transaction> transactions);
 
-    public JsonNode updateEvent(Event event);
+    public JsonNode updateEvent(Event event, String eventManagerName);
 
     public JsonNode viewEventByEventManager(String managerName);
 
@@ -29,7 +29,7 @@ public interface EventService {
 
     public boolean systemRefund(List<Transaction> transactions, boolean eventManager);
 
-    public JsonNode cancelEventByManager(JsonNode body);
+    public JsonNode cancelEventByManager(JsonNode body, String managerName);
 
     public JsonNode viewEvent(JsonNode body);
 }

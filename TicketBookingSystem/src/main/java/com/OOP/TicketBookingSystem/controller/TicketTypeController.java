@@ -12,12 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.OOP.TicketBookingSystem.model.Ticket_Type;
+import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.service.TicketTypeService;
+import com.OOP.TicketBookingSystem.service.UserService;
 
 
 @RestController
 @RequestMapping("/ticketType")
 public class TicketTypeController {
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private TicketTypeService eventService;
@@ -36,9 +41,10 @@ public class TicketTypeController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/updateTicketType")
     public JsonNode updateTicketType(@RequestBody Ticket_Type event) {
-    
+        User user = userService.getLoggedInUser();
+        String managerName = user.getName();
         try {
-            return eventService.updateTicketType(event);
+            return eventService.updateTicketType(event, managerName);
         } catch (Exception e) {
             System.err.println(e);
         }

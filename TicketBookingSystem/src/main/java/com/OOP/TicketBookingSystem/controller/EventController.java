@@ -85,7 +85,7 @@ public class EventController {
         String managerName = user.getName();
         event.setEventManagerName(managerName);
         try {
-            return eventService.updateEvent(event);
+            return eventService.updateEvent(event, managerName);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -109,11 +109,13 @@ public class EventController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/cancelEventByManager")
     public JsonNode cancelEvent(@RequestBody String body) {
-        
+        User user = userService.getLoggedInUser();
+        String managerName = user.getName();
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            return eventService.cancelEventByManager(jsonNode);
+            return eventService.cancelEventByManager(jsonNode, managerName);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -149,6 +151,7 @@ public class EventController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/getCSV")
     public ResponseEntity<InputStreamResource> getCSV(@RequestBody String body) {
+
         ObjectMapper mapper = new ObjectMapper();
         
         try {
