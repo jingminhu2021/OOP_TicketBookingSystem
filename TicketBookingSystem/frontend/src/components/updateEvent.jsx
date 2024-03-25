@@ -7,14 +7,7 @@ function UpdateEvent(id) {
     const token = localStorage.getItem('token');
 
     const [show, setShow] = useState(false);
-    const [formData, setFormData] = useState({
-        event_name: '',
-        venue: '',
-        description: '',
-        date_time: '',
-        event_type: '',
-        image: null
-    });
+    const [formData, setFormData] = useState({});
 
     const config = {
         headers: { Authorization: `Bearer ${token}` }
@@ -50,6 +43,11 @@ function UpdateEvent(id) {
             
             try {
                 const response = await axios.get(api_endpoint_url, config);
+                const event = response.data.event
+                setFormData({
+                    event_name: event.eventName,
+                    // venue: event.venue
+                })
                 console.log("Here");
                 console.log(response.data);
             } catch (error) {
@@ -60,8 +58,6 @@ function UpdateEvent(id) {
         getEventData();
         
     }, []); // Empty dependency array ensures this effect runs only once
-
-    console.log(userData);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);

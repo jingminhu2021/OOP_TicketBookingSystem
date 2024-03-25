@@ -40,13 +40,12 @@ public class ReportServiceImplementation implements ReportService{
 
     // Individual event sales statistics
     @Override
-    public JsonNode viewSalesStatistics(JsonNode body) {
+    public JsonNode viewSalesStatistics(JsonNode body, String managerName) {
         // Obtain event name
         String eventName = body.get("eventName").textValue();
-        String eventManagerName = body.get("eventManagerName").textValue();
 
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node = mapper.createObjectNode();
+        
         ArrayNode arrayNode = mapper.createArrayNode();
 
         Event event = eventRepo.findByExactEvent(eventName);
@@ -55,6 +54,8 @@ public class ReportServiceImplementation implements ReportService{
         List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(eventId);
 
         for (Ticket_Type ticketType : ticketTypes) {
+            ObjectNode node = mapper.createObjectNode();
+            
             int attended = 0;
             int ticketSold = 0;
             BigDecimal totalRevenue = BigDecimal.ZERO;
@@ -156,7 +157,7 @@ public class ReportServiceImplementation implements ReportService{
             if(firstCheck){
                 List<String> header = new ArrayList<>(); 
                 Iterator<String> fieldNames = item.fieldNames();
-                while (fieldNames.hasNext()) {
+                while (fieldNames.hasNext()) {;
                     String fieldName = fieldNames.next();
                     header.add(fieldName);
                 }
@@ -167,6 +168,7 @@ public class ReportServiceImplementation implements ReportService{
 
             List<String> items = new ArrayList<>();
             for(JsonNode value : item){
+                
                 items.add(value.asText());
             }
             rows.add(items.toArray(new String[items.size()]));

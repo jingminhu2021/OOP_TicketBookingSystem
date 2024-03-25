@@ -124,10 +124,13 @@ public class EventController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/viewSalesStatistics")
     public JsonNode viewSalesStatistics(@RequestBody String body) {
+        User user = userService.getLoggedInUser();
+        String managerName = user.getName();
+        
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            return reportService.viewSalesStatistics(jsonNode);
+            return reportService.viewSalesStatistics(jsonNode, managerName);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -150,12 +153,15 @@ public class EventController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/getCSV")
     public ResponseEntity<InputStreamResource> getCSV(@RequestBody String body) {
+        User user = userService.getLoggedInUser();
+        String managerName = user.getName();
 
         ObjectMapper mapper = new ObjectMapper();
         
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            jsonNode = reportService.viewSalesStatistics(jsonNode);
+            jsonNode = reportService.viewSalesStatistics(jsonNode, managerName);
+
             String filePath = reportService.csvWriter(jsonNode);
             return uploadCsv(filePath);
         
@@ -169,6 +175,9 @@ public class EventController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/getAllCSV")
     public ResponseEntity<InputStreamResource> getAllCSV(@RequestBody String body) {
+        User user = userService.getLoggedInUser();
+        String managerName = user.getName();
+
         ObjectMapper mapper = new ObjectMapper();
         
         try {
