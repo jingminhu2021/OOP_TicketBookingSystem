@@ -40,6 +40,7 @@ export default function App() {
         <Route path="/logout" element={<Logout />} />
         <Route path="/verifyTicket" element={<VerifyTicket/>} />
         <Route path="*" element={<h1>Not Found</h1>} />
+        <Route path="/verifyTicket"element={<VerifyTicket />} />
       </Routes>
     </BrowserRouter>
   )
