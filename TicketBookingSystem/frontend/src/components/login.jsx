@@ -52,7 +52,8 @@ function Login(){
                     setVariant("danger");
                 } else {
                     console.log(response);
-                    sessionStorage.setItem('token', data.accessToken);
+                    localStorage.setItem('token', data.accessToken);
+                    // sessionStorage.setItem('token', data.accessToken);
                     window.location.reload(false);
                 }
             })

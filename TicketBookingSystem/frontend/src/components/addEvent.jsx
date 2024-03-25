@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Form, Modal, Alert, Button, Toast } from 'react-bootstrap';
 
 function AddEvent() {
+    // const token = sessionStorage.getItem('token');
     const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
