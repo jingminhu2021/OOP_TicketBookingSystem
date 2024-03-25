@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
 import Home from './pages/home.jsx';
 import Logout from './components/logout.jsx';
+import VerifyTicket from './pages/verifyTicket.jsx';
 
 
 import "./css/style.blue.css";
@@ -37,6 +38,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path="/verifyTicket" element={<VerifyTicket/>} />
         <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
     </BrowserRouter>

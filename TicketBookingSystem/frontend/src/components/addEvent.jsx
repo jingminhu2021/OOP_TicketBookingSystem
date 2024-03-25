@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Form, Modal, Alert, Button, Toast } from 'react-bootstrap';
 
 function AddEvent() {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
     };
@@ -36,6 +36,8 @@ function AddEvent() {
         }
         
     }, []); // Empty dependency array ensures this effect runs only once
+
+    console.log(userData);
 
     const [show, setShow] = useState(false);
     const [formData, setFormData] = useState({
