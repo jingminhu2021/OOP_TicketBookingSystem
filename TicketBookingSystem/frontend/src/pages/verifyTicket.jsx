@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 
 function VerifyTicket() {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const location = useLocation();
