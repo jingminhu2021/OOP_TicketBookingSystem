@@ -11,11 +11,6 @@ function VerifyTicket() {
         headers: { Authorization: `Bearer ${token}` }
     };
     const [userData, setUserData] = useState(null);
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
-    const location = useLocation();
-
-    console.log(userData);
 
     useEffect(() => {
         console.log('Bearer ' + token);
@@ -27,6 +22,7 @@ function VerifyTicket() {
             try {
                 const response = await axios.post(api_endpoint_url, bodyParameters, config);
                 setUserData(response.data);
+                console.log(response.data.role)
             } catch (error) {
                 console.error('Error occurred:', error);
             }
@@ -35,6 +31,10 @@ function VerifyTicket() {
             getUserData(token);
         }
     }, []); // Empty dependency array ensures this effect runs only once
+
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const location = useLocation();
 
     // Parse query parameters from URL
     const searchParams = new URLSearchParams(location.search);
