@@ -4,33 +4,11 @@ import { Form, Toast } from 'react-bootstrap';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 
-import CryptoJS from 'crypto-js';
-
 function VerifyTicket() {
     const token = sessionStorage.getItem('token');
-    const config = {
-        headers: { Authorization: `Bearer ${token}` }
-    };
-    const [userData, setUserData] = useState(null);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const location = useLocation();
-
-    // Decrypt the encrypted URL using CryptoJS
-    const decryptUrl = (encryptedParams) => {
-        console.log('Encrypted URL:', encryptedParams);
-        const encryptionKey = "87D3402A2E67C6E8484C807EAA86F8DD";
-        try {
-            const decryptedBytes = CryptoJS.AES.decrypt(encryptedParams, encryptionKey);
-            const decryptedUrl = decryptedBytes.toString(CryptoJS.enc.Utf8);
-            console.lod('decryptedBytes :',decryptedBytes)
-            console.log('Decrypted URL:', decryptedUrl);
-            return decryptedUrl;
-        } catch (error) {
-            console.error('Error decrypting URL:', error);
-            return null;
-        }
-    };
 
     const [formData, setFormData] = useState({
         userId: '',
