@@ -59,6 +59,8 @@ public class SecurityConfiguration {
             .authorizeHttpRequests((auth) -> {
                 auth.requestMatchers("/login").permitAll();
                 auth.requestMatchers("/createNewUser").permitAll();
+                auth.requestMatchers("/event/viewEvent").permitAll();
+                auth.requestMatchers("/event/viewAllEvents").permitAll();
                 auth.anyRequest().authenticated();
             })
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -68,11 +68,10 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
         return node;
     }
 
-    public JsonNode updateTicketType(Ticket_Type ticket_type) {
+    public JsonNode updateTicketType(Ticket_Type ticket_type, String eventManagerName) {
         int ticketTypeId = ticket_type.getTicketTypeId();
         int eventId = ticket_type.getEventId();
         
-
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
 
@@ -86,6 +85,12 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
             // Check if event is cancelled
             if (status.equals("Cancelled")){
                 node.put("message", "Event is " + status);
+                return node;
+            }
+
+            //check if event belong to the manager
+            if (!event.getEventManagerName().equals(eventManagerName)) { 
+                node.put("message", "Invalid Event Manager");
                 return node;
             }
 

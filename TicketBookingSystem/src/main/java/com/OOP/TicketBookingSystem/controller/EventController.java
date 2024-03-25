@@ -5,8 +5,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.OOP.TicketBookingSystem.model.Event;
@@ -85,7 +84,7 @@ public class EventController {
         String managerName = user.getName();
         event.setEventManagerName(managerName);
         try {
-            return eventService.updateEvent(event);
+            return eventService.updateEvent(event, managerName);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -109,11 +108,13 @@ public class EventController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/cancelEventByManager")
     public JsonNode cancelEvent(@RequestBody String body) {
-        
+        User user = userService.getLoggedInUser();
+        String managerName = user.getName();
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            return eventService.cancelEventByManager(jsonNode);
+            return eventService.cancelEventByManager(jsonNode, managerName);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -149,6 +150,7 @@ public class EventController {
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/getCSV")
     public ResponseEntity<InputStreamResource> getCSV(@RequestBody String body) {
+
         ObjectMapper mapper = new ObjectMapper();
         
         try {
@@ -203,11 +205,10 @@ public class EventController {
     }
 
     @GetMapping("/viewEvent")
-    public JsonNode viewEvent(@RequestBody String body) {
-        ObjectMapper mapper = new ObjectMapper();
+    public JsonNode viewEvent(@RequestParam int id) {
+        
         try {
-            JsonNode jsonNode = mapper.readTree(body);
-            return eventService.viewEvent(jsonNode);
+            return eventService.viewEvent(id);
         } catch (Exception e) {
             System.err.println(e);
         }
