@@ -49,7 +49,7 @@ public class EventController {
     @PostMapping("/createEvent")
     public JsonNode createEvent(@RequestBody String body) {
         User user = userService.getLoggedInUser();
-        String managerName = user.getName();
+        int managerId = user.getId();
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -72,7 +72,7 @@ public class EventController {
             event.setVenue(venue);
             event.setDateTime(dateTime);
 
-            return eventService.createEvent(event, managerName, image);
+            return eventService.createEvent(event, managerId, image);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,10 +84,10 @@ public class EventController {
     @PostMapping("/updateEvent")
     public JsonNode updateEvent(@RequestBody Event event) {
         User user = userService.getLoggedInUser();
-        String managerName = user.getName();
+        int managerId = user.getId();
         
         try {    
-            return eventService.updateEvent(event, managerName);
+            return eventService.updateEvent(event, managerId);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,10 +98,10 @@ public class EventController {
     @PostMapping("/viewOwnEventByEventManager")
     public JsonNode viewOwnEventByEventManager() { // view event that was created by the Event Manager
         User user = userService.getLoggedInUser();
-        String managerName = user.getName();
+        int managerId = user.getId();
 
         try {
-            return eventService.viewEventByEventManager(managerName);
+            return eventService.viewEventByEventManager(managerId);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -112,12 +112,12 @@ public class EventController {
     @PostMapping("/cancelEventByManager")
     public JsonNode cancelEvent(@RequestBody String body) {
         User user = userService.getLoggedInUser();
-        String managerName = user.getName();
+        int managerId = user.getId();
 
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            return eventService.cancelEventByManager(jsonNode, managerName);
+            return eventService.cancelEventByManager(jsonNode, managerId);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -128,12 +128,12 @@ public class EventController {
     @PostMapping("/viewSalesStatistics")
     public JsonNode viewSalesStatistics(@RequestBody String body) {
         User user = userService.getLoggedInUser();
-        String managerName = user.getName();
+        int managerId = user.getId();
         
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            return reportService.viewSalesStatistics(jsonNode, managerName);
+            return reportService.viewSalesStatistics(jsonNode, managerId);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -144,12 +144,12 @@ public class EventController {
     @PostMapping("/viewAllSalesStatistics")
     public JsonNode viewAllSalesStatistics(@RequestBody String body) {
         User user = userService.getLoggedInUser();
-        String managerName = user.getName();
+        int managerId = user.getId();
 
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            return reportService.viewAllSalesStatistics(jsonNode, managerName);
+            return reportService.viewAllSalesStatistics(jsonNode, managerId);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -160,13 +160,13 @@ public class EventController {
     @PostMapping("/getCSV")
     public ResponseEntity<InputStreamResource> getCSV(@RequestBody String body) {
         User user = userService.getLoggedInUser();
-        String managerName = user.getName();
+        int managerId = user.getId();
 
         ObjectMapper mapper = new ObjectMapper();
         
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            jsonNode = reportService.viewSalesStatistics(jsonNode, managerName);
+            jsonNode = reportService.viewSalesStatistics(jsonNode, managerId);
 
             String filePath = reportService.csvWriter(jsonNode);
             return uploadCsv(filePath);
@@ -182,13 +182,13 @@ public class EventController {
     @PostMapping("/getAllCSV")
     public ResponseEntity<InputStreamResource> getAllCSV(@RequestBody String body) {
         User user = userService.getLoggedInUser();
-        String managerName = user.getName();
+        int managerId = user.getId();
 
         ObjectMapper mapper = new ObjectMapper();
         
         try {
             JsonNode jsonNode = mapper.readTree(body);
-            jsonNode = reportService.viewAllSalesStatistics(jsonNode, managerName);
+            jsonNode = reportService.viewAllSalesStatistics(jsonNode, managerId);
             String filePath = reportService.csvWriter(jsonNode);
             return uploadCsv(filePath);
 

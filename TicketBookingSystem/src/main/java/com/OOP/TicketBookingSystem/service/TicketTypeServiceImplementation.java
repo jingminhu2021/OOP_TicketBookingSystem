@@ -8,7 +8,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
@@ -68,7 +67,7 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
         return node;
     }
 
-    public JsonNode updateTicketType(Ticket_Type ticket_type, String eventManagerName) {
+    public JsonNode updateTicketType(Ticket_Type ticket_type, int managerId) {
         int ticketTypeId = ticket_type.getTicketTypeId();
         int eventId = ticket_type.getEventId();
         
@@ -89,7 +88,7 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
             }
 
             //check if event belong to the manager
-            if (!event.getEventManagerName().equals(eventManagerName)) { 
+            if (event.getEventManagerId()!=managerId) { 
                 node.put("message", "Invalid Event Manager");
                 return node;
             }

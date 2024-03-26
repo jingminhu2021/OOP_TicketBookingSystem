@@ -53,7 +53,7 @@ public class EventServiceImplementation implements EventService {
     private TicketTypeRepo ticketTypeRepo;
 
     @Override
-    public JsonNode createEvent(Event event, String managerName, String image) {
+    public JsonNode createEvent(Event event, int managerId, String image) {
         String eventName = event.getEventName();
         
         ObjectMapper mapper = new ObjectMapper();
@@ -71,14 +71,15 @@ public class EventServiceImplementation implements EventService {
             node.put("message", "Event already exists");
             return node;
         }
-        
-        if (eventManagerRepo.findByName(managerName) == null) { //check if event manager exist
+
+        if(eventManagerRepo.findById(managerId) == null){ //check if event manager exist
             node.put("message", "Invalid Event Manager");
             return node;
         }
         
         try {
-            event.setEventManagerName(managerName); //set event manager name
+            event.setEventManagerId(managerId); //set event manager id
+
             if(image.equals("")){ //if no image is provided, set default image
                 event.setImage("src/main/resources/static/event_images/default.jpg");
             }else{ //if image is provided, decode and save the image
@@ -111,8 +112,8 @@ public class EventServiceImplementation implements EventService {
 
     @Override
     public List<Event> getEventsByEventManager(Event_Manager eventManager) {
-        String eventManagerName = eventManager.getName();
-        return eventRepo.findByEventManager(eventManagerName);
+        int managerId = eventManager.getId();
+        return eventRepo.findByEventManager(managerId);
     }
 
     @Override
@@ -139,7 +140,7 @@ public class EventServiceImplementation implements EventService {
     }
 
     @Override
-    public JsonNode updateEvent(Event event, String eventManagerName) {
+    public JsonNode updateEvent(Event event, int managerId) {
         
         int id = event.getId();
         System.out.println(id);
@@ -157,7 +158,7 @@ public class EventServiceImplementation implements EventService {
         }
 
         //check if event belong to the manager
-        if (!existingEvent.getEventManagerName().equals(eventManagerName)) { 
+        if(existingEvent.getEventManagerId() != managerId){
             node.put("message", "Invalid Event Manager");
             return node;
         }
@@ -171,6 +172,7 @@ public class EventServiceImplementation implements EventService {
                 if (newValue == null) { // if new value is null, set it to the old value
                     field.set(event, oldValue); 
                 }
+                
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -187,6 +189,7 @@ public class EventServiceImplementation implements EventService {
             node.put("message", "Event name already exist");
             return node;
         }
+
         String image = event.getImage();
         
         try {
@@ -218,13 +221,13 @@ public class EventServiceImplementation implements EventService {
     }
 
     @Override
-    public JsonNode viewEventByEventManager(String ManagerName) {
+    public JsonNode viewEventByEventManager(int managerId) {
         
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         ObjectNode node = mapper.createObjectNode();
 
-        List<Event> events = eventRepo.findByEventManager(ManagerName);
+        List<Event> events = eventRepo.findByEventManager(managerId);
 
         node.put("message", "No event found");
         node.put("status", false);
@@ -239,7 +242,7 @@ public class EventServiceImplementation implements EventService {
     }
 
     @Override
-    public JsonNode cancelEventByManager(JsonNode body, String managerName) {    
+    public JsonNode cancelEventByManager(JsonNode body, int managerId) {    
 
         // 1) check if event belong to the manager - done
         // 2) check if event is not already cancelled - done
@@ -261,9 +264,11 @@ public class EventServiceImplementation implements EventService {
         node.put("status", false);
         
         Event event = eventRepo.findById(event_id).orElse(null);
+    
         if (event == null) { //check if event exist
             return node;
-        }else if (!event.getEventManagerName().equals(managerName)) { //check if event belong to the manager
+        }else if (event.getEventManagerId() != managerId) { //check if event belong to the manager
+            System.out.println(event.getEventManagerId() + " " + managerId);
             node.put("message", "Invalid Event Manager");
             return node;
         }else if (LocalDateTime.now().isAfter(event.getDateTime())) { //check if event is not already started

@@ -40,7 +40,7 @@ public class ReportServiceImplementation implements ReportService{
 
     // Individual event sales statistics
     @Override
-    public JsonNode viewSalesStatistics(JsonNode body, String managerName) {
+    public JsonNode viewSalesStatistics(JsonNode body, int managerId) {
         // Obtain event name
         String eventName = body.get("eventName").textValue();
 
@@ -84,13 +84,13 @@ public class ReportServiceImplementation implements ReportService{
 
     // View all events sales statistics
     @Override
-    public JsonNode viewAllSalesStatistics(JsonNode body, String managerName) {
+    public JsonNode viewAllSalesStatistics(JsonNode body, int managerId) {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
         ArrayNode arrayNode = mapper.createArrayNode();
 
-        List<Event> events = eventRepo.findByEventManager(managerName);
+        List<Event> events = eventRepo.findByEventManager(managerId);
 
         node.put("message", "No events found");
         node.put("status", false);

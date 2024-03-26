@@ -42,9 +42,9 @@ public class TicketTypeController {
     @PostMapping("/updateTicketType")
     public JsonNode updateTicketType(@RequestBody Ticket_Type event) {
         User user = userService.getLoggedInUser();
-        String managerName = user.getName();
+        int managerId = user.getId();
         try {
-            return eventService.updateTicketType(event, managerName);
+            return eventService.updateTicketType(event, managerId);
         } catch (Exception e) {
             System.err.println(e);
         }

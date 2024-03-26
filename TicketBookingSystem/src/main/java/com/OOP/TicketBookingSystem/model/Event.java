@@ -20,7 +20,7 @@ public class Event {
     @Column
     private LocalDateTime dateTime;
     @Column
-    private String eventManagerName;
+    private Integer eventManagerId;
     @Column
     private String description;
     @Column(columnDefinition = "varchar(9) default 'Active'")
@@ -62,14 +62,6 @@ public class Event {
         this.dateTime = dateTime;
     }
 
-    public String getEventManagerName() {
-        return eventManagerName;
-    }
-
-    public void setEventManagerName(String eventManagerName) {
-        this.eventManagerName = eventManagerName;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -101,5 +93,15 @@ public class Event {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public int getEventManagerId() {
+        return eventManagerId;
+    }
+
+    public void setEventManagerId(int eventManagerId) {
+        this.eventManagerId = eventManagerId;
+    }
+
+    
 
 }

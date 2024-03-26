@@ -9,7 +9,7 @@ import com.OOP.TicketBookingSystem.model.Transaction;
 
 public interface EventService {
 
-    public JsonNode createEvent(Event event, String managerName, String image);
+    public JsonNode createEvent(Event event, int managerId, String image);
 
     public Event getEventById(int id);
 
@@ -21,15 +21,15 @@ public interface EventService {
 
     public List<String> getCustomerEmails(List<Transaction> transactions);
 
-    public JsonNode updateEvent(Event event, String eventManagerName);
+    public JsonNode updateEvent(Event event, int managerId);
 
-    public JsonNode viewEventByEventManager(String managerName);
+    public JsonNode viewEventByEventManager(int managerId);
 
     public boolean systemRefund(List<Transaction> transactions);
 
     public boolean systemRefund(List<Transaction> transactions, boolean eventManager);
 
-    public JsonNode cancelEventByManager(JsonNode body, String managerName);
+    public JsonNode cancelEventByManager(JsonNode body, int managerId);
 
     public JsonNode viewEvent(int id);
 }

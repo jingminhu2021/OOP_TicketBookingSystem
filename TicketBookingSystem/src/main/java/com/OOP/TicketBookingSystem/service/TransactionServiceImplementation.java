@@ -347,7 +347,8 @@ public class TransactionServiceImplementation implements TransactionService {
             LocalDateTime eventDateTime = event.getDateTime();
             // Format the event date and time 
             String formattedEventDateTime = eventDateTime.format(DateTimeFormatter.ofPattern("MM-dd-yyyy, hh:mma (EEEE)"));
-            String eventManagerName = event.getEventManagerName();
+            int managerId = event.getEventManagerId();
+            String eventManagerName = userRepo.findById(managerId).orElse(null).getName();
             String description = event.getDescription();
             int ticket_type_id = transaction.getTicketTypeId();
             int eventId = transaction.getEventId();
