@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
@@ -24,7 +23,6 @@ import com.OOP.TicketBookingSystem.repository.EventRepo;
 import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
 import com.OOP.TicketBookingSystem.repository.TransactionRepo;
 import com.OOP.TicketBookingSystem.repository.UserRepo;
-import com.OOP.TicketBookingSystem.service.EventService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -433,20 +431,24 @@ public class TransactionServiceImplementation implements TransactionService {
     }
 
     @Override
-    public JsonNode refund(int transactionId, int ticktTypeId){
+    public JsonNode cancellation(int transactionId, int ticktTypeId){
         Transaction transaction = transactionRepo.findByTransactionIdAndticketTypeId(transactionId, ticktTypeId);
         int eventId = transaction.getEventId();
-        Event event = eventRepo.findById(eventId);
-        LocalDateTime eventTime = event.getDateTime();
-        LocalDateTime timeNow = LocalDateTime.now();
+        Event event = eventRepo.findById(eventId).orElse(null);
 
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode node = objectMapper.createObjectNode();
 
         node.put("status", false);
         node.put("message", "Refund failed");
-        long dayDiff = ChronoUnit.DAYS.between(timeNow, eventTime);
-        if (dayDiff < 2){
+
+        if(event == null){ // Check if event exists
+            node.put("message", "Event does not exist");
+            return node;
+        }
+        
+        if (LocalDateTime.now().plusHours(48).isAfter(event.getDateTime())){ // Check if event date is at least 48 hours from today
+            node.put("message", "Cancellation is not allowed 48 hours before event date");
             return node;
         } else {
             transactionRepo.refundTicket(transactionId, ticktTypeId);

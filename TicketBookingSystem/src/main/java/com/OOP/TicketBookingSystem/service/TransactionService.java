@@ -18,5 +18,5 @@ public interface TransactionService {
     
     public JsonNode generateQRCode(int ticketId, String text);
 
-    public JsonNode refund(int transactionId, int ticketTypeId);
+    public JsonNode cancellation(int transactionId, int ticketTypeId);
 }

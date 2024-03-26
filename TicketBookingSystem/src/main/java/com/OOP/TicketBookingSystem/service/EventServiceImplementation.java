@@ -252,7 +252,7 @@ public class EventServiceImplementation implements EventService {
         // 1) requested event manager name
         // 2) event_id
 
-        int event_id = body.get("event_id").intValue();
+        int event_id = body.get("event_id").asInt();
         
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
