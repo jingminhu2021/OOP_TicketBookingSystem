@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, Toast } from 'react-bootstrap';
 
-function cancelEvent(id){
+function CancelEvent(id){
     const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
     };
+    const [userData, setUserData] = useState(null);
     const [show, setShow] = useState(false);
     const [show2, setShow2] = useState(false);
-
+    const [message, setMessage] = useState('');
+    const [title, setTitle] = useState('');
     useEffect(() => {
         
         const getUserData = async (token) => {
@@ -38,13 +40,16 @@ function cancelEvent(id){
     const handleShow2 = () => setShow2(true);
 
     const handleCancel = async () => {
-        let api_endpoint_url = 'http://localhost:8080/event/cancelEvent';
+        let api_endpoint_url = 'http://localhost:8080/event/cancelEventByManager';
         const bodyParameters = {
             event_id: id
         };
         try {
             const response = await axios.post(api_endpoint_url, bodyParameters, config);
-            console.log(response.data);
+            
+            handleClose();
+            setTitle(response.data.status ? 'Event cancelled' : 'Error');
+            setMessage(response.data.message);
             handleShow2();
         } catch (error) {
             console.error('Error occurred:', error);
@@ -63,7 +68,8 @@ function cancelEvent(id){
                 <Modal.Title>Cancel Event</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p>Are you sure you want to cancel this event? <br> Note: All purchase tickets will be refunded.</br></p>
+                <p>Are you sure you want to cancel this event?</p>
+                <p>Note: All purchase tickets will be refunded.</p>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
@@ -77,10 +83,10 @@ function cancelEvent(id){
         
         <Modal show={show2} onHide={handleClose2}>
             <Modal.Header closeButton>
-                <Modal.Title>Event Cancelled</Modal.Title>
+                <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p>Event has been cancelled successfully.</p>
+                <p>{message}</p>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="primary" onClick={handleClose2}>
@@ -92,4 +98,4 @@ function cancelEvent(id){
     )
 }
 
-export default cancelEvent;
+export default CancelEvent;
