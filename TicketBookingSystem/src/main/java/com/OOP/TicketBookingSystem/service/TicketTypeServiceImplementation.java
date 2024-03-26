@@ -58,8 +58,11 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
             node.put("message", "Successfully created Ticket Type");
             node.put("status", true);
 
-        } catch (Exception e) {
-            node.put("message", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            node.put("message", e.toString());
+
+        } catch (Exception e ){
+            node.put("message", e.toString());
         }
 
         return node;
@@ -122,8 +125,8 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
 
                 } catch (IllegalArgumentException e) {
                     node.put("message", e.toString());
-
-                } catch (OptimisticLockingFailureException e) {
+        
+                } catch (Exception e ){
                     node.put("message", e.toString());
                 }
             }
