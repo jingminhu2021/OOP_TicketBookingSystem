@@ -122,4 +122,17 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
         return null;
     }
 
+    @PostMapping("/cancellation")
+    public JsonNode cancellation(@RequestBody JsonNode body){
+        try {
+            int transactionId = body.get("transactionId").asInt();
+            int ticketTypeId = body.get("ticketTypeId").asInt();
+            return transactionService.cancellation(transactionId, ticketTypeId);
+        }
+        catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+    }
+
 }
