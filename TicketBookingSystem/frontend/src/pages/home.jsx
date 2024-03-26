@@ -13,7 +13,7 @@ function Home() {
             <div>
             <Navbar />
             {/* {UpdateEvent(urlParams.get('id'))} */}
-            {/* {CancelEvent(urlParams.get('id'))} */}
+            {CancelEvent(urlParams.get('id'))}
             <div className="modal fade" id="productView" tabIndex="-1">
                 <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content overflow-hidden border-0">

@@ -59,7 +59,7 @@ function CancelEvent(id){
     return(
         <>
         {userData && userData.role === 'Event_Manager' &&(
-            <Button variant="outline-primary" onClick={handleShow}>
+            <Button variant="danger" onClick={handleShow}>
                 <i className="fas fa-plus me-1 text-gray fw-normal"></i>Cancel Event
             </Button>
         )}
@@ -75,7 +75,7 @@ function CancelEvent(id){
                 <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>
-                <Button variant="primary" onClick={handleCancel}>
+                <Button variant="danger" onClick={handleCancel}>
                     Cancel Event
                 </Button>
             </Modal.Footer>
