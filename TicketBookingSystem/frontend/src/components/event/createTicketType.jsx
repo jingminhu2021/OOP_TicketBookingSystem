@@ -11,11 +11,11 @@ function CreateTicketType(id){
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const [formData, setFormData] = useState([{ name: '', description: '', price: '' }]);
+    const [formData, setFormData] = useState([{ category: '', price: '', number_of_ticket: '', cancellation_fee: ''}]);
 
 
     const handleAddClick = () => {
-        setFormData([...formData, { name: '', price: '', number_of_ticket: '', cancellation_fee: ''}]);
+        setFormData([...formData, { category: '', price: '', number_of_ticket: '', cancellation_fee: ''}]);
     };
 
     const handleDeleteClick = index => {
@@ -68,6 +68,10 @@ function CreateTicketType(id){
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (formData.length === 0) {
+            console.log('No data to submit');
+            return;
+        }
         console.log('Form data submitted:', formData);
         // Add your authentication logic here, e.g., send data to an API
         // send_onsubmit(formData.email, formData.password)
@@ -121,7 +125,7 @@ function CreateTicketType(id){
                         <Form.Group className="mb-3" controlId={`ticketType${index}`} key={index}>
                             <h5>Add new Ticket {index+1}:</h5>
                             <Form.Label>Event Category:</Form.Label>
-                            <Form.Control type="text" placeholder="Enter name" name="name" value={item.name} onChange={e => handleInputChange(e, index)} required/>
+                            <Form.Control type="text" placeholder="Enter category name" name="category" value={item.category} onChange={e => handleInputChange(e, index)} required/>
 
                             <Form.Label>Event Price:</Form.Label>
                             <Form.Control type="number" placeholder="Enter price" name="price" value={item.price} onChange={e => handleInputChange(e, index)} required/>
