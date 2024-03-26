@@ -38,6 +38,13 @@ public interface TransactionRepo extends JpaRepository<Transaction, Integer> {
     @Query (value = "UPDATE transaction t SET t.status='cancelled' where t.ticket_id=:ticketId", nativeQuery = true)
     public void updateTicketStatus(@Param("ticketId")int ticketId);
 
+    @Modifying
+    @Query(value = "UPDATE transaction t SET t.status='refunded' where t.transaction_id=:transactionId and t.ticketTypeId=:ticketTypeId", nativeQuery = true)
+    public void refundTicket(@Param("transactionId")int transactionId, @Param("ticketTypeId") int ticketTypeId);
+
     @Query(value = "SELECT * FROM transaction WHERE user_email=? AND transaction_id = ?", nativeQuery=true)
     public List<Transaction> findByEmailAndTransactionId(String email, int transaction_id);
+
+    @Query(value = "SELECT * FROM transaction WHERE transaction_id = :transactionId and ticket_type_id = :ticketTypeId", nativeQuery = true)
+    public Transaction findByTransactionIdAndticketTypeId(@Param("transactionId")int transactionId, @Param("ticketTypeId")int ticketTypeId);
 }

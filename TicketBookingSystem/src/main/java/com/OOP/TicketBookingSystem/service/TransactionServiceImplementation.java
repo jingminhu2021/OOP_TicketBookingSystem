@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
@@ -23,6 +24,7 @@ import com.OOP.TicketBookingSystem.repository.EventRepo;
 import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
 import com.OOP.TicketBookingSystem.repository.TransactionRepo;
 import com.OOP.TicketBookingSystem.repository.UserRepo;
+import com.OOP.TicketBookingSystem.service.EventService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -57,6 +59,9 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private EventService eventService;
 
     @Override
     public JsonNode bookTicket(JsonNode body) {
@@ -423,6 +428,33 @@ public class TransactionServiceImplementation implements TransactionService {
         } catch (IOException | WriterException e) {
             node.put("success", false);
             node.put("message", "Error generating QR Code: " + e.getMessage());
+        }
+        return node;
+    }
+
+    @Override
+    public JsonNode refund(int transactionId, int ticktTypeId){
+        Transaction transaction = transactionRepo.findByTransactionIdAndticketTypeId(transactionId, ticktTypeId);
+        int eventId = transaction.getEventId();
+        Event event = eventRepo.findById(eventId);
+        LocalDateTime eventTime = event.getDateTime();
+        LocalDateTime timeNow = LocalDateTime.now();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode node = objectMapper.createObjectNode();
+
+        node.put("status", false);
+        node.put("message", "Refund failed");
+        long dayDiff = ChronoUnit.DAYS.between(timeNow, eventTime);
+        if (dayDiff < 2){
+            return node;
+        } else {
+            transactionRepo.refundTicket(transactionId, ticktTypeId);
+            List <Transaction> transactions = new ArrayList<Transaction>(1);
+            transactions.add(0, transaction);
+            eventService.systemRefund(transactions);
+            node.put("status", true);
+            node.put("message", "Refund successful");
         }
         return node;
     }
