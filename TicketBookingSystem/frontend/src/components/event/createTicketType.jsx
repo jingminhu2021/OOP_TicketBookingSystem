@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Modal, Button, Form, InputGroup } from 'react-bootstrap';
+import { Modal, Button, Form, InputGroup, Alert } from 'react-bootstrap';
 
 function CreateTicketType(id){
     const token = localStorage.getItem('token');
@@ -9,10 +9,28 @@ function CreateTicketType(id){
     };
     const [userData, setUserData] = useState(null);
     const [show, setShow] = useState(false);
+    const [show2, setShow2] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const [formData, setFormData] = useState([{ category: '', price: '', number_of_ticket: '', cancellation_fee: ''}]);
+    const handleClose2 = () => {
+        setShow2(false);
+        setFormData([{ category: '', price: '', number_of_ticket: '', cancellation_fee: ''}]);
+        setResults([]);
+    }
+    const handleShow2 = () => setShow2(true);
 
+    const [show3, setShow3] = useState(false);
+    const handleClose3 = () => setShow3(false);
+    const handleShow3 = () => setShow3(true);
+
+    const [showCategoryAlert, setShowCategoryAlert] = useState(false);
+    const [showPriceAlert, setShowPriceAlert] = useState(false);
+    const [showNumberOfTicketAlert, setShowNumberOfTicketAlert] = useState(false);
+    const [showCancellationFeeAlert, setShowCancellationFeeAlert] = useState(false);
+
+    const [formData, setFormData] = useState([{ category: '', price: '', number_of_ticket: '', cancellation_fee: ''}]);
+    const [results, setResults] = useState([]);
+    const [duplicate, setDuplicate] = useState([]);
 
     const handleAddClick = () => {
         setFormData([...formData, { category: '', price: '', number_of_ticket: '', cancellation_fee: ''}]);
@@ -48,7 +66,24 @@ function CreateTicketType(id){
     const handleInputChange = (e, index) => {
         const { name, value } = e.target;
         const list = [...formData];
-    
+        if (!value) {
+            switch (name) {
+                case 'category':
+                    setShowCategoryAlert(true);
+                    break;
+                case 'price':
+                    setShowPriceAlert(true);
+                    break;
+                case 'number_of_ticket':
+                    setShowNumberOfTicketAlert(true);
+                    break;
+                case 'cancellation_fee':
+                    setShowCancellationFeeAlert(true);
+                    break;
+                default:
+                    break;
+            }
+        }
         // Check if value is within range for 'cancellation_fee' field
         if (name === 'cancellation_fee') {
             if (value < 0) {
@@ -62,48 +97,54 @@ function CreateTicketType(id){
         } else {
             list[index][name] = value;
         }
-    
         setFormData(list);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Check for duplicate categories
+        const categories = formData.map(item => item.category);
+        const hasDuplicates = categories.some((category, index) => categories.indexOf(category) !== index);
+
+        if (hasDuplicates) {
+            setDuplicate(categories.filter((category, index) => categories.indexOf(category) !== index));
+            handleShow3();
+            return;
+        }
+        
         if (formData.length === 0) {
             console.log('No data to submit');
             return;
         }
         console.log('Form data submitted:', formData);
         // Add your authentication logic here, e.g., send data to an API
-        // send_onsubmit(formData.email, formData.password)
+        for (let key in formData) {
+            send_onsubmit(id, formData[key].category, formData[key].price, formData[key].cancellation_fee,  formData[key].number_of_ticket);
+        }
+        handleShow2();
+        handleClose();        
     };
 
-    const send_onsubmit = (email, password) => {
-        // let api_endpoint_url = 'http://localhost:8080/login';
-        // let formData = new FormData();
-        // formData.append('email', email);
-        // formData.append('password', password);
-    
-        // axios.post(api_endpoint_url, formData)
-        //     .then(function (response) {
-        //         var data = response.data;
-        //         var status = response.request.status;
-        //         console.log(data);
+    const send_onsubmit = (event_id, category, price, cancellation_fee, number_of_ticket) => {
+        let api_endpoint_url = 'http://localhost:8080/ticketType/createTicketType';
+        var bodyParameters = {
+            eventId: event_id,
+            eventCat: category,
+            eventPrice: price,
+            cancellationFeePercentage: cancellation_fee,
+            numberOfTix: number_of_ticket
+        };
 
-        //         if (status !== 200) {
-        //             console.log(response);
-        //             console.log("here");
-
-        //         } else {
-        //             console.log(response);
-        //             localStorage.setItem('token', data.accessToken);
-        //             // sessionStorage.setItem('token', data.accessToken);
-        //             window.location.reload(false);
-        //         }
-        //     })
-        //     .catch(function (error) {
-        //         console.error('Error occurred:', error);
-        //         // Handle error here
-        //     });
+        axios.post(api_endpoint_url, bodyParameters, config)
+        .then((response) => {
+            console.log(response);
+            setResults(prevResults => [...prevResults, response]);
+        })
+        .catch((error) => {
+            console.error('Error occurred:', error);
+        });
+        
     }
 
     return(
@@ -114,7 +155,7 @@ function CreateTicketType(id){
             </Button>
         )}
         <Modal show={show} onHide={handleClose}>
-            <Modal.Header>
+            <Modal.Header closeButton>
                 <Modal.Title>Create Ticket Type</Modal.Title>
             </Modal.Header>
 
@@ -124,21 +165,57 @@ function CreateTicketType(id){
 
                         <Form.Group className="mb-3" controlId={`ticketType${index}`} key={index}>
                             <h5>Add new Ticket {index+1}:</h5>
+                            
                             <Form.Label>Event Category:</Form.Label>
                             <Form.Control type="text" placeholder="Enter category name" name="category" value={item.category} onChange={e => handleInputChange(e, index)} required/>
+                            {showCategoryAlert && 
+                                <Alert variant="danger" onClose={() => setShowCategoryAlert(false)} dismissible>
+                                    <p>
+                                        Category is required.
+                                    </p>
+                                </Alert>
+                            }
 
+                            
                             <Form.Label>Event Price:</Form.Label>
-                            <Form.Control type="number" placeholder="Enter price" name="price" value={item.price} onChange={e => handleInputChange(e, index)} required/>
-                        
+                            <InputGroup>
+                                <InputGroup.Text id="basic-addon1">SGD$</InputGroup.Text>
+                                <Form.Control type="number" placeholder="Enter price" name="price" value={item.price} onChange={e => handleInputChange(e, index)} required/>
+
+                            </InputGroup>
+                            {showPriceAlert && 
+                                <Alert variant="danger" onClose={() => setShowPriceAlert(false)} dismissible>
+                                    <p>
+                                        Price is required.
+                                    </p>
+                                </Alert>
+                            }
+
+                            
                             <Form.Label>Number of ticket:</Form.Label>
                             <Form.Control type="number" placeholder="Enter number of ticket" name="number_of_ticket" value={item.number_of_ticket} onChange={e => handleInputChange(e, index)} required/>
+                            {showNumberOfTicketAlert && 
+                                <Alert variant="danger" onClose={() => setShowNumberOfTicketAlert(false)} dismissible>
+                                    <p>
+                                        Number of ticket is required.
+                                    </p>
+                                </Alert>
+                            }
                             
+
                             <Form.Label> Cancellation fee (Percentage)</Form.Label>
 
                             <InputGroup>
                                 <Form.Control type="number" min="0" max="100" placeholder="Enter cancellation fee" name="cancellation_fee" value={item.cancellation_fee} onChange={e => handleInputChange(e, index)} required/>
                                 <InputGroup.Text id="basic-addon1">%</InputGroup.Text>
                             </InputGroup>
+                            {showCancellationFeeAlert && 
+                                <Alert variant="danger" onClose={() => setShowCancellationFeeAlert(false)} dismissible>
+                                    <p>
+                                        Cancellation fee is required.
+                                    </p>
+                                </Alert>
+                            }
 
                             <br></br>
                             <Button variant="danger" onClick={() => handleDeleteClick(index)}>Delete</Button>
@@ -146,7 +223,7 @@ function CreateTicketType(id){
                         </Form.Group>
                     ))}
                     <div className="d-flex justify-content-between">
-                        <Button onClick={handleAddClick}>Add new ticket type</Button>
+                        <Button onClick={handleAddClick}>Add more ticket type</Button>
                         <Button variant="primary" type="submit">
                             Create
                         </Button>
@@ -154,6 +231,46 @@ function CreateTicketType(id){
   
                 </Form>
             </Modal.Body>
+        </Modal>
+        
+        <Modal show={show2} onHide={handleClose2}>
+            <Modal.Header closeButton>
+                <Modal.Title>Creation result</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {results.map((results, index) => (
+                    
+                    <div key={index}>
+                        <p>Category: {JSON.parse(results.config.data).eventCat}</p>
+                        <p>Message: {results.data.message }</p>
+                        <p>Success? {results.status ? "Yes":"No"}</p>
+                        <hr/>
+                    </div>
+                ))}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose2}>
+                    Close
+                </Button>
+            </Modal.Footer>
+        </Modal>
+
+        <Modal show={show3} onHide={handleClose3}>
+            <Modal.Header closeButton>
+                <Modal.Title>Duplicate categories</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <p>Duplicate categories are not allowed.</p>
+                <p>Duplicate categories are:</p>
+                {duplicate.map((item, index) => (
+                    <p key={index}>{item}</p>
+                ))}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose3}>
+                    Close
+                </Button>
+            </Modal.Footer>
         </Modal>
         
         </>
