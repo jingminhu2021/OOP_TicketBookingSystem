@@ -1,7 +1,8 @@
 import React from 'react';
 import Navbar from '../components/navbar';
-import UpdateEvent from '../components/updateEvent';
-import CancelEvent from '../components/cancelEvent';
+import UpdateEvent from '../components/event/updateEvent';
+import CancelEvent from '../components/event/cancelEvent';
+import CreateTicketType from '../components/event/createTicketType';
 
 import image from "../img/product-5.jpg";
 
@@ -13,7 +14,8 @@ function Home() {
             <div>
             <Navbar />
             {/* {UpdateEvent(urlParams.get('id'))} */}
-            {CancelEvent(urlParams.get('id'))}
+            {/* {CancelEvent(urlParams.get('id'))} */}
+            {CreateTicketType(urlParams.get('id'))}
             <div className="modal fade" id="productView" tabIndex="-1">
                 <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content overflow-hidden border-0">
