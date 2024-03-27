@@ -18,55 +18,47 @@ function VerifyTicket() {
         ticketTypeId: ''
     });
 
-    // Decrypt the encrypted params
-    const CryptoJS = require("crypto-js");
-    function decrypt(encryptedText) {
-        try {
-            const ENCRYPTION_KEY = process.env.REACT_APP_SECRET_KEY;
-
-            // Decode the URL-encoded ciphertext
-            const decodedEncryptedText = decodeURIComponent(encryptedText);
-
-            const encryptedBytes = CryptoJS.enc.Base64.parse(decodedEncryptedText);
-            const cipherParams = CryptoJS.lib.CipherParams.create({
-                ciphertext: encryptedBytes
-            });
-    
-            const decryptedBytes = CryptoJS.AES.decrypt(
-                cipherParams,
-                CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY),
-                {
-                    mode: CryptoJS.mode.ECB,
-                    padding: CryptoJS.pad.Pkcs7
-                }
-            );
-    
-            return decryptedBytes.toString(CryptoJS.enc.Utf8);
-        } catch (error) {
-            console.error("Error decrypting:", error.message);
-            return null;
-        }
-    }
-
-    // Parse query parameters from URL
-    const searchParams = new URLSearchParams(location.search);
-    const encryptedParams = searchParams.toString() || '';
-    const encryptedText = encryptedParams;
-    // Decrypt the encrypted url parameters
-    const decryptedText = decrypt(encryptedText);
-
     useEffect(() => {
-        if (decryptedText) {
-            const params = new URLSearchParams("?"+decryptedText);
-            setFormData({
-                userId: params.get('userId') || '',
-                eventId: params.get('eventId') || '',
-                ticketId: params.get('ticketId') || '',
-                ticketOfficerId: params.get('ticketOfficerId') || '',
-                ticketTypeId: params.get('ticketTypeId') || ''
-            });
-        }
-    }, [decryptedText]);
+        const fetchData = async () => {
+            try {
+                // Parse query parameters from URL
+                const searchParams = new URLSearchParams(location.search);
+                const encryptedParams = searchParams.toString() || '';
+                console.log('Encrypted Parameters:', encryptedParams);
+
+                // Decode URL-encoded characters
+                const decodedURL = decodeURIComponent(encryptedParams);
+                console.log('Decoded Parameters:', decodedURL);
+    
+                // Decrypt the encrypted url parameters
+                const response = await axios.post(
+                    'http://localhost:8080/transaction/decryptParams',
+                    { encryptedText: decodedURL },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+                const decryptedParams = response.data;
+                const params = new URLSearchParams("?"+decryptedParams);
+    
+                // Update form data with decrypted parameters
+                setFormData({
+                    userId: params.get('userId') || '',
+                    eventId: params.get('eventId') || '',
+                    ticketId: params.get('ticketId') || '',
+                    ticketOfficerId: params.get('ticketOfficerId') || '',
+                    ticketTypeId: params.get('ticketTypeId') || ''
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                setToastMessage('Error decrypting parameters');
+                setShowToast(true);
+            }
+        };
+            fetchData();
+        }, [location.search]);
 
     const handleChange = (event) => {
         const { name, value } = event.target;

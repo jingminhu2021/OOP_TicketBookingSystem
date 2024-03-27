@@ -101,6 +101,31 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
     
+    public String decrypt(String encryptedText) throws Exception {
+        final String encryptionKey = SECRET_KEY;
+
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        SecretKeySpec secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        byte[] encryptedBytes = Base64.getDecoder().decode(encryptedText);
+        byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+        return new String(decryptedBytes);
+    }
+
+    @PostMapping("/decryptParams")
+    public String decryptParams(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            // Decrypt the encrypted parameters
+            JsonNode jsonNode = mapper.readTree(body);
+            String decryptedParams = decrypt(jsonNode.get("encryptedText").asText());
+            return decryptedParams;
+        } catch (Exception e) {
+            e.printStackTrace(); 
+            return "Decryption failed";
+        }
+    }
+    
     @PostMapping("/generateQRCode")
     public JsonNode generateQRCode(@RequestBody String body){
         ObjectMapper mapper = new ObjectMapper();
