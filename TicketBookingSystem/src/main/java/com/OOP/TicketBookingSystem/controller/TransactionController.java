@@ -30,7 +30,7 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @Value("${app.secret-key}")
+    @Value("${enc.secret-key}")
     private String SECRET_KEY;
 
     @PreAuthorize("hasRole('USER')")
