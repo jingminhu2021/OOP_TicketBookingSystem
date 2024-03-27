@@ -6,6 +6,7 @@ import java.util.List;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionService transactionService;
+
+    @Value("${app.secret-key}")
+    private String SECRET_KEY;
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/bookTicket")
@@ -88,8 +92,7 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
     }
 
     private String encrypt(String plainText) throws Exception {
-        // Encryption key - 16 bytes (Assume: this key is kept secret)
-        final String encryptionKey = "87D3402A2E67C6E8484C807EAA86F8DD";
+        final String encryptionKey = SECRET_KEY;
 
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         SecretKeySpec secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");

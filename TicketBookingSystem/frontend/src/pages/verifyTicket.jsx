@@ -22,7 +22,7 @@ function VerifyTicket() {
     const CryptoJS = require("crypto-js");
     function decrypt(encryptedText) {
         try {
-            const ENCRYPTION_KEY = "87D3402A2E67C6E8484C807EAA86F8DD";
+            const ENCRYPTION_KEY = process.env.REACT_APP_SECRET_KEY;
 
             // Decode the URL-encoded ciphertext
             const decodedEncryptedText = decodeURIComponent(encryptedText);
