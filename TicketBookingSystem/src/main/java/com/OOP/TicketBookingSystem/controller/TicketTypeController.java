@@ -51,7 +51,7 @@ public class TicketTypeController {
         return null;
     }
 
-    @GetMapping("/viewTicketTypes")
+    @PostMapping("/viewTicketTypes")
     public List<Ticket_Type> viewTicketTypes(@RequestBody JsonNode body) {
         try {
             return ticketTypeService.viewTicketTypes(body);

@@ -4,7 +4,7 @@ import Navbar from '../components/navbar';
 // import UpdateEvent from '../components/event/updateEvent';
 // import CancelEvent from '../components/event/cancelEvent';
 // import CreateTicketType from '../components/event/createTicketType';
-// import UpdateTicketType from '../components/event/updateTicketType';
+// import ViewTicketOptionsForManager from '../components/event/viewTicketOptionsForManager';
 
 import image from "../img/product-5.jpg";
 
@@ -19,10 +19,8 @@ function Home() {
             {UpdateEvent(urlParams.get('id'))}
             {CancelEvent(urlParams.get('id'))}
             {CreateTicketType(urlParams.get('id'))}  */}
-
-            {/* 1 is the ticket_id*/}
-            {/* {UpdateTicketType(1)}  */}
             
+            {/* {ViewTicketOptionsForManager(urlParams.get('id'))} */}
             <div className="modal fade" id="productView" tabIndex="-1">
                 <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content overflow-hidden border-0">

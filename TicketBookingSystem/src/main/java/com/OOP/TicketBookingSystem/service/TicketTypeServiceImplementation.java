@@ -182,11 +182,10 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
     @Override
     public List<Ticket_Type> viewTicketTypes(JsonNode body) {
         // Get event
-        String eventName = body.get("eventName").textValue();
-        Event event = eventRepo.findByExactEvent(eventName);
+        int event_id = body.get("event_id").asInt();
 
         // Get all ticket types for the event
-        List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(event.getId());   
+        List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(event_id);   
 
         return ticketTypes;
     }
