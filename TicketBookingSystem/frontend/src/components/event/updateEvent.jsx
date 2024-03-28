@@ -25,36 +25,34 @@ function UpdateEvent(id) {
     const getEventData = () => {
         let api_endpoint_url = 'http://localhost:8080/event/viewEvent?id=' + id;
         
-        try {
-            axios.get(api_endpoint_url, config)
-                .then(function (response) {
-                    var data = response.data;
-                    var event = data.event;
-                    console.log(data);
-                    
-                    var date;
-                    try{
-                        date = new Date(event.dateTime[0], event.dateTime[1] - 1, event.dateTime[2], event.dateTime[3], event.dateTime[4]);
-                    }catch(e){
-                        date =  new Date(event.dateTime[0], event.dateTime[1] - 1, event.dateTime[2], event.dateTime[3], event.dateTime[4], event.dateTime[5], event.dateTime[6]);
-                    }
-                    date.setHours(date.getHours() + 8);
-                    setFormData({
-                        event_id: event.id,
-                        event_name: event.eventName,
-                        venue: event.venue,
-                        description: event.description,
-                        date_time: date.toISOString().slice(0, 16),
-                        event_type: event.eventType,
-                        image: event.image
-                    });
-                })
-                .catch(function (error) {
-                    console.error('Error occurred:', error);
+        
+        axios.get(api_endpoint_url, config)
+            .then(function (response) {
+                var data = response.data;
+                var event = data.event;
+                console.log(data);
+                
+                var date;
+                try{
+                    date = new Date(event.dateTime[0], event.dateTime[1] - 1, event.dateTime[2], event.dateTime[3], event.dateTime[4]);
+                }catch(e){
+                    date =  new Date(event.dateTime[0], event.dateTime[1] - 1, event.dateTime[2], event.dateTime[3], event.dateTime[4], event.dateTime[5], event.dateTime[6]);
+                }
+                date.setHours(date.getHours() + 8);
+                setFormData({
+                    event_id: event.id,
+                    event_name: event.eventName,
+                    venue: event.venue,
+                    description: event.description,
+                    date_time: date.toISOString().slice(0, 16),
+                    event_type: event.eventType,
+                    image: event.image
                 });
-        } catch (error) {
-            console.error('Error occurred:', error);
-        }
+            })
+            .catch(function (error) {
+                console.error('Error occurred:', error);
+            });
+    
     };
     
 
