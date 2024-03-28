@@ -72,11 +72,21 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Override
     public JsonNode bookTicket(JsonNode body) {
-        // JSON input: userEmail, eventName, eventCats, eachCatTickets
+        // JSON input: userEmail, eventName, eventCats, eachCatTickets, paymentMode
+        // Sample input:
+        // {
+        //     "userEmail": "test2@gmail.com", 
+        //     "eventName": "test event7", 
+        //     "eventCats": ["cat1", "cat6", "cat5"], 
+        //     "eachCatTickets": [2, 0, 2],
+        //     "paymentMode": "wallet"
+        // }
+
         // Get user info
         String userEmail = body.get("userEmail").textValue();
         User user = userRepo.findByEmail(userEmail);
         int userId = (user != null) ? user.getId() : 0;
+        String paymentMode = body.get("paymentMode").textValue();
 
         // Get event
         String eventName = body.get("eventName").textValue();
@@ -125,6 +135,11 @@ public class TransactionServiceImplementation implements TransactionService {
         // Check if event exists
         if (event == null){
             node.put("message", "Event does not exist");
+            return node;
+        }
+
+        if (paymentMode == null || paymentMode.isEmpty()) {
+            node.put("message", "Payment mode not selected");
             return node;
         }
 
@@ -185,91 +200,96 @@ public class TransactionServiceImplementation implements TransactionService {
             eachCatCost.add(ticketType.getEventPrice());
         }
 
-        // Check if user has enough money
-        if(user.getWallet().compareTo(totalCost) < 0){
-            node.put("message", "Wallet has insufficient funds");
-            return node;
-        }
-
-
-        try {   
-            // Stripe payment
-            Stripe.apiKey = stripeApiKey;
-            String domain = "http://localhost:3000";
-
-            SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl(domain + "/transaction/success?session_id={CHECKOUT_SESSION_ID}");
-
-            // Add line items from arrays
-            for (int i = 0; i < eventCats.size(); i++) {
-                if (eachCatTickets.get(i) != 0) {
-                    paramsBuilder.addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                            .setPriceData(
-                                SessionCreateParams.LineItem.PriceData.builder()
-                                    .setCurrency("SGD")
-                                    .setProductData(
-                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                            .setName(eventCats.get(i) + " ticket")
-                                            .build()
-                                    )
-                                    .setUnitAmount(eachCatCost.get(i).longValue()*100)
-                                    .build()
-                            )
-                            .setQuantity(eachCatTickets.get(i).longValue())
-                            .build()
-                    );
-                }
+        if (paymentMode.equals("wallet")) { // Pay by wallet
+            // Check if user has enough money
+            if(user.getWallet().compareTo(totalCost) < 0){
+                node.put("message", "Wallet has insufficient funds");
+                return node;
             }
-
-            SessionCreateParams params = paramsBuilder.build();
 
             try {
+                // Add each ticket as a transaction
+                for (int i = 0; i < eventCats.size(); i++) {
+                    Ticket_Type ticketType = ticketTypeRepo.findByEventCat(eventCats.get(i), eventId);
+                    int purchaseTickets = eachCatTickets.get(i);
+                    ticketType.setNumberOfTix(ticketType.getNumberOfTix() - purchaseTickets);
+                    // Add a record for each ticket bought
+                    for (int j = 0; j < purchaseTickets; j++) {
+                        existingTransactions = transactionRepo.getPurchasedTickets(eventId, userEmail);
+                        // If user has bought tickets before
+                        if (existingTransactions.size() > 0) {
+                            Transaction transaction = new Transaction();
+                            transaction.setTransactionId(existingTransactions.get(0).getTransactionId());
+                            transaction.setEventId(eventId);
+                            transaction.setTicketTypeId(ticketType.getTicketTypeId());
+                            transaction.setBookingDateTime(bookingDateTime);
+                            transaction.setUserEmail(userEmail);
+                            transaction.setUserId(userId);
+                            transactionRepo.save(transaction);
+                        }
+                        else {
+                            Transaction transaction = new Transaction();
+                            transaction.setTransactionId(transactionRepo.getMaxTransactionId() + 1);
+                            transaction.setEventId(eventId);
+                            transaction.setTicketTypeId(ticketType.getTicketTypeId());
+                            transaction.setBookingDateTime(bookingDateTime);
+                            transaction.setUserEmail(userEmail);
+                            transaction.setUserId(userId);
+                            transactionRepo.save(transaction);
+                        }
+                    }
+                    // Update remaining event tickets
+                    ticketTypeRepo.save(ticketType);
+                }
+
+                // Update user wallet
+                user.setWallet(user.getWallet().subtract(totalCost));
+                userRepo.save(user);
+            } catch (IllegalArgumentException e) {
+                node.put("message", e.toString());
+    
+            } catch (OptimisticLockingFailureException e) {
+                node.put("message", e.toString());
+            }
+        }
+        else { // Pay by Stripe
+            try {   
+                // Stripe payment
+                Stripe.apiKey = stripeApiKey;
+                String domain = "http://localhost:3000";
+    
+                SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
+                    .setMode(SessionCreateParams.Mode.PAYMENT)
+                    .setSuccessUrl(domain + "/transaction/success?session_id={CHECKOUT_SESSION_ID}");
+    
+                // Add line items from arrays
+                for (int i = 0; i < eventCats.size(); i++) {
+                    if (eachCatTickets.get(i) != 0) {
+                        paramsBuilder.addLineItem(
+                            SessionCreateParams.LineItem.builder()
+                                .setPriceData(
+                                    SessionCreateParams.LineItem.PriceData.builder()
+                                        .setCurrency("SGD")
+                                        .setProductData(
+                                            SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                .setName(eventCats.get(i) + " ticket")
+                                                .build()
+                                        )
+                                        .setUnitAmount(eachCatCost.get(i).longValue()*100)
+                                        .build()
+                                )
+                                .setQuantity(eachCatTickets.get(i).longValue())
+                                .build()
+                        );
+                    }
+                }
+                SessionCreateParams params = paramsBuilder.build();
                 Session session = Session.create(params);
                 return mapper.valueToTree(session.getUrl());   
+            } catch (StripeException e) {
+                node.put("message", e.toString());
             }
-            catch (StripeException e) {
-                e.printStackTrace();
-            }
-
-            // // Add each ticket as a transaction
-            // for (int i = 0; i < eventCats.size(); i++) {
-            //     Ticket_Type ticketType = ticketTypeRepo.findByEventCat(eventCats.get(i), eventId);
-            //     int purchaseTickets = eachCatTickets.get(i);
-            //     ticketType.setNumberOfTix(ticketType.getNumberOfTix() - purchaseTickets);
-            //     // Add a record for each ticket bought
-            //     for (int j = 0; j < purchaseTickets; j++) {
-            //         existingTransactions = transactionRepo.getPurchasedTickets(eventId, userEmail);
-            //         // If user has bought tickets before
-            //         if (existingTransactions.size() > 0) {
-            //             Transaction transaction = new Transaction();
-            //             transaction.setTransactionId(existingTransactions.get(0).getTransactionId());
-            //             transaction.setEventId(eventId);
-            //             transaction.setTicketTypeId(ticketType.getTicketTypeId());
-            //             transaction.setBookingDateTime(bookingDateTime);
-            //             transaction.setUserEmail(userEmail);
-            //             transaction.setUserId(userId);
-            //             transactionRepo.save(transaction);
-            //         }
-            //         else {
-            //             Transaction transaction = new Transaction();
-            //             transaction.setTransactionId(transactionRepo.getMaxTransactionId() + 1);
-            //             transaction.setEventId(eventId);
-            //             transaction.setTicketTypeId(ticketType.getTicketTypeId());
-            //             transaction.setBookingDateTime(bookingDateTime);
-            //             transaction.setUserEmail(userEmail);
-            //             transaction.setUserId(userId);
-            //             transactionRepo.save(transaction);
-            //         }
-            //     }
-            //     // Update remaining event tickets
-            //     ticketTypeRepo.save(ticketType);
-            // }
-
-            // // Update user wallet
-            // user.setWallet(user.getWallet().subtract(totalCost));
-            // userRepo.save(user);
+        }
 
             // // Create QR Code for each tickets purchased -->NOTE:(For now only store ticketId, im planning to store the url of a verifyTicket web page(Still creating))
             // List<Transaction> ls = transactionRepo.findByEmail(userEmail);
@@ -281,12 +301,6 @@ public class TransactionServiceImplementation implements TransactionService {
 
             // node.put("message", "Successfully booked ticket(s)");
             // node.put("status", true);
-        } catch (IllegalArgumentException e) {
-            node.put("message", e.toString());
-
-        } catch (OptimisticLockingFailureException e) {
-            node.put("message", e.toString());
-        }
 
         return node;
     }
