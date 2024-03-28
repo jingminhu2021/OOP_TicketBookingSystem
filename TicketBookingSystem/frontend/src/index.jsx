@@ -6,6 +6,7 @@ import './index.css';
 import Home from './pages/home.jsx';
 import Logout from './components/logout.jsx';
 import VerifyTicket from './pages/verifyTicket.jsx';
+import ViewSalesStatistics from './pages/viewSalesStatistics.jsx';
 
 
 import "./css/style.blue.css";
@@ -67,11 +68,17 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/logout" element={<Logout />} />
 
-        // Check if the user is a Ticketing Officer
+        {/* // Check if the user is a Ticketing Officer */}
         {userData && userData.role === 'Ticketing_Officer' ? (
           <Route path="/verifyTicket" element={<VerifyTicket />} />
         ) : (
           <Route path="/verifyTicket" element={<h1>Not Authorized</h1>} />
+        )}
+
+        {userData && userData.role === 'Event_Manager' ? (
+          <Route path="/viewSalesStatistics" element={<ViewSalesStatistics />} />
+        ) : (
+          <Route path="/viewSalesStatistics" element={<h1>Not Authorized</h1>} />
         )}
 
         <Route path="*" element={<h1>Not Found</h1>} />
