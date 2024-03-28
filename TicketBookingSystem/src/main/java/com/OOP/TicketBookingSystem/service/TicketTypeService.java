@@ -12,4 +12,6 @@ public interface TicketTypeService {
     public JsonNode updateTicketType(Ticket_Type ticket_type, int managerId);
 
     public List<Ticket_Type> viewTicketTypes(JsonNode body);
+
+    public Ticket_Type viewSingleTicketType(JsonNode body);
 }

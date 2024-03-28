@@ -353,7 +353,9 @@ public class TransactionServiceImplementation implements TransactionService {
             int ticket_type_id = transaction.getTicketTypeId();
             int eventId = transaction.getEventId();
             // Get ticket type name
-            String eventCat = ticketTypeRepo.findByTicketTypeId(ticket_type_id).getEventCat();
+            Ticket_Type ticketType = ticketTypeRepo.findById(ticket_type_id).orElse(null);
+            String eventCat = ticketType.getEventCat();
+
             // Get ticket cat price of event
             BigDecimal eventPrice = ticketTypeRepo.findByEventCat(eventCat, eventId).getEventPrice();
             totalPrice = totalPrice.add(eventPrice);

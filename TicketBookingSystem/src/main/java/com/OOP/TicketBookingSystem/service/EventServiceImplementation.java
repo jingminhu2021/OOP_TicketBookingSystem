@@ -330,7 +330,7 @@ public class EventServiceImplementation implements EventService {
             for(Transaction transaction : transactions){
 
                 int ticketTypeID = transaction.getTicketTypeId();
-                Ticket_Type ticketType = ticketTypeRepo.findByTicketTypeId(ticketTypeID);
+                Ticket_Type ticketType = ticketTypeRepo.findById(ticketTypeID).orElse(null);
                 BigDecimal price = ticketType.getEventPrice();
                 String email = transaction.getUserEmail();
                 User user = userRepo.findByEmail(email);
