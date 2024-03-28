@@ -19,12 +19,14 @@ function ViewSalesStatistics() {
     useEffect(() => {
         const fetchEventNames = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/event/viewAllEvents', {
+                const response = await axios({
+                    method: 'post',
+                    url: 'http://localhost:8080/event/viewOwnEventByEventManager',
                     headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
-                setEventNames(response.data.map(event => event.eventName));
+                setEventNames(response.data.events.map(event => event.eventName));
             } catch (error) {
                 console.error('Error:', error);
                 setToastMessage(error.message);
@@ -116,13 +118,13 @@ function ViewSalesStatistics() {
                     <div className="container">
                         <div className="row px-4 px-lg-5 py-lg-4 align-items-center">
                             <div className="col-lg-6">
-                                <h1 className="h2 text-uppercase mb-0">Verify Ticket</h1>
+                                <h1 className="h2 text-uppercase mb-0">Sales Statistics</h1>
                             </div>
                             <div className="col-lg-6 text-lg-end">
                                 <nav aria-label="breadcrumb">
                                     <ol className="breadcrumb justify-content-lg-end mb-0 px-0 bg-light">
                                         <li className="breadcrumb-item"><a className="text-dark" href="/">Home</a></li>
-                                        <li className="breadcrumb-item active">Verify Ticket</li>
+                                        <li className="breadcrumb-item active">Sales Statistics</li>
                                     </ol>
                                 </nav>
                             </div>
@@ -133,14 +135,6 @@ function ViewSalesStatistics() {
                     <div className="row">
                         <div className="col">
                             <Form onSubmit={handleSubmit}>
-                                <div className="mb-3">
-                                    <label htmlFor="managerId" className="form-label">Manager ID</label>
-                                    <input type="text" className="form-control" id="managerId" name="managerId" value={formData.managerId} onChange={handleChange} placeholder="Enter user ID" />
-                                </div>
-                                {/* <div className="mb-3">
-                                    <label htmlFor="eventName" className="form-label">Event Name</label>
-                                    <input type="text" className="form-control" id="eventName" name="eventName" value={formData.eventName} onChange={handleChange} placeholder="Enter event ID" />
-                                </div> */}
                                 <div className="mb-3">
                                     <label htmlFor="eventNameDropdown" className="form-label">Event Name</label>
                                     <select className="form-control" id="eventNameDropdown" name="eventName" value={formData.eventName} onChange={handleChange}>
