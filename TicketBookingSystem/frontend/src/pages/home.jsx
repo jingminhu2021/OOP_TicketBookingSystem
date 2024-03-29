@@ -1,9 +1,9 @@
 import React from 'react';
 import Navbar from '../components/navbar';
-import AddEvent from '../components/event/addEvent';
-import UpdateEvent from '../components/event/updateEvent';
-import CancelEvent from '../components/event/cancelEvent';
-import CreateTicketType from '../components/event/createTicketType';
+// import AddEvent from '../components/event/addEvent';
+// import UpdateEvent from '../components/event/updateEvent';
+// import CancelEvent from '../components/event/cancelEvent';
+// import CreateTicketType from '../components/event/createTicketType';
 // import ViewTicketOptionsForManager from '../components/event/viewTicketOptionsForManager';
 
 import image from "../img/product-5.jpg";
@@ -15,10 +15,10 @@ function Home() {
     return (
             <div>
             <Navbar />
-            { AddEvent()}
+            {/* { AddEvent()}
             {UpdateEvent(urlParams.get('id'))}
             {CancelEvent(urlParams.get('id'))}
-            {CreateTicketType(urlParams.get('id'))} 
+            {CreateTicketType(urlParams.get('id'))}  */}
             
             {/* {ViewTicketOptionsForManager(urlParams.get('id'))} */}
             <div className="modal fade" id="productView" tabIndex="-1">
