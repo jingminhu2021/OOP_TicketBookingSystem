@@ -70,6 +70,10 @@ public class TransactionServiceImplementation implements TransactionService {
     @Autowired
     private EventService eventService;
 
+    public List<Transaction> stripeTxns;
+    
+    public List<Ticket_Type> stripeTicketTypes;
+
     @Override
     public JsonNode bookTicket(JsonNode body) {
         // JSON input: userEmail, eventName, eventCats, eachCatTickets, paymentMode
@@ -254,6 +258,42 @@ public class TransactionServiceImplementation implements TransactionService {
         }
         else { // Pay by Stripe
             try {   
+                // Create a list of transactions and ticket types for Stripe payment success
+                stripeTxns = new ArrayList<>();
+                stripeTicketTypes = new ArrayList<>();
+
+                for (int i = 0; i < eventCats.size(); i++) {
+                    Ticket_Type ticketType = ticketTypeRepo.findByEventCat(eventCats.get(i), eventId);
+                    int purchaseTickets = eachCatTickets.get(i);
+                    ticketType.setNumberOfTix(ticketType.getNumberOfTix() - purchaseTickets);
+                    stripeTicketTypes.add(ticketType);
+                    // Add a record for each ticket bought
+                    for (int j = 0; j < purchaseTickets; j++) {
+                        existingTransactions = transactionRepo.getPurchasedTickets(eventId, userEmail);
+                        // If user has bought tickets before
+                        if (existingTransactions.size() > 0) {
+                            Transaction transaction = new Transaction();
+                            transaction.setTransactionId(existingTransactions.get(0).getTransactionId());
+                            transaction.setEventId(eventId);
+                            transaction.setTicketTypeId(ticketType.getTicketTypeId());
+                            transaction.setBookingDateTime(bookingDateTime);
+                            transaction.setUserEmail(userEmail);
+                            transaction.setUserId(userId);
+                            stripeTxns.add(transaction);
+                        }
+                        else {
+                            Transaction transaction = new Transaction();
+                            transaction.setTransactionId(transactionRepo.getMaxTransactionId() + 1);
+                            transaction.setEventId(eventId);
+                            transaction.setTicketTypeId(ticketType.getTicketTypeId());
+                            transaction.setBookingDateTime(bookingDateTime);
+                            transaction.setUserEmail(userEmail);
+                            transaction.setUserId(userId);
+                            stripeTxns.add(transaction);
+                        }
+                    }
+                }
+
                 // Stripe payment
                 Stripe.apiKey = stripeApiKey;
                 String domain = "http://localhost:3000";
@@ -302,6 +342,39 @@ public class TransactionServiceImplementation implements TransactionService {
             // node.put("message", "Successfully booked ticket(s)");
             // node.put("status", true);
 
+        return node;
+    }
+
+    @Override
+    public JsonNode success(String sessionId) {
+        // If stripe payment succeeded, add to DB
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+        node.put("message", "Payment successful");
+        node.put("status", true);
+
+        try {
+            Stripe.apiKey = stripeApiKey;
+            Session session = Session.retrieve(sessionId);
+
+            // Check if paid
+            if (session.getPaymentStatus().equals("paid")) {
+                // Update DB
+                for (Transaction transaction : stripeTxns) {
+                    transactionRepo.save(transaction);
+                }
+                for (Ticket_Type ticketType : stripeTicketTypes) {
+                    ticketTypeRepo.save(ticketType);
+                }
+            } else {
+                node.put("message", "Payment failed");
+                node.put("status", false);
+            }
+
+        } catch (StripeException e) {
+            node.put("message", e.toString());
+            node.put("status", false);
+        }
         return node;
     }
 

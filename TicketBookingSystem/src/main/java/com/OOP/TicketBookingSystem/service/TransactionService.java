@@ -19,4 +19,6 @@ public interface TransactionService {
     public JsonNode generateQRCode(int ticketId, String text);
 
     public JsonNode cancellation(int transactionId, int ticketTypeId);
+
+    public JsonNode success(String sessionId);
 }
