@@ -76,11 +76,11 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Override
     public JsonNode bookTicket(JsonNode body) {
-        // JSON input: userId, eventName, eventCats, eachCatTickets, paymentMode
+        // JSON input: userId, eventId, eventCats, eachCatTickets, paymentMode
         // Sample input:
         // {
         //     "userId": "2", 
-        //     "eventName": "test event7", 
+        //     "eventId": "6", 
         //     "eventCats": ["cat1", "cat6", "cat5"], 
         //     "eachCatTickets": [2, 0, 2],
         //     "paymentMode": "wallet"
@@ -93,9 +93,8 @@ public class TransactionServiceImplementation implements TransactionService {
         String paymentMode = body.get("paymentMode").textValue();
 
         // Get event
-        String eventName = body.get("eventName").textValue();
-        Event event = eventRepo.findByExactEvent(eventName);
-        int eventId = (event != null) ? event.getId() : 0;
+        int eventId = body.get("eventId").intValue();
+        Event event = eventRepo.findByEventId(eventId);
 
         int totalTickets = 0;
         // Get Transaction types and number of tickets to purchase in each category
