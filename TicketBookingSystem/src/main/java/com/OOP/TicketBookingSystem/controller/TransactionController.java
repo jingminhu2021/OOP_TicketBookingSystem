@@ -129,9 +129,7 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
             String query = text.split("\\?")[1];
             System.err.println(domain);
             System.err.println(query);
-            // Encrypt the query
-            String encryptedQuery = encrypt(query);
-            return transactionService.generateQRCode(ticketId, domain + "?" + encryptedQuery);
+            return transactionService.generateQRCode(ticketId, text);
         }
         catch (Exception e){
             System.err.println(e);
