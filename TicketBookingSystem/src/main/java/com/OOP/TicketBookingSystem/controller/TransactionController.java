@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.crypto.Cipher;
 import java.util.Base64;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 @RestController
@@ -90,16 +91,6 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
         }
         return null;
     }
-
-    private String encrypt(String plainText) throws Exception {
-        final String encryptionKey = SECRET_KEY;
-
-        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        SecretKeySpec secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
-        return Base64.getEncoder().encodeToString(encryptedBytes);
-    }
     
     public String decrypt(String encryptedText) throws Exception {
         final String encryptionKey = SECRET_KEY;
@@ -118,8 +109,9 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
         try {
             // Decrypt the encrypted parameters
             JsonNode jsonNode = mapper.readTree(body);
-            String decryptedParams = decrypt(jsonNode.get("encryptedText").asText());
-            return decryptedParams;
+            String urlDecodedParams = URLDecoder.decode(jsonNode.get("encryptedText").asText(), "UTF-8").replace(" ", "+").replace("=", "");
+            String decryptedParams = decrypt(urlDecodedParams);
+            return decryptedParams.replace(body, decryptedParams);
         } catch (Exception e) {
             e.printStackTrace(); 
             return "Decryption failed";
@@ -139,10 +131,7 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
             System.err.println(query);
             // Encrypt the query
             String encryptedQuery = encrypt(query);
-            // URL encode the encrypted query
-            String encodedEncryptedQuery = URLEncoder.encode(encryptedQuery, "UTF-8");
-
-            return transactionService.generateQRCode(ticketId, domain + "?" + encodedEncryptedQuery);
+            return transactionService.generateQRCode(ticketId, domain + "?" + encryptedQuery);
         }
         catch (Exception e){
             System.err.println(e);

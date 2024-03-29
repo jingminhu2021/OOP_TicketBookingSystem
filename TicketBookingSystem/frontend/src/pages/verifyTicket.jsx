@@ -6,6 +6,10 @@ import { useLocation } from 'react-router-dom';
 
 function VerifyTicket() {
     const token = localStorage.getItem('token');
+    const config = {
+        headers: { Authorization: `Bearer ${token}` }
+    };
+
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const location = useLocation();
@@ -17,6 +21,26 @@ function VerifyTicket() {
         ticketOfficerId: '',
         ticketTypeId: ''
     });
+    
+    const getUserData = async (token, userId, eventId, ticketId, ticketTypeId) => {
+        let api_endpoint_url = 'http://localhost:8080/user/getLoggedInUser';
+        const bodyParameters = {
+            key: "value"
+        };
+        try {
+            const response = await axios.post(api_endpoint_url, bodyParameters, config);
+            setFormData({
+                userId: userId,
+                eventId: eventId,
+                ticketId: ticketId,
+                ticketTypeId: ticketTypeId,
+                ticketOfficerId: response.data.user.id,
+            });
+            
+        } catch (error) {
+            console.error('Error occurred:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,15 +49,11 @@ function VerifyTicket() {
                 const searchParams = new URLSearchParams(location.search);
                 const encryptedParams = searchParams.toString() || '';
                 console.log('Encrypted Parameters:', encryptedParams);
-
-                // Decode URL-encoded characters
-                const decodedURL = decodeURIComponent(encryptedParams);
-                console.log('Decoded Parameters:', decodedURL);
     
                 // Decrypt the encrypted url parameters
                 const response = await axios.post(
                     'http://localhost:8080/transaction/decryptParams',
-                    { encryptedText: decodedURL },
+                    { encryptedText: encryptedParams },
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -48,17 +68,21 @@ function VerifyTicket() {
                     userId: params.get('userId') || '',
                     eventId: params.get('eventId') || '',
                     ticketId: params.get('ticketId') || '',
-                    ticketOfficerId: params.get('ticketOfficerId') || '',
                     ticketTypeId: params.get('ticketTypeId') || ''
                 });
+    
+                if (token) {
+                    await getUserData(token, params.get('userId'), params.get('eventId'), params.get('ticketId'),params.get('ticketTypeId'));
+                }
+
             } catch (error) {
                 console.error('Error:', error);
                 setToastMessage('Error decrypting parameters');
                 setShowToast(true);
             }
         };
-            fetchData();
-        }, [location.search]);
+        fetchData();
+    }, [location.search, token]); // Include token in dependency array
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -133,10 +157,10 @@ function VerifyTicket() {
                                     <label htmlFor="ticketId" className="form-label">Ticket ID</label>
                                     <input type="text" className="form-control" id="ticketId" name="ticketId" value={formData.ticketId} onChange={handleChange} placeholder="Enter ticket ID" />
                                 </div>
-                                <div className="mb-3">
+                                {/* <div className="mb-3">
                                     <label htmlFor="ticketOfficerId" className="form-label">Ticket Officer ID</label>
                                     <input type="text" className="form-control" id="ticketOfficerId" name="ticketOfficerId" value={formData.ticketOfficerId} onChange={handleChange} placeholder="Enter ticket officer ID" />
-                                </div>
+                                </div> */}
                                 <div className="mb-3">
                                     <label htmlFor="ticketTypeId" className="form-label">Ticket Type ID</label>
                                     <input type="text" className="form-control" id="ticketTypeId" name="ticketTypeId" value={formData.ticketTypeId} onChange={handleChange} placeholder="Enter ticket type ID" />
