@@ -18,6 +18,10 @@ public interface UserRepo extends JpaRepository<User, Integer> {
     @Query(value = "SELECT * FROM users WHERE email=?",nativeQuery=true)
     public User findByEmail(String email);
 
+    // find by id
+    @Query(value = "SELECT * FROM users WHERE id=?",nativeQuery=true)
+    public User findById(int id);
+
     @Modifying
     @Query (value = "UPDATE users u SET u.dtype='Ticketing_Officer' where u.id = :id", nativeQuery = true)
     public void setTicketOfficer(@Param("id")int id);

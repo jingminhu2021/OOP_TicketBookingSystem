@@ -76,10 +76,10 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Override
     public JsonNode bookTicket(JsonNode body) {
-        // JSON input: userEmail, eventName, eventCats, eachCatTickets, paymentMode
+        // JSON input: userId, eventName, eventCats, eachCatTickets, paymentMode
         // Sample input:
         // {
-        //     "userEmail": "test2@gmail.com", 
+        //     "userId": "2", 
         //     "eventName": "test event7", 
         //     "eventCats": ["cat1", "cat6", "cat5"], 
         //     "eachCatTickets": [2, 0, 2],
@@ -87,9 +87,9 @@ public class TransactionServiceImplementation implements TransactionService {
         // }
 
         // Get user info
-        String userEmail = body.get("userEmail").textValue();
-        User user = userRepo.findByEmail(userEmail);
-        int userId = (user != null) ? user.getId() : 0;
+        int userId = body.get("userId").intValue();
+        User user = userRepo.findById(userId);
+        String userEmail = (user != null) ? user.getEmail() : null;
         String paymentMode = body.get("paymentMode").textValue();
 
         // Get event
@@ -181,7 +181,7 @@ public class TransactionServiceImplementation implements TransactionService {
         }
 
         // Check if previously purchased + current purchase exceeds 5 tickets
-        List<Transaction> existingTransactions = transactionRepo.getPurchasedTickets(eventId, userEmail);
+        List<Transaction> existingTransactions = transactionRepo.getPurchasedTickets(eventId, userId);
         int previouslyPurchased = existingTransactions.size();
         if (previouslyPurchased + totalTickets > 5) {
             node.put("message", "Maximum of 5 tickets can be bought for this event");
@@ -219,7 +219,7 @@ public class TransactionServiceImplementation implements TransactionService {
                     ticketType.setNumberOfTix(ticketType.getNumberOfTix() - purchaseTickets);
                     // Add a record for each ticket bought
                     for (int j = 0; j < purchaseTickets; j++) {
-                        existingTransactions = transactionRepo.getPurchasedTickets(eventId, userEmail);
+                        existingTransactions = transactionRepo.getPurchasedTickets(eventId, userId);
                         // If user has bought tickets before
                         if (existingTransactions.size() > 0) {
                             Transaction transaction = new Transaction();
@@ -249,6 +249,9 @@ public class TransactionServiceImplementation implements TransactionService {
                 // Update user wallet
                 user.setWallet(user.getWallet().subtract(totalCost));
                 userRepo.save(user);
+
+                node.put("message", "Successfully booked ticket(s)");
+                node.put("status", true);
             } catch (IllegalArgumentException e) {
                 node.put("message", e.toString());
     
@@ -269,7 +272,7 @@ public class TransactionServiceImplementation implements TransactionService {
                     stripeTicketTypes.add(ticketType);
                     // Add a record for each ticket bought
                     for (int j = 0; j < purchaseTickets; j++) {
-                        existingTransactions = transactionRepo.getPurchasedTickets(eventId, userEmail);
+                        existingTransactions = transactionRepo.getPurchasedTickets(eventId, userId);
                         // If user has bought tickets before
                         if (existingTransactions.size() > 0) {
                             Transaction transaction = new Transaction();
@@ -338,9 +341,6 @@ public class TransactionServiceImplementation implements TransactionService {
             //     String text = "ticketId: "+ticketId;
             //     generateQRCode(ticketId, text);
             // }
-
-            // node.put("message", "Successfully booked ticket(s)");
-            // node.put("status", true);
 
         return node;
     }
