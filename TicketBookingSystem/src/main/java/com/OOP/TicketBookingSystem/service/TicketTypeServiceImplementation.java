@@ -52,6 +52,27 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
             return node;
         }
 
+        //check price is negative
+        if(ticket_type.getEventPrice().compareTo(java.math.BigDecimal.ZERO) < 0){
+            node.put("message", "Price cannot be negative");
+            return node;
+        }
+
+        //check if number of ticket is negative
+        if(ticket_type.getNumberOfTix() < 0){
+            node.put("message", "Number of tickets cannot be negative");
+            return node;
+        }
+
+        //check if cancellation fee is negative or more than 100%
+        if(ticket_type.getCancellationFeePercentage().compareTo(java.math.BigDecimal.ZERO) < 0){
+            node.put("message", "Cancellation fee cannot be negative");
+            return node;
+        }else if (ticket_type.getCancellationFeePercentage().compareTo(java.math.BigDecimal.valueOf(100)) > 0){
+            node.put("message", "Cancellation fee cannot be more than 100%");
+            return node;
+        }
+
         try {
             ticketTypeRepo.save(ticket_type);
             node.put("message", "Successfully created Ticket Type");
@@ -84,6 +105,27 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
             // Check if event is cancelled
             if (status.equals("Cancelled")){
                 node.put("message", "Event is " + status);
+                return node;
+            }
+
+            //check price is negative
+            if(ticket_type.getEventPrice().compareTo(java.math.BigDecimal.ZERO) < 0){
+                node.put("message", "Price cannot be negative");
+                return node;
+            }
+
+            //check if number of ticket is negative
+            if(ticket_type.getNumberOfTix() < 0){
+                node.put("message", "Number of tickets cannot be negative");
+                return node;
+            }
+
+            //check if cancellation fee is negative or more than 100%
+            if(ticket_type.getCancellationFeePercentage().compareTo(java.math.BigDecimal.ZERO) < 0){
+                node.put("message", "Cancellation fee cannot be negative");
+                return node;
+            }else if (ticket_type.getCancellationFeePercentage().compareTo(java.math.BigDecimal.valueOf(100)) > 0){
+                node.put("message", "Cancellation fee cannot be more than 100%");
                 return node;
             }
 
@@ -140,12 +182,23 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
     @Override
     public List<Ticket_Type> viewTicketTypes(JsonNode body) {
         // Get event
-        String eventName = body.get("eventName").textValue();
-        Event event = eventRepo.findByExactEvent(eventName);
+        int event_id = body.get("event_id").asInt();
 
         // Get all ticket types for the event
-        List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(event.getId());   
+        List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(event_id);   
 
         return ticketTypes;
     }
+
+    @Override
+    public Ticket_Type viewSingleTicketType(JsonNode body) {
+
+        int ticketTypeId = body.get("ticketTypeId").intValue();
+
+        // Get ticket type
+        Ticket_Type ticketType = ticketTypeRepo.findById(ticketTypeId).orElse(null);
+
+        return ticketType;
+    }
+
 }

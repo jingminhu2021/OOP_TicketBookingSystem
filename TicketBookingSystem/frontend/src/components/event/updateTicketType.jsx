@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, Form, InputGroup, Alert } from 'react-bootstrap';
 
-function UpdateTicketType(ticket_id){
+function UpdateTicketType(props){
+    const ticket_id = props.ticketId;
     const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
@@ -170,8 +171,8 @@ function UpdateTicketType(ticket_id){
     return(
         <>
         {userData && userData.role === 'Event_Manager' &&(
-            <Button variant="danger" onClick={handleShow}>
-                <i className="fas fa-plus me-1 text-gray fw-normal"></i> Update
+            <Button variant="primary" onClick={handleShow}>
+                <i className="fas fa-plus me-1 text-gray fw-normal"></i> Edit
             </Button>
         )}
 

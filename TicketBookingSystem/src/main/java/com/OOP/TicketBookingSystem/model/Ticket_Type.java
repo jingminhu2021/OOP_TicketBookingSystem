@@ -14,7 +14,7 @@ public class Ticket_Type {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ticketTypeId;
     @Column
-    private int eventId;
+    private Integer eventId;
     @Column
     private String eventCat;
     @Column(columnDefinition = "decimal(38, 2) default 0.00")

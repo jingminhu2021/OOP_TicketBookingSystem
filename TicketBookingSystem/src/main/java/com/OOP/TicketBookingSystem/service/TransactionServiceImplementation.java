@@ -7,7 +7,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,6 +77,9 @@ public class TransactionServiceImplementation implements TransactionService {
     public List<Transaction> stripeTxns;
     
     public List<Ticket_Type> stripeTicketTypes;
+    
+    @Value("${enc.secret-key}")
+    private String SECRET_KEY;
 
     @Override
     public JsonNode bookTicket(JsonNode body) {
@@ -257,6 +264,27 @@ public class TransactionServiceImplementation implements TransactionService {
             } catch (OptimisticLockingFailureException e) {
                 node.put("message", e.toString());
             }
+            
+            // Create QR Code for each tickets purchased
+            //List<Transaction> ls = transactionRepo.findByEmail(userEmail);
+            //for (Transaction transaction: ls){
+            //  int event_id = transaction.getEventId();
+            //  int ticket_id = transaction.getTicketId();
+            //  int ticket_type_id = transaction.getTicketTypeId();
+            //  String text = String.format("http://localhost:3000/verifyTicket?userId=%d&eventId=%d&ticketId=%d&ticketTypeId=%d", userId, event_id, ticket_id, ticket_type_id);
+            //  generateQRCode(ticket_id, text);
+            //}
+
+            // Send ticket details to user email
+            //int transcation_id = ls.get(0).getTransactionId();
+            //sendTicketDetailsEmail(userEmail, transcation_id);
+
+            //node.put("message", "Successfully booked ticket(s)");
+            //node.put("status", true);
+        //} catch (IllegalArgumentException e) {
+        //  node.put("message", e.toString());
+        //}
+          
         }
         else { // Pay by Stripe
             try {   
@@ -332,14 +360,6 @@ public class TransactionServiceImplementation implements TransactionService {
                 node.put("message", e.toString());
             }
         }
-
-            // // Create QR Code for each tickets purchased -->NOTE:(For now only store ticketId, im planning to store the url of a verifyTicket web page(Still creating))
-            // List<Transaction> ls = transactionRepo.findByEmail(userEmail);
-            // for (Transaction transaction: ls){
-            //     int ticketId = transaction.getTicketId();
-            //     String text = "ticketId: "+ticketId;
-            //     generateQRCode(ticketId, text);
-            // }
 
         return node;
     }
@@ -492,7 +512,9 @@ public class TransactionServiceImplementation implements TransactionService {
             int ticket_type_id = transaction.getTicketTypeId();
             int eventId = transaction.getEventId();
             // Get ticket type name
-            String eventCat = ticketTypeRepo.findByTicketTypeId(ticket_type_id).getEventCat();
+            Ticket_Type ticketType = ticketTypeRepo.findById(ticket_type_id).orElse(null);
+            String eventCat = ticketType.getEventCat();
+
             // Get ticket cat price of event
             BigDecimal eventPrice = ticketTypeRepo.findByEventCat(eventCat, eventId).getEventPrice();
             totalPrice = totalPrice.add(eventPrice);
@@ -536,11 +558,38 @@ public class TransactionServiceImplementation implements TransactionService {
         return emailService.sendEmailForTicketComfirm(email, subject, message, ls);
     }
 
+    private String encrypt(String plainText) throws Exception {
+        final String encryptionKey = SECRET_KEY;
+
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        SecretKeySpec secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
+        return Base64.getEncoder().encodeToString(encryptedBytes);
+    }
+
+    public String decrypt(String encryptedText) throws Exception {
+        final String encryptionKey = SECRET_KEY;
+
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        SecretKeySpec secretKey = new SecretKeySpec(encryptionKey.getBytes(), "AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        byte[] encryptedBytes = Base64.getDecoder().decode(encryptedText);
+        byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+        return new String(decryptedBytes);
+    }
+
     @Override
     public JsonNode generateQRCode(int ticketId, String text) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode node = objectMapper.createObjectNode();
         try {
+            String domain = text.split("\\?")[0];
+            String query = text.split("\\?")[1];
+            String encryptedQuery = encrypt(query);
+
+            String finalURL = domain + "?" +encryptedQuery;
+
             // Create a directory if it doesn't exist
             Path qrCodeDir = Paths.get("src/main/resources/static/qrcodes");
             Files.createDirectories(qrCodeDir);
@@ -552,7 +601,7 @@ public class TransactionServiceImplementation implements TransactionService {
             // Generate the QR code
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(
-                    text,
+                    finalURL,
                     BarcodeFormat.QR_CODE, 400, 400);
 
             // Write the QR code image to the file
@@ -563,9 +612,15 @@ public class TransactionServiceImplementation implements TransactionService {
             node.put("success", true);
             node.put("message", "QR Code generated successfully");
             node.put("qrCodeFilePath", qrCodeFilePath);
-        } catch (IOException | WriterException e) {
+        } 
+        catch (IOException | WriterException e) {
             node.put("success", false);
             node.put("message", "Error generating QR Code: " + e.getMessage());
+        }
+        catch (Exception e) {
+            // Handle any other exceptions
+            node.put("success", false);
+            node.put("message", "Unexpected error: " + e.getMessage());
         }
         return node;
     }

@@ -25,13 +25,13 @@ public class TicketTypeController {
     private UserService userService;
 
     @Autowired
-    private TicketTypeService eventService;
+    private TicketTypeService ticketTypeService;
 
     @PreAuthorize("hasRole('Event_Manager')")
     @PostMapping("/createTicketType")
     public JsonNode createTicketType(@RequestBody Ticket_Type event) {
         try {
-            return eventService.createTicketType(event);
+            return ticketTypeService.createTicketType(event);
         } catch (Exception e) {
             System.err.println(e);
         }
@@ -44,20 +44,31 @@ public class TicketTypeController {
         User user = userService.getLoggedInUser();
         int managerId = user.getId();
         try {
-            return eventService.updateTicketType(event, managerId);
+            return ticketTypeService.updateTicketType(event, managerId);
         } catch (Exception e) {
             System.err.println(e);
         }
         return null;
     }
 
-    @GetMapping("/viewTicketTypes")
+    @PostMapping("/viewTicketTypes")
     public List<Ticket_Type> viewTicketTypes(@RequestBody JsonNode body) {
         try {
-            return eventService.viewTicketTypes(body);
+            return ticketTypeService.viewTicketTypes(body);
         } catch (Exception e) {
             System.err.println(e);
         }
         return null;
     }
+
+    @PostMapping("/viewSingleTicketType")
+    public Ticket_Type viewSingleTicketType(@RequestBody JsonNode body) {
+        try {
+            return ticketTypeService.viewSingleTicketType(body);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+    }
+    
 }
