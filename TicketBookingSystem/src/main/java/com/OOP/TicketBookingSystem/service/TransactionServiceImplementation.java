@@ -631,8 +631,8 @@ public class TransactionServiceImplementation implements TransactionService {
     }
 
     @Override
-    public JsonNode cancellation(int transactionId, int ticktTypeId){
-        Transaction transaction = transactionRepo.findByTransactionIdAndticketTypeId(transactionId, ticktTypeId);
+    public JsonNode cancellation(int ticketId, User user){
+        Transaction transaction = transactionRepo.findById(ticketId).orElse(null);
         int eventId = transaction.getEventId();
         Event event = eventRepo.findById(eventId).orElse(null);
 
@@ -641,9 +641,29 @@ public class TransactionServiceImplementation implements TransactionService {
 
         node.put("status", false);
         node.put("message", "Refund failed");
+        if(user.getId()!=transaction.getUserId()){
+            node.put("message", "User does not have permission to cancel this ticket");
+            return node;
+        }
 
         if(event == null){ // Check if event exists
             node.put("message", "Event does not exist");
+            return node;
+        }
+
+        if(event.getStatus().equals("Cancelled")){ // Check if event is cancelled
+            node.put("message", "Event is already cancelled");
+            return node;
+        }
+
+        if(transaction.getStatus().equals("cancelled")){ // Check if ticket is already cancelled
+            node.put("message", "Ticket is already cancelled");
+            return node;
+        }else if(transaction.getStatus().equals("refunded")){ // Check if ticket is already refunded
+            node.put("message", "Ticket is already refunded");
+            return node;
+        }else if(transaction.getStatus().equals("redeemed")){ // Check if ticket is already redeemed
+            node.put("message", "Ticket is already redeemed");
             return node;
         }
         
@@ -651,7 +671,8 @@ public class TransactionServiceImplementation implements TransactionService {
             node.put("message", "Cancellation is not allowed 48 hours before event date");
             return node;
         } else {
-            transactionRepo.refundTicket(transactionId, ticktTypeId);
+
+            transactionRepo.refundTicket(ticketId);
             List <Transaction> transactions = new ArrayList<Transaction>(1);
             transactions.add(0, transaction);
             eventService.systemRefund(transactions);

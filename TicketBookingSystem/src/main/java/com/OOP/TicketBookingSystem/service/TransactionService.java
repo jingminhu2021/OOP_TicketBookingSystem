@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 
 import com.OOP.TicketBookingSystem.model.Transaction;
+import com.OOP.TicketBookingSystem.model.User;
 
 public interface TransactionService {
 
@@ -20,7 +21,7 @@ public interface TransactionService {
     
     public JsonNode generateQRCode(int ticketId, String text);
 
-    public JsonNode cancellation(int transactionId, int ticketTypeId);
+    public JsonNode cancellation(int ticketId, User user);
 
     public JsonNode success(String sessionId);
 }

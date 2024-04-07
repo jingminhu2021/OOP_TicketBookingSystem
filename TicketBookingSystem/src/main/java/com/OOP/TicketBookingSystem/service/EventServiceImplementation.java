@@ -332,18 +332,19 @@ public class EventServiceImplementation implements EventService {
                 int ticketTypeID = transaction.getTicketTypeId();
                 Ticket_Type ticketType = ticketTypeRepo.findById(ticketTypeID).orElse(null);
                 BigDecimal price = ticketType.getEventPrice();
+
                 String email = transaction.getUserEmail();
                 User user = userRepo.findByEmail(email);
                 BigDecimal wallet = user.getWallet();
 
                 if(!eventManager){ //if not cancel by event manager, then we will need to deduct the cancellation fee
                     BigDecimal cancellationFeePercentage = ticketType.getCancellationFeePercentage();
-                    if(!cancellationFeePercentage.equals(BigDecimal.ZERO)){
+                    if(cancellationFeePercentage.compareTo(BigDecimal.ZERO)!=0){
+                        
                         BigDecimal cancellationFee = price.divide(cancellationFeePercentage);
                         price = price.subtract(cancellationFee);
                     }    
                 }
-
                 user.setWallet(wallet.add(price));
                 userRepo.save(user);
             }   

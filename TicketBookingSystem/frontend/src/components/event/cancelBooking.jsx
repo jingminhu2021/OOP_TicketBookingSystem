@@ -2,15 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, Toast } from 'react-bootstrap';
 
-//To do
-//2. Check if transaction is active
-//3. Check if the event is within 48 hours
-//4. Cancel the booking
-//5. Show the message
-
-
-function CancelBooking(ticket_id){
-    // const ticket_id = props.ticketId;
+function CancelBooking(props){
+    const ticket_id = props.ticketId;
     const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
@@ -21,6 +14,7 @@ function CancelBooking(ticket_id){
     const [message, setMessage] = useState('');
     const [title, setTitle] = useState('');
     const [ticketDetails, setTicketDetails] = useState(null);
+    const [isDisabled, setIsDisabled] = useState(false);
 
     useEffect(() => {
         
@@ -68,15 +62,17 @@ function CancelBooking(ticket_id){
     const handleCancel = async () => {
         let api_endpoint_url = 'http://localhost:8080/transaction/cancellation';
         const bodyParameters = {
-            ticketTypeId: ticket_id
+            ticket_id: ticket_id
         };
         try {
             const response = await axios.post(api_endpoint_url, bodyParameters, config);
-            
+                
             handleClose();
             setTitle(response.data.status ? 'Booking cancelled' : 'Cancellation failed');
             setMessage(response.data.message);
             handleShow2();
+            setIsDisabled(true);
+
         } catch (error) {
             console.error('Error occurred:', error);
         }
@@ -84,11 +80,17 @@ function CancelBooking(ticket_id){
 
     return(
         <>
-        {userData && userData.role === 'Customer' &&(
-            <Button variant="danger" onClick={handleShow}>
-                <i className="fas fa-plus me-1 text-gray fw-normal"></i>Cancel Booking
-            </Button>
-        )}
+        {userData && userData.role === 'Customer' && ticketDetails ? (
+            ticketDetails.status === 'active' ? (
+                <Button variant="danger" onClick={handleShow} disabled={isDisabled}>
+                    <i className="fas fa-plus me-1 text-gray fw-normal"></i>Cancel Booking
+                </Button>
+            ) : (
+                <Button variant="danger" onClick={handleShow} disabled>
+                    <i className="fas fa-plus me-1 text-gray fw-normal"></i>Cancel Booking
+                </Button>
+            )
+        ) : null}
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Cancel Booking</Modal.Title>

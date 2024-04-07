@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.OOP.TicketBookingSystem.model.Transaction;
 
@@ -39,8 +40,10 @@ public interface TransactionRepo extends JpaRepository<Transaction, Integer> {
     public void updateTicketStatus(@Param("ticketId")int ticketId);
 
     @Modifying
-    @Query(value = "UPDATE transaction t SET t.status='refunded' where t.transaction_id=:transactionId and t.ticketTypeId=:ticketTypeId", nativeQuery = true)
-    public void refundTicket(@Param("transactionId")int transactionId, @Param("ticketTypeId") int ticketTypeId);
+    @Transactional
+    @Query(value = "UPDATE transaction t SET t.status='refunded' where t.ticket_id=:ticketId", nativeQuery = true)
+    public void refundTicket(@Param("ticketId") int ticketId);
+    
 
     @Query(value = "SELECT * FROM transaction WHERE user_email=? AND transaction_id = ?", nativeQuery=true)
     public List<Transaction> findByEmailAndTransactionId(String email, int transaction_id);

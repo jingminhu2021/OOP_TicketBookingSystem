@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.OOP.TicketBookingSystem.model.Transaction;
+import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.service.TransactionService;
+import com.OOP.TicketBookingSystem.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,6 +33,9 @@ public class TransactionController {
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private UserService userService;
 
     @Value("${enc.secret-key}")
     private String SECRET_KEY;
@@ -153,9 +158,10 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
     @PostMapping("/cancellation")
     public JsonNode cancellation(@RequestBody JsonNode body){
         try {
-            int transactionId = body.get("transactionId").asInt();
-            int ticketTypeId = body.get("ticketTypeId").asInt();
-            return transactionService.cancellation(transactionId, ticketTypeId);
+            int ticket_id = body.get("ticket_id").asInt();
+            User user = userService.getLoggedInUser();
+            
+            return transactionService.cancellation(ticket_id, user);
         }
         catch (Exception e) {
             System.err.println(e);
