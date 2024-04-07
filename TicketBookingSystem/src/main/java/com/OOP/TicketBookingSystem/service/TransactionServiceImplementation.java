@@ -82,6 +82,11 @@ public class TransactionServiceImplementation implements TransactionService {
     private String SECRET_KEY;
 
     @Override
+    public Transaction getTicketDetails(int ticket_id){
+        return transactionRepo.findById(ticket_id).orElse(null);
+    }
+
+    @Override
     public JsonNode bookTicket(JsonNode body) {
         // JSON input: userId, eventId, eventCats, eachCatTickets, paymentMode
         // Sample input:
@@ -95,7 +100,7 @@ public class TransactionServiceImplementation implements TransactionService {
 
         // Get user info
         int userId = body.get("userId").intValue();
-        User user = userRepo.findById(userId);
+        User user = userRepo.findById(userId).orElse(null);
         String userEmail = (user != null) ? user.getEmail() : null;
         String paymentMode = body.get("paymentMode").textValue();
 

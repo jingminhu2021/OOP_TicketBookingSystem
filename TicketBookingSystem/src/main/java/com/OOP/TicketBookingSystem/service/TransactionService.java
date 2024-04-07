@@ -8,6 +8,8 @@ import com.OOP.TicketBookingSystem.model.Transaction;
 
 public interface TransactionService {
 
+    public Transaction getTicketDetails(int ticket_id);
+
     public JsonNode bookTicket(JsonNode body);
 
     public List<Transaction> bookingHistory(int user_id);

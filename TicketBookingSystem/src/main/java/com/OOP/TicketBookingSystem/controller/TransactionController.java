@@ -149,12 +149,27 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
         return null;
     }
 
+    @PreAuthorize("hasRole('Customer')")
     @PostMapping("/cancellation")
     public JsonNode cancellation(@RequestBody JsonNode body){
         try {
             int transactionId = body.get("transactionId").asInt();
             int ticketTypeId = body.get("ticketTypeId").asInt();
             return transactionService.cancellation(transactionId, ticketTypeId);
+        }
+        catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+    }
+
+    @PreAuthorize("hasRole('Customer')")
+    @PostMapping("getTicketDetails")
+    public Transaction getTicketDetails(@RequestBody JsonNode body){
+        try {
+            
+            int ticket_id = body.get("ticket_id").asInt();
+            return transactionService.getTicketDetails(ticket_id);
         }
         catch (Exception e) {
             System.err.println(e);

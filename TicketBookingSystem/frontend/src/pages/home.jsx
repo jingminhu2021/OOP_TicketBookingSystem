@@ -5,13 +5,13 @@ import Navbar from '../components/navbar';
 // import CancelEvent from '../components/event/cancelEvent';
 // import CreateTicketType from '../components/event/createTicketType';
 // import ViewTicketOptionsForManager from '../components/event/viewTicketOptionsForManager';
+import CancelBooking from '../components/event/cancelBooking';
 
 import image from "../img/product-5.jpg";
 
 function Home() {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-
     return (
             <div>
             <Navbar />
@@ -21,6 +21,7 @@ function Home() {
             {CreateTicketType(urlParams.get('id'))}  */}
             
             {/* {ViewTicketOptionsForManager(urlParams.get('id'))} */}
+            {CancelBooking(urlParams.get('id'))}
             <div className="modal fade" id="productView" tabIndex="-1">
                 <div className="modal-dialog modal-lg modal-dialog-centered">
                 <div className="modal-content overflow-hidden border-0">
