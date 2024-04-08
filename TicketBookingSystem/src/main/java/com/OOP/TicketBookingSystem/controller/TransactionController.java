@@ -93,21 +93,6 @@ public JsonNode onSiteBookTicket(@RequestBody String body){
     }
     return null;
     }
-
-    @PostMapping("/sendTicketDetailsEmail")
-    public JsonNode sendTicketDetailsEmail(@RequestBody String body){
-        ObjectMapper mapper = new ObjectMapper();
-        try{
-            JsonNode jsonNode = mapper.readTree(body);
-            String email = jsonNode.get("email").asText();
-            int transactionId = jsonNode.get("TransactionId").asInt();
-            return transactionService.sendTicketDetailsEmail(email, transactionId);
-        }
-        catch (Exception e){
-            System.err.println(e);
-        }
-        return null;
-    }
     
     public String decrypt(String encryptedText) throws Exception {
         final String encryptionKey = SECRET_KEY;
