@@ -55,8 +55,11 @@ public class TransactionController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/success")
-    public JsonNode success(@RequestParam String session_id) {
+    public JsonNode success(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
         try {
+            JsonNode jsonNode = mapper.readTree(body);
+            String session_id = jsonNode.get("session_id").asText();
             return transactionService.success(session_id);
         } catch (Exception e) {
             System.err.println(e);

@@ -317,7 +317,7 @@ public class TransactionServiceImplementation implements TransactionService {
     
                 SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
-                    .setSuccessUrl(domain + "/transaction/success?session_id={CHECKOUT_SESSION_ID}");
+                    .setSuccessUrl(domain + "/paymentSuccess?session_id={CHECKOUT_SESSION_ID}");
     
                 // Add line items from arrays
                 for (int i = 0; i < eventCats.size(); i++) {
