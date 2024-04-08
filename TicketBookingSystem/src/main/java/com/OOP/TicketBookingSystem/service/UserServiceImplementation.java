@@ -68,6 +68,13 @@ public class UserServiceImplementation implements UserService{
             }
 
             try {
+                // Check if Ticket Officer already added to the event
+                Ticket_Officer_Restriction ticketOfficerR = ticketOfficerRestrictionRepo.findByEventIdAndUserId(eventId, userId);
+                if (ticketOfficerR != null) {
+                    node.put("message", "Ticket Officer is already added to this event");
+                    return node;
+                }
+
                 Ticket_Officer_Restriction restriction = new Ticket_Officer_Restriction();
                 restriction.setUserId(userId);
                 restriction.setEventId(eventId);
