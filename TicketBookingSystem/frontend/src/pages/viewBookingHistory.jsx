@@ -9,6 +9,7 @@ function ViewBookingHistory() {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [apiResponse, setApiResponse] = useState(null);
+    var noBooking = { textAlign: 'center' }
 
     useEffect(() => {
         const fetchBookingHistory = async () => {
@@ -21,8 +22,9 @@ function ViewBookingHistory() {
                     },
                 });
 
-                setApiResponse(response.data);
-                console.log('API Response:', response.data);
+                if (response.data.message == null) {
+                    setApiResponse(response.data);
+                }
             } catch (error) {
                 console.error('Error:', error);
                 setToastMessage(error.message);
@@ -87,6 +89,11 @@ function ViewBookingHistory() {
                                                     ))}
                                                 </tbody>
                                             </table>
+                                        </div>
+                                    }
+                                    {!apiResponse &&
+                                        <div>
+                                            <h3 style={noBooking}>No booking history available</h3>
                                         </div>
                                     }
                                 </div>

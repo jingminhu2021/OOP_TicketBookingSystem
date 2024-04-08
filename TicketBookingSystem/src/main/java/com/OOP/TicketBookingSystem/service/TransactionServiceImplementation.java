@@ -438,6 +438,12 @@ public class TransactionServiceImplementation implements TransactionService {
             arrayNode.add(node);
         }
 
+        if (arrayNode.isEmpty()) {
+            ObjectNode node = mapper.createObjectNode();
+            node.put("message", "No booking history found");
+            return node;
+        }
+
         return arrayNode;
     }
 
