@@ -17,7 +17,7 @@ public interface TransactionService {
     
     public JsonNode onSiteBookTicket(JsonNode body);
 
-    public JsonNode sendTicketDetailsEmail(String email, int transaction_id, String paymentMode);
+    public JsonNode sendTicketDetailsEmail(String email, List<Transaction> transactions, String paymentMode);
     
     public JsonNode generateQRCode(int ticketId, String text);
 

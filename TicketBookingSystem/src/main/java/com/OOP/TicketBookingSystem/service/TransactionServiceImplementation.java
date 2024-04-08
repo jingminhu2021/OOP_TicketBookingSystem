@@ -215,7 +215,6 @@ public class TransactionServiceImplementation implements TransactionService {
             eachCatCost.add(ticketType.getEventPrice());
         }
 
-        boolean haspaid = false;
         if (paymentMode.equals("wallet")) { // Pay by wallet
             // Check if user has enough money
             if(user.getWallet().compareTo(totalCost) < 0){
@@ -224,6 +223,7 @@ public class TransactionServiceImplementation implements TransactionService {
             }
 
             try {
+                List<Transaction> transactions = new ArrayList<>();
                 // Add each ticket as a transaction
                 for (int i = 0; i < eventCats.size(); i++) {
                     Ticket_Type ticketType = ticketTypeRepo.findByEventCat(eventCats.get(i), eventId);
@@ -242,6 +242,8 @@ public class TransactionServiceImplementation implements TransactionService {
                             transaction.setUserEmail(userEmail);
                             transaction.setUserId(userId);
                             transactionRepo.save(transaction);
+
+                            transactions.add(transaction);
                         }
                         else {
                             Transaction transaction = new Transaction();
@@ -252,6 +254,8 @@ public class TransactionServiceImplementation implements TransactionService {
                             transaction.setUserEmail(userEmail);
                             transaction.setUserId(userId);
                             transactionRepo.save(transaction);
+
+                            transactions.add(transaction);
                         }
                     }
                     // Update remaining event tickets
@@ -262,7 +266,8 @@ public class TransactionServiceImplementation implements TransactionService {
                 user.setWallet(user.getWallet().subtract(totalCost));
                 userRepo.save(user);
 
-                haspaid = true; // Payment successful
+                // Generate QR code and send email
+                generateQRnSendEmail(transactions, paymentMode);
 
                 node.put("message", "Successfully booked ticket(s)");
                 node.put("status", true);
@@ -342,32 +347,25 @@ public class TransactionServiceImplementation implements TransactionService {
                 }
                 SessionCreateParams params = paramsBuilder.build();
                 Session session = Session.create(params);
-
-                haspaid = true; // Payment successful
-
                 return mapper.valueToTree(session.getUrl());
             } catch (StripeException e) {
                 node.put("message", e.toString());
             }
         }
-
-        // Check if payment successful
-        if (haspaid){
-            // Create QR Code for each tickets purchased After payment
-            List<Transaction> ls = transactionRepo.findbyUserId(userId);
-            for (Transaction transaction: ls){
-                int event_id = transaction.getEventId();
-                int ticket_id = transaction.getTicketId();
-                int ticket_type_id = transaction.getTicketTypeId();
-                String text = String.format("http://localhost:3000/verifyTicket?userId=%d&eventId=%d&ticketId=%d&ticketTypeId=%d", userId, event_id, ticket_id, ticket_type_id);
-                generateQRCode(ticket_id, text);
-            }
-            // Send ticket details to user email
-            int transcation_id = ls.get(0).getTransactionId();
-            sendTicketDetailsEmail(userEmail, transcation_id, paymentMode);
-        }
-
         return node;
+    }
+
+    public void generateQRnSendEmail(List<Transaction> transactions, String paymentMode){
+        for (Transaction transaction: transactions){
+            int event_id = transaction.getEventId();
+            int ticket_id = transaction.getTicketId();
+            int ticket_type_id = transaction.getTicketTypeId();
+            String text = String.format("http://localhost:3000/verifyTicket?userId=%d&eventId=%d&ticketId=%d&ticketTypeId=%d", transaction.getUserId(), event_id, ticket_id, ticket_type_id);
+            generateQRCode(ticket_id, text);
+        }
+        // Send ticket details to user email
+        String userEmail = transactions.get(0).getUserEmail();
+        sendTicketDetailsEmail(userEmail, transactions, paymentMode);
     }
 
     @Override
@@ -391,6 +389,8 @@ public class TransactionServiceImplementation implements TransactionService {
                 for (Ticket_Type ticketType : stripeTicketTypes) {
                     ticketTypeRepo.save(ticketType);
                 }
+                // Generate QR code and send email
+                generateQRnSendEmail(stripeTxns, "stripe");
             } else {
                 node.put("message", "Payment failed");
                 node.put("status", false);
@@ -440,9 +440,8 @@ public class TransactionServiceImplementation implements TransactionService {
     }
 
     @Override
-    public JsonNode sendTicketDetailsEmail(String email, int transaction_id, String paymentMode) {
-        // Fetch transaction details for the given email and transaction ID
-        List<Transaction> transactions = transactionRepo.findByEmailAndTransactionId(email, transaction_id);
+    public JsonNode sendTicketDetailsEmail(String email, List<Transaction> transactions, String paymentMode) {
+
         User user = userRepo.findByEmail(email);
 
         // Constructing the message
@@ -546,7 +545,7 @@ public class TransactionServiceImplementation implements TransactionService {
 
         messageBuilder.append("<div style=\"").append(headerStyle).append("\">");
         messageBuilder.append("<h2 style='text-align: center;color: black'>Total Price: $ "+totalPrice+"<br></h2>");
-        messageBuilder.append("<h2 style='text-align: center;color: black'>Paid by: "+ paymentMode.toUpperCase() +"<br></h2>");
+        messageBuilder.append("<h2 style='text-align: center;color: black'>Paid with: "+ paymentMode.toUpperCase() +"<br></h2>");
         messageBuilder.append("</div><br>");
 
         messageBuilder.append("<p>If there are any issues with your booking, please contact 91234567 immediately.</p>");
