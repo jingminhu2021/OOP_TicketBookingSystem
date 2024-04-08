@@ -64,13 +64,12 @@ public class TransactionController {
         return null;
     }
 
-    @PreAuthorize("hasRole('Customer')")
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/bookingHistory")
-    public List<Transaction> bookingHistory(@RequestBody String body) {
-        ObjectMapper mapper = new ObjectMapper();
+    public List<Transaction> bookingHistory() {
+        User user = userService.getLoggedInUser();
+        int id = user.getId();
         try{
-            JsonNode jsonNode = mapper.readTree(body);
-            int id = jsonNode.get("user_id").asInt();
             List<Transaction> trans_ls = transactionService.bookingHistory(id);
             return trans_ls;
         }catch (Exception e) {

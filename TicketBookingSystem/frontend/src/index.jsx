@@ -7,6 +7,7 @@ import Home from './pages/home.jsx';
 import Logout from './components/logout.jsx';
 import VerifyTicket from './pages/verifyTicket.jsx';
 import ViewSalesStatistics from './pages/viewSalesStatistics.jsx';
+import ViewBookingHistory from './pages/viewBookingHistory.jsx';
 
 
 import "./css/style.blue.css";
@@ -79,6 +80,12 @@ export default function App() {
           <Route path="/viewSalesStatistics" element={<ViewSalesStatistics />} />
         ) : (
           <Route path="/viewSalesStatistics" element={<h1>Not Authorized</h1>} />
+        )}
+
+        {userData != null ? (
+          <Route path="/viewBookingHistory" element={<ViewBookingHistory />} />
+        ) : (
+          <Route path="/viewBookingHistory" element={<h1>Not Authorized</h1>} />
         )}
 
         <Route path="*" element={<h1>Not Found</h1>} />
