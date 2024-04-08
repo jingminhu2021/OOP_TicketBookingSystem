@@ -31,6 +31,7 @@ import com.OOP.TicketBookingSystem.repository.UserRepo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -404,8 +405,40 @@ public class TransactionServiceImplementation implements TransactionService {
     }
 
     @Override
-    public List<Transaction> bookingHistory(int user_id){
-        return transactionRepo.findbyUserId(user_id);
+    public JsonNode bookingHistory(int user_id){
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode arrayNode = mapper.createArrayNode();
+
+        List<Transaction> transactions = transactionRepo.findbyUserId(user_id);
+        for (Transaction transaction : transactions) {
+            ObjectNode node = mapper.createObjectNode();
+            
+            // Get event name
+            Event event = eventRepo.findByEventId(transaction.getEventId());
+            String eventName = event.getEventName();
+
+            if (event == null) {
+                continue;
+            }
+            
+            // Get ticket category
+            Ticket_Type ticketType = ticketTypeRepo.findById(transaction.getTicketTypeId()).orElse(null);
+            String eventCat = ticketType.getEventCat();
+
+            if (ticketType == null) {
+                continue;
+            }
+
+            node.put("Date & Time of Booking", transaction.getBookingDateTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")));
+            node.put("Ticket Id", transaction.getTicketId());
+            node.put("Event", eventName);
+            node.put("Category", eventCat);
+            node.put("Status", transaction.getStatus());
+
+            arrayNode.add(node);
+        }
+
+        return arrayNode;
     }
 
     @Override

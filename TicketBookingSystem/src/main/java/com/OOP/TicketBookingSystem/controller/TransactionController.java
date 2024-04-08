@@ -69,12 +69,11 @@ public class TransactionController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/bookingHistory")
-    public List<Transaction> bookingHistory() {
+    public JsonNode bookingHistory() {
         User user = userService.getLoggedInUser();
         int id = user.getId();
         try{
-            List<Transaction> trans_ls = transactionService.bookingHistory(id);
-            return trans_ls;
+            return transactionService.bookingHistory(id);
         }catch (Exception e) {
             System.err.println(e);
         }
