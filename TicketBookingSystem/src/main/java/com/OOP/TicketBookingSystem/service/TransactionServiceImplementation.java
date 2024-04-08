@@ -91,8 +91,8 @@ public class TransactionServiceImplementation implements TransactionService {
         // JSON input: userId, eventId, eventCats, eachCatTickets, paymentMode
         // Sample input:
         // {
-        //     "userId": "2", 
-        //     "eventId": "6", 
+        //     "userId": 2, 
+        //     "eventId": 6, 
         //     "eventCats": ["cat1", "cat6", "cat5"], 
         //     "eachCatTickets": [2, 0, 2],
         //     "paymentMode": "wallet"
