@@ -215,6 +215,7 @@ public class TransactionServiceImplementation implements TransactionService {
             eachCatCost.add(ticketType.getEventPrice());
         }
 
+        boolean haspaid = false;
         if (paymentMode.equals("wallet")) { // Pay by wallet
             // Check if user has enough money
             if(user.getWallet().compareTo(totalCost) < 0){
@@ -261,6 +262,8 @@ public class TransactionServiceImplementation implements TransactionService {
                 user.setWallet(user.getWallet().subtract(totalCost));
                 userRepo.save(user);
 
+                haspaid = true; // Payment successful
+
                 node.put("message", "Successfully booked ticket(s)");
                 node.put("status", true);
             } catch (IllegalArgumentException e) {
@@ -269,27 +272,6 @@ public class TransactionServiceImplementation implements TransactionService {
             } catch (OptimisticLockingFailureException e) {
                 node.put("message", e.toString());
             }
-            
-            // Create QR Code for each tickets purchased
-            //List<Transaction> ls = transactionRepo.findByEmail(userEmail);
-            //for (Transaction transaction: ls){
-            //  int event_id = transaction.getEventId();
-            //  int ticket_id = transaction.getTicketId();
-            //  int ticket_type_id = transaction.getTicketTypeId();
-            //  String text = String.format("http://localhost:3000/verifyTicket?userId=%d&eventId=%d&ticketId=%d&ticketTypeId=%d", userId, event_id, ticket_id, ticket_type_id);
-            //  generateQRCode(ticket_id, text);
-            //}
-
-            // Send ticket details to user email
-            //int transcation_id = ls.get(0).getTransactionId();
-            //sendTicketDetailsEmail(userEmail, transcation_id);
-
-            //node.put("message", "Successfully booked ticket(s)");
-            //node.put("status", true);
-        //} catch (IllegalArgumentException e) {
-        //  node.put("message", e.toString());
-        //}
-          
         }
         else { // Pay by Stripe
             try {   
@@ -360,10 +342,29 @@ public class TransactionServiceImplementation implements TransactionService {
                 }
                 SessionCreateParams params = paramsBuilder.build();
                 Session session = Session.create(params);
-                return mapper.valueToTree(session.getUrl());   
+
+                haspaid = true; // Payment successful
+
+                return mapper.valueToTree(session.getUrl());
             } catch (StripeException e) {
                 node.put("message", e.toString());
             }
+        }
+
+        // Check if payment successful
+        if (haspaid){
+            // Create QR Code for each tickets purchased After payment
+            List<Transaction> ls = transactionRepo.findbyUserId(userId);
+            for (Transaction transaction: ls){
+                int event_id = transaction.getEventId();
+                int ticket_id = transaction.getTicketId();
+                int ticket_type_id = transaction.getTicketTypeId();
+                String text = String.format("http://localhost:3000/verifyTicket?userId=%d&eventId=%d&ticketId=%d&ticketTypeId=%d", userId, event_id, ticket_id, ticket_type_id);
+                generateQRCode(ticket_id, text);
+            }
+            // Send ticket details to user email
+            int transcation_id = ls.get(0).getTransactionId();
+            sendTicketDetailsEmail(userEmail, transcation_id, paymentMode);
         }
 
         return node;
@@ -439,7 +440,7 @@ public class TransactionServiceImplementation implements TransactionService {
     }
 
     @Override
-    public JsonNode sendTicketDetailsEmail(String email, int transaction_id) {
+    public JsonNode sendTicketDetailsEmail(String email, int transaction_id, String paymentMode) {
         // Fetch transaction details for the given email and transaction ID
         List<Transaction> transactions = transactionRepo.findByEmailAndTransactionId(email, transaction_id);
         User user = userRepo.findByEmail(email);
@@ -545,6 +546,7 @@ public class TransactionServiceImplementation implements TransactionService {
 
         messageBuilder.append("<div style=\"").append(headerStyle).append("\">");
         messageBuilder.append("<h2 style='text-align: center;color: black'>Total Price: $ "+totalPrice+"<br></h2>");
+        messageBuilder.append("<h2 style='text-align: center;color: black'>Paid by: "+ paymentMode.toUpperCase() +"<br></h2>");
         messageBuilder.append("</div><br>");
 
         messageBuilder.append("<p>If there are any issues with your booking, please contact 91234567 immediately.</p>");
@@ -559,7 +561,6 @@ public class TransactionServiceImplementation implements TransactionService {
         String subject = "Your Ticket Purchase Confirmation";
 
         // Sending the email
-        // return emailService.sendEmailForTicketComfirm("hujingmin123@gmail.com", subject, message, ls); // for testing - change to ur own email to receive it to ur email.
         return emailService.sendEmailForTicketComfirm(email, subject, message, ls);
     }
 
