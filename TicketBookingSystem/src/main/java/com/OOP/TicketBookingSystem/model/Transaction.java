@@ -26,7 +26,7 @@ public class Transaction {
     @Column
     private int userId;
     @Column
-    private String status;
+    private String status = "active"; // default status is active
 
 
     // Getters
