@@ -3,6 +3,7 @@ import Navbar from '../components/navbar';
 import { Toast } from 'react-bootstrap';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import CancelBooking from '../components/event/cancelBooking';
 
 function ViewBookingHistory() {
     const token = localStorage.getItem('token');
@@ -77,6 +78,7 @@ function ViewBookingHistory() {
                                                         {Object.keys(apiResponse[0]).map((key) => (
                                                             <th key={key}>{key}</th>
                                                         ))}
+                                                        <th>Cancel Booking</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -85,8 +87,12 @@ function ViewBookingHistory() {
                                                             {Object.values(row).map((value, i) => (
                                                                 <td key={i}>{value}</td>
                                                             ))}
+                                                            <td>
+                                                                <CancelBooking ticket_id={row['Ticket Id']} />
+                                                            </td>
                                                         </tr>
                                                     ))}
+                                                    
                                                 </tbody>
                                             </table>
                                         </div>

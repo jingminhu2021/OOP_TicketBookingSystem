@@ -3,7 +3,8 @@ import axios from 'axios';
 import { Modal, Button, Toast } from 'react-bootstrap';
 
 function CancelBooking(props){
-    const ticket_id = props.ticketId;
+    const ticket_id = props.ticket_id;
+
     const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
@@ -56,7 +57,10 @@ function CancelBooking(props){
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const handleClose2 = () => setShow2(false);
+    const handleClose2 = () => {
+        setShow2(false);
+        window.location.reload();
+    }
     const handleShow2 = () => setShow2(true);
 
     const handleCancel = async () => {
