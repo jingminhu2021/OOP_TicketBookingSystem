@@ -7,6 +7,7 @@ import Home from './pages/home.jsx';
 import Logout from './components/logout.jsx';
 import VerifyTicket from './pages/verifyTicket.jsx';
 import ViewSalesStatistics from './pages/viewSalesStatistics.jsx';
+import ViewAllSalesStatistics from './pages/viewAllSalesStatistics.jsx';
 import ViewBookingHistory from './pages/viewBookingHistory.jsx';
 
 
@@ -80,6 +81,12 @@ export default function App() {
           <Route path="/viewSalesStatistics" element={<ViewSalesStatistics />} />
         ) : (
           <Route path="/viewSalesStatistics" element={<h1>Not Authorized</h1>} />
+        )}
+
+        {userData && userData.role === 'Event_Manager' ? (
+          <Route path="/viewAllSalesStatistics" element={<ViewAllSalesStatistics />} />
+        ) : (
+          <Route path="/viewAllSalesStatistics" element={<h1>Not Authorized</h1>} />
         )}
 
         {userData != null ? (

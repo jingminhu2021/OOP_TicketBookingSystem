@@ -91,10 +91,6 @@ public class ReportServiceImplementation implements ReportService{
         ArrayNode arrayNode = mapper.createArrayNode();
 
         List<Event> events = eventRepo.findByEventManager(managerId);
-
-        node.put("message", "No events found");
-        node.put("status", false);
-
         // Check if any events exist
         if (events.isEmpty()) {
             return node;
@@ -112,16 +108,6 @@ public class ReportServiceImplementation implements ReportService{
 
             node = mapper.createObjectNode();
 
-            // Check if any tickets sold
-            if (noOfTicketsSold == 0) {
-                node.put("message", event.getEventName());
-                node.put("ticketsSold", noOfTicketsSold);
-                node.put("totalRevenue", totalRevenue);
-                node.put("status", true);
-                arrayNode.add(node);
-                continue;
-            }
-
             // Get the total revenue
             List<Ticket_Type> ticketTypes = ticketTypeRepo.findByEventId(eventId);
 
@@ -135,10 +121,9 @@ public class ReportServiceImplementation implements ReportService{
                 }
             }
 
-            node.put("message", event.getEventName());
-            node.put("ticketsSold", noOfTicketsSold);
-            node.put("totalRevenue", totalRevenue);
-            node.put("status", true);
+            node.put("Event Name", event.getEventName());
+            node.put("Tickets Sold", noOfTicketsSold);
+            node.put("Total Revenue", totalRevenue);
             arrayNode.add(node);
         }
 
