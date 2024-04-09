@@ -17,7 +17,4 @@ public interface UserService {
     public JsonNode setTicketOfficer(int userId, int eventId);
 
     public User getLoggedInUser();
-
-    public JsonNode verifyTicket(int userId, int eventId, int ticketId, int ticketOfficerId, int ticketTypeId);
-
 }

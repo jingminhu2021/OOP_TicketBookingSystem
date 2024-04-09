@@ -12,8 +12,6 @@ import com.OOP.TicketBookingSystem.repository.UserRepo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.OOP.TicketBookingSystem.model.Transaction;
-import com.OOP.TicketBookingSystem.repository.TransactionRepo;
 import com.OOP.TicketBookingSystem.model.Ticket_Officer_Restriction;
 import com.OOP.TicketBookingSystem.repository.TicketOfficerRestrictionRepo;
 
@@ -25,9 +23,6 @@ public class UserServiceImplementation implements UserService{
 
     @Autowired
     private TicketOfficerRestrictionRepo ticketOfficerRestrictionRepo;
-
-    @Autowired
-    private TransactionRepo transactionRepo;
 
     @Override
     public User getUserById(int id) {
@@ -96,50 +91,5 @@ public class UserServiceImplementation implements UserService{
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         return getUserByEmail(email);
-    }
-
-    @Transactional
-    @Override
-    public JsonNode verifyTicket(int userId, int eventId, int ticketId, int ticketOfficerId, int ticketTypeId) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node = mapper.createObjectNode();
-
-        node.put("status", false);
-        User user = getUserById(userId);
-        if (user==null){
-            node.put("message", "No user found");
-            return node;
-        }
-
-        Transaction transaction = transactionRepo.findByTicketId(ticketId);
-        if (transaction==null){
-            node.put("message", "Transaction not found");
-            return node;
-        }
-
-        Ticket_Officer_Restriction ticketOfficerRestriction = ticketOfficerRestrictionRepo.findByEventIdAndUserId(eventId, ticketOfficerId);
-        if (ticketOfficerRestriction==null){
-            node.put("message", "Ticket officer does not have permission to validate ticket for this event");
-            return node;
-        }
-        
-        if (transaction.getStatus().equals("redeemed")){
-            node.put("message", "Ticket already redeemed");
-            return node;
-        }
-
-        if (transaction.getUserId()!=userId){
-            node.put("message", "User does not own this ticket");
-            return node;
-        }
-        try {
-            transactionRepo.updateTicketStatus(userId, ticketId, ticketTypeId);
-            node.put("message", "Successfully redeemed ticket");
-            node.put("status", true);
-            return node; 
-        } catch (Exception e) {
-            node.put("message", e.toString());
-            return node;
-        }
     }
 }

@@ -9,11 +9,17 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.OOP.TicketBookingSystem.model.Event;
 import com.OOP.TicketBookingSystem.model.Ticket_Type;
+import com.OOP.TicketBookingSystem.model.Transaction;
+import com.OOP.TicketBookingSystem.model.Ticket_Officer_Restriction;
+import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
+import com.OOP.TicketBookingSystem.repository.TransactionRepo;
+import com.OOP.TicketBookingSystem.repository.TicketOfficerRestrictionRepo;
 
 @Service
 public class TicketTypeServiceImplementation implements TicketTypeService {
@@ -22,6 +28,15 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
 
     @Autowired
     private EventRepo eventRepo;
+
+    @Autowired
+    private TransactionRepo transactionRepo;
+
+    @Autowired
+    private TicketOfficerRestrictionRepo ticketOfficerRestrictionRepo;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public JsonNode createTicketType(Ticket_Type ticket_type) {
@@ -199,6 +214,51 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
         Ticket_Type ticketType = ticketTypeRepo.findById(ticketTypeId).orElse(null);
 
         return ticketType;
+    }
+
+    @Transactional
+    @Override
+    public JsonNode verifyTicket(int userId, int eventId, int ticketId, int ticketOfficerId, int ticketTypeId) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+
+        node.put("status", false);
+        User user = userService.getUserById(userId);
+        if (user==null){
+            node.put("message", "No user found");
+            return node;
+        }
+
+        Transaction transaction = transactionRepo.findByTicketId(ticketId);
+        if (transaction==null){
+            node.put("message", "Transaction not found");
+            return node;
+        }
+
+        Ticket_Officer_Restriction ticketOfficerRestriction = ticketOfficerRestrictionRepo.findByEventIdAndUserId(eventId, ticketOfficerId);
+        if (ticketOfficerRestriction==null){
+            node.put("message", "Ticket officer does not have permission to validate ticket for this event");
+            return node;
+        }
+        
+        if (transaction.getStatus().equals("redeemed")){
+            node.put("message", "Ticket already redeemed");
+            return node;
+        }
+
+        if (transaction.getUserId()!=userId){
+            node.put("message", "User does not own this ticket");
+            return node;
+        }
+        try {
+            transactionRepo.updateTicketStatus(userId, ticketId, ticketTypeId);
+            node.put("message", "Successfully redeemed ticket");
+            node.put("status", true);
+            return node; 
+        } catch (Exception e) {
+            node.put("message", e.toString());
+            return node;
+        }
     }
 
 }
