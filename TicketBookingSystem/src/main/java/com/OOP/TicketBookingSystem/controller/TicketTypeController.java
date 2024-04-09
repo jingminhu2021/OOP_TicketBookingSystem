@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -64,6 +66,21 @@ public class TicketTypeController {
     public Ticket_Type viewSingleTicketType(@RequestBody JsonNode body) {
         try {
             return ticketTypeService.viewSingleTicketType(body);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+    }
+
+    @PreAuthorize("hasRole('Ticketing_Officer')")
+    @GetMapping("/verifyTicket")
+    public JsonNode verifyTicket(@RequestParam int userId, 
+                                @RequestParam int eventId, 
+                                @RequestParam int ticketId, 
+                                @RequestParam int ticketOfficerId, 
+                                @RequestParam int ticketTypeId) {
+        try {
+            return userService.verifyTicket(userId, eventId, ticketId, ticketOfficerId, ticketTypeId);
         } catch (Exception e) {
             System.err.println(e);
         }
