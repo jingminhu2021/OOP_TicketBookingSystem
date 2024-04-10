@@ -72,7 +72,7 @@ public class TicketTypeController {
         return null;
     }
 
-    @PreAuthorize("hasRole('Event_Manager')")
+    @PreAuthorize("hasRole('Ticketing_Officer')")
     @PostMapping("/verifyTicket")
     public JsonNode verifyTicket(@RequestBody JsonNode body) {
         try {

@@ -21,7 +21,7 @@ public class Event {
     private LocalDateTime dateTime;
     @Column
     private Integer eventManagerId;
-    @Column
+    @Column(columnDefinition = "varchar(8000) default 'No Description'")
     private String description;
     @Column(columnDefinition = "varchar(9) default 'Active'")
     private String status="Active";

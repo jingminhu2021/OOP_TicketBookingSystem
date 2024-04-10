@@ -32,4 +32,6 @@ public interface EventService {
     public JsonNode cancelEventByManager(JsonNode body, int managerId);
 
     public JsonNode viewEvent(int id);
+
+    public JsonNode viewTicketingOfficerByEventId(int eventId);
 }

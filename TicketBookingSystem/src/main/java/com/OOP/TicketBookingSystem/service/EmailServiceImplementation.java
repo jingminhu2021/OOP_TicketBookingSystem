@@ -50,7 +50,7 @@ public class EmailServiceImplementation implements EmailService {
         return node;   
     }
 
-    public JsonNode sendEmailForTicketComfirm(String email, String subject, String message, List<Integer> ticketIds) {
+    public JsonNode sendEmailForTicketConfirm(String email, String subject, String message, List<Integer> ticketIds) {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, Toast } from 'react-bootstrap';
 
-function CancelEvent(id){
+function CancelEvent(props){
+    const id = props.event_id;
+    const event_status = props.event_status;
     const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
@@ -59,7 +61,7 @@ function CancelEvent(id){
     return(
         <>
         {userData && userData.role === 'Event_Manager' &&(
-            <Button variant="danger" onClick={handleShow}>
+            <Button className='w-100' style={{height: '60px'}} variant="danger" onClick={handleShow} disabled={event_status !== 'Active'}>
                 <i className="fas fa-plus me-1 text-gray fw-normal"></i>Cancel Event
             </Button>
         )}

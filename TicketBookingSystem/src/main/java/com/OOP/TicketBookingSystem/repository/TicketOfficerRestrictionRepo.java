@@ -1,5 +1,7 @@
 package com.OOP.TicketBookingSystem.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,4 +14,8 @@ public interface TicketOfficerRestrictionRepo extends JpaRepository<Ticket_Offic
 
     @Query(value = "SELECT * FROM ticket_officer_restriction where event_id= :eventId and user_id= :userId", nativeQuery = true)
     public Ticket_Officer_Restriction findByEventIdAndUserId(@Param("eventId")int eventId, @Param("userId")int userId);
+
+    @Query(value = "SELECT * FROM ticket_officer_restriction where event_id= :eventId", nativeQuery = true)
+    public List<Ticket_Officer_Restriction> findByEventId(@Param("eventId")int eventId);
+
 }

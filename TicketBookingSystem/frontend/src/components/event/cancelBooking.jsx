@@ -40,7 +40,7 @@ function CancelBooking(props){
             try {
                 const response = await axios.post(api_endpoint_url, bodyParameters, config);
                 setTicketDetails(response.data);
-                console.log(response.data);
+                // console.log(response.data);
             } catch (error) {
                 console.error('Error occurred:', error);
             }

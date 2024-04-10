@@ -16,8 +16,6 @@ function AddEvent() {
 
     useEffect(() => {
         
-        console.log('Bearer ' + token);
-
         const getUserData = async (token) => {
             let api_endpoint_url = 'http://localhost:8080/user/getLoggedInUser';
             
@@ -37,8 +35,6 @@ function AddEvent() {
         }
         
     }, []); // Empty dependency array ensures this effect runs only once
-
-    console.log(userData);
 
     const [show, setShow] = useState(false);
     const [formData, setFormData] = useState({
@@ -129,15 +125,15 @@ function AddEvent() {
                 <Toast.Body>{toastMessage}</Toast.Body>
         </Toast>
         {userData && userData.role === 'Event_Manager' &&(
-            <Button variant="outline-primary" onClick={handleShow}>
-                <i className="fas fa-plus me-1 text-gray fw-normal"></i>Add Event
+            <Button variant="outline-primary w-100" onClick={handleShow}>
+                <i className="fas fa-plus me-1 text-gray fw-normal"></i>Add New Event
             </Button>
         )}
             
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Add Event</Modal.Title>
+                    <Modal.Title>Add New Event</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={handleSubmit}>

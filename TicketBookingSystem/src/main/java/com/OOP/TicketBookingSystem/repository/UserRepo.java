@@ -1,5 +1,6 @@
 package com.OOP.TicketBookingSystem.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,7 @@ public interface UserRepo extends JpaRepository<User, Integer> {
     @Modifying
     @Query (value = "UPDATE users u SET u.dtype='Ticketing_Officer' where u.id = :id", nativeQuery = true)
     public void setTicketOfficer(@Param("id")int id);
+
+    @Query(value = "SELECT * FROM users WHERE dtype='Ticketing_Officer'",nativeQuery=true)
+    public List<User> findTicketingOfficers();
 }

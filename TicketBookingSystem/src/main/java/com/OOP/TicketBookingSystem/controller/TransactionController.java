@@ -54,12 +54,14 @@ public class TransactionController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/success")
+    @PostMapping("/success")
     public JsonNode success(@RequestBody String body) {
+        
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode jsonNode = mapper.readTree(body);
             String session_id = jsonNode.get("session_id").asText();
+            
             return transactionService.success(session_id);
         } catch (Exception e) {
             System.err.println(e);
@@ -81,19 +83,20 @@ public class TransactionController {
     }
 
 
-@PreAuthorize("hasRole('Ticketing_Officer')")
-@PostMapping("/onSiteBookTicket")
-public JsonNode onSiteBookTicket(@RequestBody String body){
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-        JsonNode jsonNode = mapper.readTree(body);
-        return transactionService.onSiteBookTicket(jsonNode);
+    @PreAuthorize("hasRole('Ticketing_Officer')")
+    @PostMapping("/onSiteBookTicket")
+    public JsonNode onSiteBookTicket(@RequestBody String body){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.readTree(body);
+            return transactionService.onSiteBookTicket(jsonNode);
 
-    } catch (Exception e) {
-        System.err.println(e);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
     }
-    return null;
-    }
+    
     
     public String decrypt(String encryptedText) throws Exception {
         final String encryptionKey = SECRET_KEY;

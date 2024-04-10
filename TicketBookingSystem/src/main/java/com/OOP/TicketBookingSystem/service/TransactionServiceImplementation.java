@@ -51,7 +51,7 @@ import com.stripe.exception.StripeException;
 
 @Service
 public class TransactionServiceImplementation implements TransactionService {
-    @Value("${stripe.api.key}")
+    @Value("sk_test_51OyEDmP9UQPUI3wt6P2e47bObxNr9gw9gdlUo92S3dooNOqFcajqidTBRtQvU3r4YE2iCZcDpdzt7RUkIMmEptLb009VEooTFT")
     private String stripeApiKey;
 
     @Autowired
@@ -79,16 +79,20 @@ public class TransactionServiceImplementation implements TransactionService {
     
     public List<Ticket_Type> stripeTicketTypes;
     
-    @Value("${enc.secret-key}")
+    @Value("87D3402A2E67C6E8484C807EAA86F8DD")
     private String SECRET_KEY;
 
     @Override
     public Transaction getTicketDetails(int ticket_id){
         return transactionRepo.findById(ticket_id).orElse(null);
     }
+    @Override
+    public JsonNode bookTicket(JsonNode body){
+        return bookTicket(body, null, null);
+    }
 
     @Override
-    public JsonNode bookTicket(JsonNode body) {
+    public JsonNode bookTicket(JsonNode body, String email, String name) {
         // JSON input: userId, eventId, eventCats, eachCatTickets, paymentMode
         // Sample input:
         // {
@@ -100,11 +104,18 @@ public class TransactionServiceImplementation implements TransactionService {
         // }
 
         // Get user info
+        
         int userId = body.get("userId").intValue();
         User user = userRepo.findById(userId).orElse(null);
-        String userEmail = (user != null) ? user.getEmail() : null;
-        String paymentMode = body.get("paymentMode").textValue();
+        String userEmail = "";
+        if(email == null){
+            userEmail = (user != null) ? user.getEmail() : null;
+        }else{
+            userEmail = email;
+        }
 
+        String paymentMode = body.get("paymentMode").textValue();
+        
         // Get event
         int eventId = body.get("eventId").intValue();
         Event event = eventRepo.findByEventId(eventId);
@@ -126,7 +137,7 @@ public class TransactionServiceImplementation implements TransactionService {
                 totalTickets += ticketAmt.intValue();
             }
         }
- 
+        
         // Get booking date time
         LocalDateTime bookingDateTime = LocalDateTime.now();
 
@@ -184,20 +195,32 @@ public class TransactionServiceImplementation implements TransactionService {
             node.put("message", "Maximum of 5 tickets can be bought");
             return node;
         }
-
+        
         // Check if allowed to book (6 months in advance - no later than 24hrs)
         LocalDateTime eventStart = event.getDateTime();
-        if(bookingDateTime.getMonthValue()-eventStart.getMonthValue() > 6 || bookingDateTime.isAfter(eventStart.minus(24,ChronoUnit.HOURS))){
-            node.put("message", "Booking is not allowed now");
-            return node;
+        
+        if(!user.getClass().getSimpleName().equals("Ticketing_Officer")){
+            
+            if(bookingDateTime.getMonthValue()-eventStart.getMonthValue() > 6 || bookingDateTime.isAfter(eventStart.minus(24,ChronoUnit.HOURS))){
+                node.put("message", "Booking is not allowed now");
+                return node;
+            }
+        }else{
+            
+            if(bookingDateTime.isAfter(eventStart)){
+                node.put("message", "Booking is not allowed now");
+                return node;
+            }
         }
-
+        
         // Check if previously purchased + current purchase exceeds 5 tickets
         List<Transaction> existingTransactions = transactionRepo.getPurchasedTickets(eventId, userId);
-        int previouslyPurchased = existingTransactions.size();
-        if (previouslyPurchased + totalTickets > 5) {
-            node.put("message", "Maximum of 5 tickets can be bought for this event");
-            return node;
+        if(!user.getClass().getSimpleName().equals("Ticketing_Officer")){
+            int previouslyPurchased = existingTransactions.size();
+            if (previouslyPurchased + totalTickets > 5) {
+                node.put("message", "Maximum of 5 tickets can be bought for this event");
+                return node;
+            }
         }
 
         // Get total cost of all tickets + check if enough tickets
@@ -215,7 +238,7 @@ public class TransactionServiceImplementation implements TransactionService {
             totalCost = totalCost.add(ticketType.getEventPrice().multiply(BigDecimal.valueOf(purchaseTickets)));
             eachCatCost.add(ticketType.getEventPrice());
         }
-
+        
         if (paymentMode.equals("wallet")) { // Pay by wallet
             // Check if user has enough money
             if(user.getWallet().compareTo(totalCost) < 0){
@@ -264,13 +287,20 @@ public class TransactionServiceImplementation implements TransactionService {
                 }
 
                 // Update user wallet
-                user.setWallet(user.getWallet().subtract(totalCost));
-                userRepo.save(user);
-
+                if(!user.getClass().getSimpleName().equals("Ticketing_Officer")){
+                    user.setWallet(user.getWallet().subtract(totalCost));
+                    userRepo.save(user);
+                }
+                
                 // Generate QR code and send email
-                generateQRnSendEmail(transactions, paymentMode);
+                if(user.getClass().getSimpleName().equals("Ticketing_Officer")){
+                    generateQRnSendEmail(transactions, paymentMode, name, userEmail);
+                }else{
+                    generateQRnSendEmail(transactions, paymentMode);
+                }
+                
 
-                node.put("message", "Successfully booked ticket(s)");
+                node.put("message", "Ticket(s) successfully booked. Ticket details have been sent to your email: " + userEmail);
                 node.put("status", true);
             } catch (IllegalArgumentException e) {
                 node.put("message", e.toString());
@@ -323,7 +353,8 @@ public class TransactionServiceImplementation implements TransactionService {
     
                 SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
-                    .setSuccessUrl(domain + "/paymentSuccess?session_id={CHECKOUT_SESSION_ID}");
+                    // .setSuccessUrl(domain + "/paymentSuccess?session_id={CHECKOUT_SESSION_ID}");
+                    .setSuccessUrl(domain+"/success/{CHECKOUT_SESSION_ID}");
     
                 // Add line items from arrays
                 for (int i = 0; i < eventCats.size(); i++) {
@@ -356,7 +387,13 @@ public class TransactionServiceImplementation implements TransactionService {
         return node;
     }
 
+    @Override
     public void generateQRnSendEmail(List<Transaction> transactions, String paymentMode){
+        generateQRnSendEmail(transactions, paymentMode, null, null);
+    }
+
+    @Override
+    public void generateQRnSendEmail(List<Transaction> transactions, String paymentMode, String name, String email){
         for (Transaction transaction: transactions){
             int event_id = transaction.getEventId();
             int ticket_id = transaction.getTicketId();
@@ -365,13 +402,22 @@ public class TransactionServiceImplementation implements TransactionService {
             generateQRCode(ticket_id, text);
         }
         // Send ticket details to user email
-        String userEmail = transactions.get(0).getUserEmail();
-        sendTicketDetailsEmail(userEmail, transactions, paymentMode);
+        String userEmail = email;
+        if(email == null){
+            userEmail = transactions.get(0).getUserEmail();
+        }
+        
+        if(name != null){
+            sendTicketDetailsEmail(userEmail, transactions, paymentMode);
+        }else{
+            sendTicketDetailsEmail(userEmail, transactions, paymentMode, name);
+        }
     }
 
     @Override
     public JsonNode success(String sessionId) {
         // If stripe payment succeeded, add to DB
+        
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
         node.put("message", "Payment successful");
@@ -380,7 +426,6 @@ public class TransactionServiceImplementation implements TransactionService {
         try {
             Stripe.apiKey = stripeApiKey;
             Session session = Session.retrieve(sessionId);
-
             // Check if paid
             if (session.getPaymentStatus().equals("paid")) {
                 // Update DB
@@ -391,6 +436,7 @@ public class TransactionServiceImplementation implements TransactionService {
                     ticketTypeRepo.save(ticketType);
                 }
                 // Generate QR code and send email
+                
                 generateQRnSendEmail(stripeTxns, "stripe");
             } else {
                 node.put("message", "Payment failed");
@@ -449,37 +495,47 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Override
     public JsonNode onSiteBookTicket(JsonNode body){
-
+        
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
         node.put("status", false);
 
         LocalDateTime dateNow = LocalDateTime.now();
-        String eventName = body.get("eventName").textValue();
-        Event event = eventRepo.findByExactEvent(eventName);
-        int eventId = event.getId();
+        String name = body.get("name").textValue();
+        String email = body.get("email").textValue();
+        int eventId = body.get("eventId").asInt();
+        Event event = eventRepo.findByEventId(eventId);
+        
         LocalDateTime dateEvent = event.getDateTime();
-        int ticketOfficerId = body.get("ticketOfficerId").asInt();
-
+        
+        int ticketOfficerId = body.get("userId").asInt();
+        
         if (!dateEvent.toLocalDate().isEqual(dateNow.toLocalDate())){
             node.put("message", "Can only process on-site sales on event day");
             return node;
         }
-
+    
         Ticket_Officer_Restriction ticketOfficerRestriction = ticketOfficerRestrictionRepo.findByEventIdAndUserId(eventId, ticketOfficerId);
         if (ticketOfficerRestriction==null){
+            
             node.put("message", "Ticket Officer has no permissions to sell tickets");
             return node;
         }
+        System.out.println("Ticket Officer has permissions to sell tickets");
+        return bookTicket(body, email, name);
 
-        bookTicket(body);
-        node.put("message", "Successfully booked on-site ticket");
-        node.put("status", true);
-        return node;
+        // node.put("message", "Successfully booked on-site ticket");
+        // // node.put("status", true);
+        // return node;
     }
 
     @Override
     public JsonNode sendTicketDetailsEmail(String email, List<Transaction> transactions, String paymentMode) {
+        return sendTicketDetailsEmail(email, transactions, paymentMode, null);
+    }
+
+    @Override
+    public JsonNode sendTicketDetailsEmail(String email, List<Transaction> transactions, String paymentMode, String name) {
 
         User user = userRepo.findByEmail(email);
 
@@ -503,7 +559,11 @@ public class TransactionServiceImplementation implements TransactionService {
         messageBuilder.append("</div>");
 
         messageBuilder.append("<div style=\"padding: 20px;\">");
-        messageBuilder.append("<p>Dear ").append(user.getName()).append(",</p>");
+        if(name == null){
+            messageBuilder.append("<p>Dear ").append(name).append(",</p>");
+        }else{
+            messageBuilder.append("<p>Dear ").append(user.getName()).append(",</p>");
+        }
         messageBuilder.append("<p>Thank you for your purchase! Below are the details of your tickets:</p>");
         int transactionId = transactions.get(0).getTransactionId();
         messageBuilder.append("<p><strong>Transaction ID: </strong>").append(transactionId).append("</p>");
@@ -589,7 +649,7 @@ public class TransactionServiceImplementation implements TransactionService {
 
         messageBuilder.append("<p>If there are any issues with your booking, please contact 91234567 immediately.</p>");
         messageBuilder.append("<p>Thank you for choosing our services!</p>");
-        messageBuilder.append("<p>Best regards,<br>(Company Name)</p>");
+        messageBuilder.append("<p>Best regards,<br>The Team<br>TBS Pte Ltd.</p>");
         messageBuilder.append("</div>");
         messageBuilder.append("</div>");
 
@@ -599,7 +659,7 @@ public class TransactionServiceImplementation implements TransactionService {
         String subject = "Your Ticket Purchase Confirmation";
 
         // Sending the email
-        return emailService.sendEmailForTicketComfirm(email, subject, message, ls);
+        return emailService.sendEmailForTicketConfirm(email, subject, message, ls);
     }
 
     private String encrypt(String plainText) throws Exception {

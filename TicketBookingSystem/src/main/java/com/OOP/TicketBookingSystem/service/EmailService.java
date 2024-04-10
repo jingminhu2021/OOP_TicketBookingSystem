@@ -8,5 +8,5 @@ public interface EmailService {
 
     public JsonNode sendEmail(String email, String subject, String message);
 
-    public JsonNode sendEmailForTicketComfirm(String email, String subject, String message, List<Integer> ticketId);
+    public JsonNode sendEmailForTicketConfirm(String email, String subject, String message, List<Integer> ticketId);
 }

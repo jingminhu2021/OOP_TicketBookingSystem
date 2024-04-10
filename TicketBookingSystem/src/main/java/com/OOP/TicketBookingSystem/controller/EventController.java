@@ -33,6 +33,7 @@ import com.OOP.TicketBookingSystem.service.EventService;
 import com.OOP.TicketBookingSystem.service.ReportService;
 import com.OOP.TicketBookingSystem.service.UserService;
 
+
 @RestController
 @RequestMapping("/event")
 public class EventController {
@@ -237,6 +238,20 @@ public class EventController {
         
         try {
             return eventService.viewEvent(id);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+    }
+
+    @PreAuthorize("hasRole('Event_Manager')")
+    @PostMapping("/viewTicketingOfficerByEventId")
+    public JsonNode viewTicketingOfficerByEventId(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.readTree(body);
+            int eventId = jsonNode.get("eventId").asInt();
+            return eventService.viewTicketingOfficerByEventId(eventId);
         } catch (Exception e) {
             System.err.println(e);
         }

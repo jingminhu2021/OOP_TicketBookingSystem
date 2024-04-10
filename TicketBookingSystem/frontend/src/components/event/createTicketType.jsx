@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Modal, Button, Form, InputGroup, Alert } from 'react-bootstrap';
 
 function CreateTicketType(id){
+    // const id = props.event_id;
+    console.log("event id", id)
     const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
@@ -16,11 +18,13 @@ function CreateTicketType(id){
         setShow2(false);
         setFormData([{ category: '', price: '', number_of_ticket: '', cancellation_fee: ''}]);
         setResults([]);
+        window.location.reload();
     }
     const handleShow2 = () => setShow2(true);
 
     const [show3, setShow3] = useState(false);
     const handleClose3 = () => setShow3(false);
+    
     const handleShow3 = () => setShow3(true);
 
     const [showCategoryAlert, setShowCategoryAlert] = useState(false);
@@ -150,7 +154,7 @@ function CreateTicketType(id){
     return(
         <>
         {userData && userData.role === 'Event_Manager' &&(
-            <Button variant="danger" onClick={handleShow}>
+            <Button variant="primary" className='w-100' onClick={handleShow}>
                 <i className="fas fa-plus me-1 text-gray fw-normal"></i>Create Ticket Type
             </Button>
         )}
@@ -243,7 +247,7 @@ function CreateTicketType(id){
                     <div key={index}>
                         <p>Category: {JSON.parse(results.config.data).eventCat}</p>
                         <p>Message: {results.data.message }</p>
-                        <p>Success? {results.status ? "Yes":"No"}</p>
+                        {/* <p>Success? {results.status ? "Yes":"No"}</p> */}
                         <hr/>
                     </div>
                 ))}

@@ -69,6 +69,7 @@ public class SecurityController {
 
     @PostMapping("/createNewUser")
     public ResponseEntity createNewUser(@ModelAttribute RegisterRequest request){
+        System.out.println(request);
         String email = request.getEmail();
         Optional<User> userOptional = userRepo.findByOptEmail(email);
         if(userOptional.isPresent()){
@@ -87,6 +88,7 @@ public class SecurityController {
                 customer.setEmail(email);
                 customer.setName(request.getName());
                 customer.setPassword(encoder.encode(request.getPassword()));
+                customer.setWallet(request.getWallet());
                 customerRepo.save(customer);
                 return ResponseEntity.ok("success");
         

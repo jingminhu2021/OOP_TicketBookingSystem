@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table } from 'react-bootstrap';
+import { Table, Button, Modal } from 'react-bootstrap';
 import UpdateTicketType from './updateTicketType';
+import CreateTicketType from './createTicketType';
 
-function ViewTicketOptionsForManager(event_id) {
+function ViewTicketOptionsForManager(props) {
+    const event_id = props.event_id;
+    const event_status = props.event_status;
     const token = localStorage.getItem('token');
     const config = {
         headers: { Authorization: `Bearer ${token}` }
     };
     const [userData, setUserData] = useState(null);
     const [ticketOptions, setTicketOptions] = useState([]);
+    const [show, setShow] = useState(false);
+    const handleShow = () => setShow(true);
+    const handleClose = () => setShow(false);
 
     useEffect(() => {
         
@@ -55,36 +61,49 @@ function ViewTicketOptionsForManager(event_id) {
     return(
         <>
         {userData && userData.role === 'Event_Manager' &&(
-            <Table>
-                <thead>
-                    <tr>
-                        <th>Event Category</th>
-                        <th>Event Price</th>
-                        <th>Number of Tickets left</th>
-                        <th>Cancellation Fee Percentage</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
+        <Button className='w-100' style={{height: '60px'}} variant="primary" onClick={handleShow} disabled={event_status !== 'Active'}>
+            <i className="fas fa-plus me-1 text-gray fw-normal"></i> Edit
+        </Button>
+        )}
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Ticket Details</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {CreateTicketType(event_id)}
+                <Table>
+                    <thead>
+                        <tr>
+                            <th>Event Category</th>
+                            <th>Event Price</th>
+                            <th>Number of Tickets left</th>
+                            <th>Cancellation Fee Percentage</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                    {ticketOptions.map((ticketOption, index) => {
-                        console.log(ticketOption)
-                        return(
-                            <tr key={index}>
-                                <td>{ticketOption.eventCat}</td>
-                                <td>{ticketOption.eventPrice}</td>
-                                <td>{ticketOption.numberOfTix}</td>
-                                <td>{ticketOption.cancellationFeePercentage}</td>
-                                <td>
-                                    <UpdateTicketType ticketId={ticketOption.ticketTypeId} />
-                                    {/* <Button variant="danger" onClick={() => {}}>Delete</Button> */}
-                                </td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
-            </Table>
-            )}
+                        {ticketOptions.map((ticketOption, index) => {
+                            // console.log(ticketOption)
+                            return(
+                                <tr key={index}>
+                                    <td>{ticketOption.eventCat}</td>
+                                    <td>{ticketOption.eventPrice}</td>
+                                    <td>{ticketOption.numberOfTix}</td>
+                                    <td>{ticketOption.cancellationFeePercentage}</td>
+                                    <td>
+                                        <UpdateTicketType ticketId={ticketOption.ticketTypeId} />
+                                        {/* <Button variant="danger" onClick={() => {}}>Delete</Button> */}
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </Table>
+            </Modal.Body>
+        </Modal>
+            
+            
         </>
     )
 }

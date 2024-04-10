@@ -79,4 +79,17 @@ public class UserController {
         response.put("role", user.getClass().getSimpleName());
         return response;
     }
+
+    @PreAuthorize("hasRole('Event_Manager')")
+    @PostMapping("/viewAllTicketingOfficer")
+    public JsonNode viewAllTicketingOfficer() {
+        try {
+            return userService.viewAllTicketingOfficer();
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+    }
+
+
 }

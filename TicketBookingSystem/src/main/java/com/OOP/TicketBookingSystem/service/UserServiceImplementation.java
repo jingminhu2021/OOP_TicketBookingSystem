@@ -92,4 +92,21 @@ public class UserServiceImplementation implements UserService{
         String email = auth.getName();
         return getUserByEmail(email);
     }
+
+    @Override
+    public JsonNode viewAllTicketingOfficer(){
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+
+        List<User> ticketOfficerRestrictions = userRepo.findTicketingOfficers();
+        node.put("message", "No ticketing officer found");
+        node.put("status", false);
+
+        if (!ticketOfficerRestrictions.isEmpty()) {
+            node.put("message", "Ticketing officer found");
+            node.put("status", true);
+            node.set("ticketingOfficers", mapper.valueToTree(ticketOfficerRestrictions));
+        }
+        return node;
+    }
 }

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Modal, Alert, Button, Toast } from 'react-bootstrap';
 
-function UpdateEvent(id) {
+function UpdateEvent(props) {
+    const id = props.event_id;
+    const event_status = props.event_status;
     const token = localStorage.getItem('token');
 
     const [show, setShow] = useState(false);
@@ -30,7 +32,7 @@ function UpdateEvent(id) {
             .then(function (response) {
                 var data = response.data;
                 var event = data.event;
-                console.log(data);
+                // console.log(data);
                 
                 var date;
                 try{
@@ -122,7 +124,7 @@ function UpdateEvent(id) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form data submitted:', formData);
+        // console.log('Form data submitted:', formData);
         // Add your authentication logic here, e.g., send data to an API
         send_onsubmit(formData.event_id,formData.event_name, formData.venue, formData.description, formData.date_time, formData.event_type, formData.image);
     };
@@ -139,7 +141,7 @@ function UpdateEvent(id) {
             eventManagerName: userData.user.name,
             image: image
         }
-        console.log(data);
+        // console.log(data);
 
         axios.post(api_endpoint_url, data, config)
             .then(function (response) {
@@ -167,7 +169,7 @@ function UpdateEvent(id) {
                 <Toast.Body>{toastMessage}</Toast.Body>
         </Toast>
         {userData && userData.role === 'Event_Manager' &&(
-            <Button variant="outline-primary" onClick={handleShow}>
+            <Button className='w-100' style={{height: '60px'}} variant="outline-primary" onClick={handleShow} disabled={event_status !== 'Active'}>
                 <i className="fas fa-plus me-1 text-gray fw-normal"></i>Update Event
             </Button>
         )}

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import com.OOP.TicketBookingSystem.model.Event;
 import com.OOP.TicketBookingSystem.model.Event_Manager;
+import com.OOP.TicketBookingSystem.model.Ticket_Officer_Restriction;
 import com.OOP.TicketBookingSystem.model.Ticket_Type;
 import com.OOP.TicketBookingSystem.repository.EventManagerRepo;
 import com.OOP.TicketBookingSystem.repository.EventRepo;
@@ -31,6 +32,7 @@ import com.OOP.TicketBookingSystem.model.User;
 import com.OOP.TicketBookingSystem.repository.TransactionRepo;
 import com.OOP.TicketBookingSystem.repository.UserRepo;
 import com.OOP.TicketBookingSystem.repository.TicketTypeRepo;
+import com.OOP.TicketBookingSystem.repository.TicketOfficerRestrictionRepo;
 
 @Service
 public class EventServiceImplementation implements EventService {
@@ -51,6 +53,9 @@ public class EventServiceImplementation implements EventService {
 
     @Autowired
     private TicketTypeRepo ticketTypeRepo;
+
+    @Autowired
+    private TicketOfficerRestrictionRepo ticketOfficerRestrictionRepo;
 
     @Override
     public JsonNode createEvent(Event event, int managerId, String image) {
@@ -389,6 +394,23 @@ public class EventServiceImplementation implements EventService {
         node.set("event", mapper.valueToTree(event));
         node.set("ticketTypes", mapper.valueToTree(ticketTypeRepo.findByEventId(event.getId())));
 
+        return node;
+    }
+
+    @Override
+    public JsonNode viewTicketingOfficerByEventId(int eventId){
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode node = mapper.createObjectNode();
+
+        List<Ticket_Officer_Restriction> ticketOfficerRestrictions = ticketOfficerRestrictionRepo.findByEventId(eventId);
+        node.put("message", "No ticketing officer found");
+        node.put("status", false);
+
+        if (!ticketOfficerRestrictions.isEmpty()) {
+            node.put("message", "Ticketing officer found");
+            node.put("status", true);
+            node.set("ticketingOfficers", mapper.valueToTree(ticketOfficerRestrictions));
+        }
         return node;
     }
 }

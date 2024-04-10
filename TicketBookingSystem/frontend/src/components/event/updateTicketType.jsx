@@ -34,6 +34,7 @@ function UpdateTicketType(props){
     const handleClose2 = () => {
         setResults({message: 'Loading...'});
         setShow2(false);
+        window.location.reload();
     }
     const [showCategoryAlert, setShowCategoryAlert] = useState(false);
     const [showPriceAlert, setShowPriceAlert] = useState(false);
@@ -100,7 +101,7 @@ function UpdateTicketType(props){
         axios.post(api_endpoint_url, bodyParameters, config)
         .then(function (response) {
             var data = response.data;
-            console.log(data);  
+            // console.log(data);  
             setTicketType({
                 category: data.eventCat,
                 price: data.eventPrice,
@@ -117,7 +118,7 @@ function UpdateTicketType(props){
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Form data submitted:', ticketType);
+        // console.log('Form data submitted:', ticketType);
         // Add your authentication logic here, e.g., send data to an API
         send_onsubmit(ticket_id, ticketType.category, ticketType.price, ticketType.number_of_ticket, ticketType.cancellation_fee, ticketType.event_id);
         handleClose();
@@ -145,7 +146,7 @@ function UpdateTicketType(props){
     }, []); // Empty dependency array ensures this effect runs only once
 
 
-    const send_onsubmit = (ticket_id, category, price, cancellation_fee, number_of_ticket, event_id) => {
+    const send_onsubmit = (ticket_id, category, price, number_of_ticket, cancellation_fee, event_id) => {
         let api_endpoint_url = 'http://localhost:8080/ticketType/updateTicketType';
 
         var bodyParameters = {
@@ -159,7 +160,7 @@ function UpdateTicketType(props){
 
         axios.post(api_endpoint_url, bodyParameters, config)
         .then((response) => {
-            console.log(response);
+            // console.log(response);
             setResults(response.data);
         })
         .catch((error) => {
