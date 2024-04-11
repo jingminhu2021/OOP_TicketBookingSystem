@@ -158,4 +158,18 @@ public class TransactionController {
         return null;
     }
 
+    @PreAuthorize("hasRole('Customer')")
+    @PostMapping("getTicketDetails")
+    public Transaction getTicketDetails(@RequestBody JsonNode body){
+        try {
+            
+            int ticket_id = body.get("ticket_id").asInt();
+            return transactionService.getTicketDetails(ticket_id);
+        }
+        catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+    }
+
 }
