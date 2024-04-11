@@ -30,6 +30,7 @@ import ViewBookingHistory from './pages/viewBookingHistory.jsx';
 // import "./css/style.red.css";
 // import "./css/style.red.min.css";
 // import "./css/style.red.min.css.map";
+import "./css/custom.css";
 import "./css/style.sea.css";
 import "./css/style.sea.min.css";
 import "./css/style.sea.min.css.map";

@@ -1,1 +1,8 @@
 /* your styles go here */
+svg {
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    fill: #379392!important;
+    stroke: #379392!important;
+   }

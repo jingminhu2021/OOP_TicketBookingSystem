@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import Login from "./login";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { Nav, Navbar, NavDropdown } from "react-bootstrap";
-
+import {ReactComponent as WalletLogo} from "../img/wallet.svg"
+import {ReactComponent as HomeLogo} from "../img/home.svg"
+import {ReactComponent as HistoryLogo} from "../img/history.svg"
+import {ReactComponent as LogoutLogo} from "../img/logout.svg"
+import {ReactComponent as ProfileLogo} from "../img/profile.svg"
+import {ReactComponent as TicketLogo} from "../img/ticket.svg"
+import {ReactComponent as EventLogo} from "../img/event.svg"
+import {ReactComponent as LoginLogo} from "../img/login.svg"
 
 function Navibar(){
   const token = localStorage.getItem('token');
@@ -36,14 +42,16 @@ function Navibar(){
       // console.log("current token:"+`${token}`);
       return(
           <Nav.Item className="nav-item">
-            <Nav.Link className="nav-link" href="/logout">Logout</Nav.Link>
+            <Nav.Link className="nav-link" href="/logout"><LogoutLogo />Logout</Nav.Link>
           </Nav.Item>          
 
       )
     }else{
       return(
         // <li className="nav-item"><a className="nav-link" href="#!"> <i className="fas fa-user me-1 text-gray fw-normal"></i>Login</a></li>
-        <Login />
+        <Nav.Item className="nav-item" style={{display:"flex"}}>
+          <LoginLogo /><Login />          
+        </Nav.Item>
       )
     }
   }
@@ -51,7 +59,7 @@ function Navibar(){
     if (userData && userData.role === 'Customer'){
       return(
         <Nav.Item className="nav-item">
-          <Nav.Link className="nav-link" href="/viewBookingHistory">Booking History</Nav.Link>
+          <Nav.Link className="nav-link" href="/viewBookingHistory"><HistoryLogo />Booking History</Nav.Link>
         </Nav.Item>
       )
     }
@@ -61,7 +69,7 @@ function Navibar(){
     // console.log(userData);
     return(
       <Nav.Item className="nav-item">
-        <Nav.Link className="nav-link" href="/manageEvents">Manage Events</Nav.Link>
+        <Nav.Link className="nav-link" href="/manageEvents"><EventLogo />Manage Events</Nav.Link>
       </Nav.Item>
     )
   }
@@ -86,11 +94,41 @@ function Navibar(){
       // console.log(userData);
       return(
         <Nav.Item className="nav-item">
-            <Nav.Link className="nav-link" href="/verifyticket">Verify Ticket</Nav.Link>
+            <Nav.Link className="nav-link" href="/verifyticket"><TicketLogo />Verify Ticket</Nav.Link>
         </Nav.Item> 
       )
     }
         // Empty dependency array ensures this effect runs only once
+    }
+
+  function renderWallet(){
+    if (userData && userData.role === 'Customer'){
+      console.log(userData.user.wallet);
+      if (Number.isInteger(userData.user.wallet)){
+        return(
+          <Nav.Item className="nav-item">
+              <Nav.Link disabled className="nav-link" style={{color:"#379392"}}><WalletLogo />Wallet Balance: ${userData.user.wallet}.00</Nav.Link>
+          </Nav.Item> 
+        )
+      } else {
+          return(
+            <Nav.Item className="nav-item">
+                <Nav.Link disabled className="nav-link" style={{color:"#379392"}}><WalletLogo />Wallet Balance: ${userData.user.wallet}</Nav.Link>
+            </Nav.Item> 
+          )
+        }
+      }
+        // Empty dependency array ensures this effect runs only once
+    }
+
+    function CheckName(){
+      if (userData){
+        return(
+          <Nav.Item className="me-auto">
+          <Nav.Link className="nav-link"disabled style={{color:"#379392"}}><ProfileLogo />{userData.user.name}</Nav.Link>
+        </Nav.Item>
+        )
+      }
     }
 
     return(
@@ -101,13 +139,15 @@ function Navibar(){
             <div className="collapse navbar-collapse" id="navbarSupportedContent">
               <Navbar>
                 <Nav.Item className="me-auto">
-                  <Nav.Link className="nav-link" href="/">Home</Nav.Link>
+                  <Nav.Link className="nav-link" href="/"><HomeLogo />Home</Nav.Link>
                 </Nav.Item>
+                {CheckName()}
                 {CheckRole()}
               </Navbar>
               <Navbar className="ms-auto">               
                 {/* <li className="nav-item"><a className="nav-link" href="cart.html"> <i className="fas fa-dolly-flatbed me-1 text-gray"></i>Cart<small className="text-gray fw-normal">(2)</small></a></li>
                 <li className="nav-item"><a className="nav-link" href="#!"> <i className="far fa-heart me-1"></i><small className="text-gray fw-normal"> (0)</small></a></li> */}
+                {renderWallet()}
                 {renderSalesStatistics()}
                 {renderBookingHistory()}
                 {renderVerifyTicket()}
