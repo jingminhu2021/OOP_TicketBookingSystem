@@ -16,4 +16,6 @@ public interface TicketTypeService {
     public Ticket_Type viewSingleTicketType(JsonNode body);
 
     public JsonNode verifyTicket(int userId, int eventId, int ticketId, int ticketOfficerId, int ticketTypeId);
+
+    public JsonNode getTicketDetails(int userId, int eventId, int ticketId, int ticketTypeId);
 }

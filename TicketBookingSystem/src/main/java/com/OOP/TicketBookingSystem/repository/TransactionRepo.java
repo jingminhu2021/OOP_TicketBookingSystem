@@ -50,4 +50,7 @@ public interface TransactionRepo extends JpaRepository<Transaction, Integer> {
 
     @Query(value = "SELECT * FROM transaction WHERE transaction_id = :transactionId and ticket_type_id = :ticketTypeId", nativeQuery = true)
     public Transaction findByTransactionIdAndticketTypeId(@Param("transactionId")int transactionId, @Param("ticketTypeId")int ticketTypeId);
+
+    @Query(value = "SELECT * FROM transaction WHERE user_id = :userId and event_id = :eventId and ticket_id = :ticketId and ticket_type_id = :ticketTypeId", nativeQuery = true)
+    public Transaction findTicketDetail(@Param("userId")int userId, @Param("eventId")int eventId, @Param("ticketId")int ticketId, @Param("ticketTypeId")int ticketTypeId);
 }

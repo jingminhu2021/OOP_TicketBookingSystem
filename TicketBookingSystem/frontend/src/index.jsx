@@ -75,13 +75,6 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/logout" element={<Logout />} />
 
-        {/* // Check if the user is a Ticketing Officer */}
-        {userData && userData.role === 'Ticketing_Officer' ? (
-          <Route path="/verifyTicket" element={<VerifyTicket />} />
-        ) : (
-          <Route path="/verifyTicket" element={<h1>Not Authorized</h1>} />
-        )}
-
         {userData && userData.role === 'Event_Manager' ? (
           <Route path="/viewSalesStatistics" element={<ViewSalesStatistics />} />
         ) : (
@@ -100,31 +93,12 @@ export default function App() {
           <Route path="/viewBookingHistory" element={<h1>Not Authorized</h1>} />
         )}
 
-
-        {/* // Check if the user is a Ticketing Officer */}
-        {userData && userData.role === 'Ticketing_Officer' ? (
-          <Route path="/verifyTicket" element={<VerifyTicket />} />
-        ) : (
-          <Route path="/verifyTicket" element={<h1>Not Authorized</h1>} />
-        )}
-
-        {userData && userData.role === 'Event_Manager' ? (
-          <Route path="/viewSalesStatistics" element={<ViewSalesStatistics />} />
-        ) : (
-          <Route path="/viewSalesStatistics" element={<h1>Not Authorized</h1>} />
-        )}
-
-        {userData != null ? (
-          <Route path="/viewBookingHistory" element={<ViewBookingHistory />} />
-        ) : (
-          <Route path="/viewBookingHistory" element={<h1>Not Authorized</h1>} />
-        )}
-
         <Route path="*" element={<h1>Not Found</h1>} />
         <Route path="/manageEvents" element={<ManageEventPage/>}/>
         <Route path="/event/:event_id" element={<EventDetailPage/>}/>
         <Route path="/editEvent/:event_id" element={<UpdateEvent/>}/>
         <Route path="/success/:session_id" element={<SuccessPage/>}/>
+        <Route path="/verifyTicket" element={<VerifyTicket />} />
       </Routes>
     </BrowserRouter>
   )

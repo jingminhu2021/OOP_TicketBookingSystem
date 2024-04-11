@@ -4,6 +4,7 @@ package com.OOP.TicketBookingSystem.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -260,6 +261,25 @@ public class TicketTypeServiceImplementation implements TicketTypeService {
             node.put("message", e.toString());
             return node;
         }
+    }
+
+    @Override
+    public JsonNode getTicketDetails(int userId, int eventId, int ticketId, int ticketTypeId) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        ObjectNode node = mapper.createObjectNode();
+
+        Transaction transaction = transactionRepo.findTicketDetail(userId, eventId, ticketId, ticketTypeId);
+        if (transaction==null){
+            node.put("message", "Transaction not found");
+            node.put("status", false);
+            return node;
+        }
+
+        JsonNode transactionNode = mapper.valueToTree(transaction);
+        node.set("ticketDetails", transactionNode);
+        node.put("status", true);
+        return node;
     }
 
 }

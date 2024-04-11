@@ -81,6 +81,18 @@ function Navibar(){
        // Empty dependency array ensures this effect runs only once
     }
 
+  function renderVerifyTicket(){
+    if (userData && userData.role === 'Ticketing_Officer'){
+      // console.log(userData);
+      return(
+        <Nav.Item className="nav-item">
+            <Nav.Link className="nav-link" href="/verifyticket">Verify Ticket</Nav.Link>
+        </Nav.Item> 
+      )
+    }
+        // Empty dependency array ensures this effect runs only once
+    }
+
     return(
         <header className="header bg-white">
         <div className="container px-lg-3">
@@ -98,6 +110,7 @@ function Navibar(){
                 <li className="nav-item"><a className="nav-link" href="#!"> <i className="far fa-heart me-1"></i><small className="text-gray fw-normal"> (0)</small></a></li> */}
                 {renderSalesStatistics()}
                 {renderBookingHistory()}
+                {renderVerifyTicket()}
                 {checkUser()}
               </Navbar>
             </div>

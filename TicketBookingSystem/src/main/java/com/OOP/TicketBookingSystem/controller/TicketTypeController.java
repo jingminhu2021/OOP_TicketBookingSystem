@@ -1,6 +1,8 @@
 package com.OOP.TicketBookingSystem.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +88,24 @@ public class TicketTypeController {
             System.err.println(e);
         }
         return null;
+    }
+
+    @PostMapping("/getTicketDetails")
+    public JsonNode getTicketDetails(@RequestBody String body){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.readTree(body);
+            int userId = jsonNode.get("userId").asInt();
+            int eventId = jsonNode.get("eventId").asInt();
+            int ticketId = jsonNode.get("ticketId").asInt();
+            int ticketTypeId = jsonNode.get("ticketTypeId").asInt();
+
+            return ticketTypeService.getTicketDetails(userId, eventId, ticketId, ticketTypeId);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        return null;
+        
     }
     
 }
