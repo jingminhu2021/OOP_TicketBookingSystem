@@ -65,13 +65,13 @@ function SuccessPage(){
                 </div>
             </div>
         </section> */}
-        <section class="">
-          <div class="mb-5">
+        <section className="">
+          <div className="mb-5">
             
           </div>
-          <div class="container">
+          <div className="container">
             
-            <div class="row mb-5">
+            <div className="row mb-5">
               {/* <div class="col-lg-6 mt-4">
                 <div class="row m-sm-0">
                   <div class="col-sm-10 w-100">
@@ -84,15 +84,15 @@ function SuccessPage(){
                 </div>
               </div> */}
             
-              <div class="col-lg-12">
-                <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
-                  <li class="nav-item"><a class="nav-link text-uppercase active" id="description-tab" data-bs-toggle="tab" href="#description" role="tab" aria-controls="description" aria-selected="true">Thank you for your purchase</a></li>
+              <div className="col-lg-12">
+                <ul className="nav nav-tabs border-0" id="myTab" role="tablist">
+                  <li className="nav-item"><a className="nav-link text-uppercase active" id="description-tab" data-bs-toggle="tab" href="#description" role="tab" aria-controls="description" aria-selected="true">Thank you for your purchase</a></li>
                 </ul>
-                <div class="tab-content mb-5" id="myTabContent">
-                  <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
-                    <div class="p-4 p-lg-5 bg-light">
-                      <h6 class="text-uppercase">✅ Congratulation!</h6>
-                      <p class="text-muted text-sm mb-0">You have successfully made your payment. You may now view your booking in your booking history!</p>
+                <div className="tab-content mb-5" id="myTabContent">
+                  <div className="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                    <div className="p-4 p-lg-5 bg-light">
+                      <h6 className="text-uppercase">✅ Congratulation!</h6>
+                      <p className="text-muted text-sm mb-0">You have successfully made your payment. You may now view your booking in your booking history!</p>
                     </div>
                   </div>
                 </div>
