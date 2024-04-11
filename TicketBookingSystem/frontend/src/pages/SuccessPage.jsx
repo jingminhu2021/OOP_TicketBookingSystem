@@ -105,7 +105,7 @@ function SuccessPage(){
                         <div className="col-auto ml-auto">
                             
                         {userData && userData.role !== 'Ticketing_Officer' && (
-                            <Button variant="outline-primary" href="/booking-history">View Booking History</Button>
+                            <Button variant="outline-primary" href="/viewBookingHistory">View Booking History</Button>
                         )}
                             <span className="p-2"></span>
                             <Button href="/">Back to Home</Button>
