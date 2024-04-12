@@ -126,7 +126,7 @@ function BookTicket(props){
                 }
             }).catch(function (error){
                 console.error(`Error occurred:`, error);
-                setResults({message: 'ticket is out of stock.'});
+                setResults({message: 'Ticket is out of stock.'});
             });
     }
 
