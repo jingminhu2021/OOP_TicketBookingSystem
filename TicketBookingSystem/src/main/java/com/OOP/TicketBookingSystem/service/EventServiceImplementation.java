@@ -314,7 +314,7 @@ public class EventServiceImplementation implements EventService {
 
             //Send Email
             String subject = String.format("[Notice] %s Cancellation", event.getEventName());
-            String message = String.format("The event %s has been cancelled. We are sorry for the inconvenience. Your ticket will be refunded.%n Regards, Event Manager",event.getEventName());
+            String message = String.format("Dear Customer, the event %s has been cancelled. We are sorry for the inconvenience. Your ticket will be refunded.%n Regards, Event Manager",event.getEventName());
             for(String email: emails){
                 emailService.sendEmail(email,subject,message);
             }
