@@ -296,6 +296,7 @@ public class TransactionServiceImplementation implements TransactionService {
                 if(user.getClass().getSimpleName().equals("Ticketing_Officer")){
                     generateQRnSendEmail(transactions, paymentMode, name, userEmail);
                 }else{
+                    
                     generateQRnSendEmail(transactions, paymentMode);
                 }
                 
@@ -389,7 +390,7 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Override
     public void generateQRnSendEmail(List<Transaction> transactions, String paymentMode){
-        generateQRnSendEmail(transactions, paymentMode, null, null);
+        generateQRnSendEmail(transactions, paymentMode, "", null);
     }
 
     @Override
@@ -531,7 +532,8 @@ public class TransactionServiceImplementation implements TransactionService {
 
     @Override
     public JsonNode sendTicketDetailsEmail(String email, List<Transaction> transactions, String paymentMode) {
-        return sendTicketDetailsEmail(email, transactions, paymentMode, null);
+        
+        return sendTicketDetailsEmail(email, transactions, paymentMode, "");
     }
 
     @Override
@@ -560,6 +562,7 @@ public class TransactionServiceImplementation implements TransactionService {
 
         messageBuilder.append("<div style=\"padding: 20px;\">");
         if(name == null){
+            
             messageBuilder.append("<p>Dear ").append(name).append(",</p>");
         }else{
             messageBuilder.append("<p>Dear ").append(user.getName()).append(",</p>");
