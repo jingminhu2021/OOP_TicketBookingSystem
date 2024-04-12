@@ -186,7 +186,7 @@ public class EventController {
         int managerId = user.getId();
 
         ObjectMapper mapper = new ObjectMapper();
-        
+        System.out.println(managerId);
         try {
             JsonNode jsonNode = mapper.readTree(body);
             jsonNode = reportService.viewAllSalesStatistics(jsonNode, managerId);

@@ -54,7 +54,7 @@ function ViewAllSalesStatistics() {
         try {
             const response = await axios({
                 method: 'post',
-                url: 'http://localhost:8080/event/getCSV',
+                url: 'http://localhost:8080/event/getAllCSV',
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

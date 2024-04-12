@@ -89,17 +89,17 @@ public class ReportServiceImplementation implements ReportService{
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode node = mapper.createObjectNode();
         ArrayNode arrayNode = mapper.createArrayNode();
-
+        System.out.println(managerId);
         List<Event> events = eventRepo.findByEventManager(managerId);
         // Check if any events exist
         if (events.isEmpty()) {
             return node;
         }
-
+    
         // Loop through each event
         for (Event event : events) {
             BigDecimal totalRevenue = BigDecimal.ZERO;
-
+            
             int eventId = event.getId();
 
             // Obtain number of tickets sold
