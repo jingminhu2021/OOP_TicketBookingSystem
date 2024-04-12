@@ -77,12 +77,14 @@ function BookTicket(props){
         }else if (!validateForm()) {
             setResults({message: 'Please purchase at least 1 ticket and ensure the total quantity does not exceed 5.'});
         }
-        if(userData && validateForm()){
+        else{
+            if(userData && validateForm()){
                 if(userData.role === 'Customer'){
                     send_onsubmit(userData.user.id,formData.eventId,formData.ticketAndQuantity, formData.paymentMethod);
                 }else if (userData.role === 'Ticketing_Officer'){
                     send_onsitesubmit(userData.user.id, formData.customerName, formData.customerEmail, formData.eventId,formData.ticketAndQuantity, formData.paymentMethod);
-        }
+                }
+            }
         }
     };
 
