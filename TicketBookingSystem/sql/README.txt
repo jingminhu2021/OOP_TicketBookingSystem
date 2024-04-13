@@ -1,3 +1,5 @@
+#Set up the database
+
 1. Open MySQL Workbench: Launch the MySQL Workbench application on your computer.
 
 2. Connect to your MySQL Server: Connect to the MySQL Server instance where you want to import the SQL file. You can do this by clicking on the '+' icon next to "MySQL Connections" in the home screen of MySQL Workbench and entering the necessary connection details like hostname, port, username, and password.
