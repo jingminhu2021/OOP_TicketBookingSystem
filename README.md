@@ -1,3 +1,11 @@
+
+System Architecture:
+![System Architecture](SystemArchitecture.png)
+
+UML Diagram:
+![UML Diagram](UML.png)
+
+
 How to Set Up the Application
 To set up and run our application, firstly clone this GitHub repository to your local machine. You can do this by running the following command in your terminal:
 
