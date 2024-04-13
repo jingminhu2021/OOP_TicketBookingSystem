@@ -1,18 +1,13 @@
 package com.OOP.TicketBookingSystem.controller;
 
-
-import java.util.List;
-
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.OOP.TicketBookingSystem.model.Transaction;
@@ -25,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.crypto.Cipher;
 import java.util.Base64;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 
 @RestController
 @RequestMapping("/transaction")

@@ -51,7 +51,7 @@ import com.stripe.exception.StripeException;
 
 @Service
 public class TransactionServiceImplementation implements TransactionService {
-    @Value("sk_test_51OyEDmP9UQPUI3wt6P2e47bObxNr9gw9gdlUo92S3dooNOqFcajqidTBRtQvU3r4YE2iCZcDpdzt7RUkIMmEptLb009VEooTFT")
+    @Value("${stripe.api.key}")
     private String stripeApiKey;
 
     @Autowired
@@ -79,7 +79,7 @@ public class TransactionServiceImplementation implements TransactionService {
     
     public List<Ticket_Type> stripeTicketTypes;
     
-    @Value("87D3402A2E67C6E8484C807EAA86F8DD")
+    @Value("${enc.secret-key}")
     private String SECRET_KEY;
 
     @Override
