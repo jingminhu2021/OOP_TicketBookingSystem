@@ -1,4 +1,4 @@
-#Set up the database
+# Set up the database
 
 1. Open MySQL Workbench: Launch the MySQL Workbench application on your computer.
 
