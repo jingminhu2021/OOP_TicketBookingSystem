@@ -1,3 +1,4 @@
+# Ticketing Booking System
 
 System Architecture:
 ![System Architecture](SystemArchitecture.png)
@@ -5,6 +6,10 @@ System Architecture:
 UML Diagram:
 ![UML Diagram](UML.png)
 
+
+
+Set up database:
+https://github.com/Disquietudee/OOP-Java/tree/main/TicketBookingSystem/sql
 
 How to Set Up the Application
 To set up and run our application, firstly clone this GitHub repository to your local machine. You can do this by running the following command in your terminal:
