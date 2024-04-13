@@ -74,7 +74,7 @@ function ViewTicketOptionsForManager(props) {
                 <Table>
                     <thead>
                         <tr>
-                            <th>Event Category</th>
+                            <th>Ticket Type</th>
                             <th>Event Price</th>
                             <th>Number of Tickets left</th>
                             <th>Cancellation Fee Percentage</th>

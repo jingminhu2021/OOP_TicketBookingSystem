@@ -186,12 +186,12 @@ function UpdateTicketType(props){
                 <Form onSubmit={handleSubmit}> 
                     <Form.Group className="mb-3" controlId="formBasic">
                                 
-                        <Form.Label>Event Category:</Form.Label>
-                        <Form.Control type="text" placeholder="Enter category name" name="category" value={ticketType.category || ''} onChange={handleInputChange} required/>
+                        <Form.Label>Ticket Type:</Form.Label>
+                        <Form.Control type="text" placeholder="Enter ticket type" name="category" value={ticketType.category || ''} onChange={handleInputChange} required/>
                         {showCategoryAlert && 
                             <Alert variant="danger" onClose={() => setShowCategoryAlert(false)} dismissible>
                                 <p>
-                                    Category is required.
+                                    Ticket type is required.
                                 </p>
                             </Alert>
                         }
