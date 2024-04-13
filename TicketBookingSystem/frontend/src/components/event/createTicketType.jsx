@@ -171,19 +171,11 @@ function CreateTicketType(id){
                             <h5>Add new Ticket {index+1}:</h5>
                             
                             <Form.Label>Ticket Type:</Form.Label>
-<<<<<<< HEAD
                             <Form.Control type="text" placeholder="Enter Ticket Type name" name="category" value={item.category} onChange={e => handleInputChange(e, index)} required/>
                             {showCategoryAlert && 
                                 <Alert variant="danger" onClose={() => setShowCategoryAlert(false)} dismissible>
                                     <p>
                                         Ticket Type name is required.
-=======
-                            <Form.Control type="text" placeholder="Enter ticket type" name="category" value={item.category} onChange={e => handleInputChange(e, index)} required/>
-                            {showCategoryAlert && 
-                                <Alert variant="danger" onClose={() => setShowCategoryAlert(false)} dismissible>
-                                    <p>
-                                        Ticket type is required.
->>>>>>> 718e98fc5aee01eb5d404ff8dc334057f73c6f57
                                     </p>
                                 </Alert>
                             }
