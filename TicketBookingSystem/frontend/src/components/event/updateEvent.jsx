@@ -60,8 +60,11 @@ function UpdateEvent(props) {
 
     const [userData, setUserData] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
+    const [show2, setShow2] = useState(false);
 
-    const [showToast, setShowToast] = useState(false);
+    const handleClose2 = () => setShow2(false);
+    const handleShow2 = () => setShow2(true);
+
     const [toastMessage, setToastMessage] = useState('');
 
     useEffect(() => {
@@ -148,7 +151,7 @@ function UpdateEvent(props) {
                 var data = response.data;
                 
                 setToastMessage(data.message);
-                setShowToast(true);
+                setShow2(true);
                 if (data.status === true) {
                     handleClose();
                 }
@@ -162,12 +165,7 @@ function UpdateEvent(props) {
 
     return(
         <>
-        <Toast onClose={() => setShowToast(false)} style={{zIndex:9999}} show={showToast} delay={3000} autohide>
-                <Toast.Header>
-                    <strong className="me-auto">Notification</strong>
-                </Toast.Header>
-                <Toast.Body>{toastMessage}</Toast.Body>
-        </Toast>
+
         {userData && userData.role === 'Event_Manager' &&(
             <Button className='w-100' style={{height: '60px'}} variant="outline-primary" onClick={handleShow} disabled={event_status !== 'Active'}>
                 <i className="fas fa-plus me-1 text-gray fw-normal"></i>Update Event
@@ -216,6 +214,14 @@ function UpdateEvent(props) {
                 </Modal.Body>
             </Modal>
 
+            <Modal show={show2} onHide={handleClose2}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Notification</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {toastMessage}
+                </Modal.Body>
+            </Modal>
         </>
     )
     

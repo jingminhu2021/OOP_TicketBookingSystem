@@ -170,12 +170,12 @@ function CreateTicketType(id){
                         <Form.Group className="mb-3" controlId={`ticketType${index}`} key={index}>
                             <h5>Add new Ticket {index+1}:</h5>
                             
-                            <Form.Label>Event Category:</Form.Label>
-                            <Form.Control type="text" placeholder="Enter category name" name="category" value={item.category} onChange={e => handleInputChange(e, index)} required/>
+                            <Form.Label>Ticket Type:</Form.Label>
+                            <Form.Control type="text" placeholder="Enter Ticket Type name" name="category" value={item.category} onChange={e => handleInputChange(e, index)} required/>
                             {showCategoryAlert && 
                                 <Alert variant="danger" onClose={() => setShowCategoryAlert(false)} dismissible>
                                     <p>
-                                        Category is required.
+                                        Ticket Type name is required.
                                     </p>
                                 </Alert>
                             }

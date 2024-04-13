@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Form, Modal, Alert, Button, Toast } from 'react-bootstrap';
+import { Form, Modal, Alert, Button } from 'react-bootstrap';
 
 function AddEvent() {
     // const token = sessionStorage.getItem('token');
@@ -10,8 +10,6 @@ function AddEvent() {
     };
     const [userData, setUserData] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
-
-    const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
 
     useEffect(() => {
@@ -37,6 +35,7 @@ function AddEvent() {
     }, []); // Empty dependency array ensures this effect runs only once
 
     const [show, setShow] = useState(false);
+    const [show2, setShow2] = useState(false);
     const [formData, setFormData] = useState({
         event_name: '',
         venue: '',
@@ -48,6 +47,9 @@ function AddEvent() {
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const handleClose2 = () => setShow2(false);
+    const handleShow2 = () => setShow2(true);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -104,7 +106,7 @@ function AddEvent() {
                 var data = response.data;
                 
                 setToastMessage(data.message);
-                setShowToast(true);
+                setShow2(true);
                 if (data.status === true) {
                     handleClose();
                 }
@@ -118,12 +120,7 @@ function AddEvent() {
 
     return(
         <>
-        <Toast onClose={() => setShowToast(false)} style={{zIndex:9999}} show={showToast} delay={3000} autohide>
-                <Toast.Header>
-                    <strong className="me-auto">Notification</strong>
-                </Toast.Header>
-                <Toast.Body>{toastMessage}</Toast.Body>
-        </Toast>
+
         {userData && userData.role === 'Event_Manager' &&(
             <Button variant="outline-primary w-100" onClick={handleShow}>
                 <i className="fas fa-plus me-1 text-gray fw-normal"></i>Add New Event
@@ -169,6 +166,15 @@ function AddEvent() {
                         </Form.Group>
                         <button type="submit" className="btn btn-primary">Submit</button>
                     </Form>
+                </Modal.Body>
+            </Modal>
+
+            <Modal show={show2} onHide={handleClose2}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Notification</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {toastMessage}
                 </Modal.Body>
             </Modal>
 

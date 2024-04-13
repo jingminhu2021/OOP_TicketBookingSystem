@@ -24,8 +24,8 @@ const Events = () =>{
                 let api_endpoint_url='http://localhost:8080/event/viewAllEvents';
                 const response = await axios.get(api_endpoint_url);
                 setEvents(response.data);
-                setUniqueEventTypes([...new Set(response.data.map(event => event.eventType))]);
-                setSelectedEventTypes([...new Set(response.data.map(event => event.eventType))]);
+                setUniqueEventTypes([...new Set(response.data.map(event => event.eventType.toLowerCase()))]);
+                setSelectedEventTypes([...new Set(response.data.map(event => event.eventType.toLowerCase()))]);
             }catch(error){
                 console.log("Error fetching events:", error);
             }
