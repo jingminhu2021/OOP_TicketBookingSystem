@@ -561,8 +561,7 @@ public class TransactionServiceImplementation implements TransactionService {
         messageBuilder.append("</div>");
 
         messageBuilder.append("<div style=\"padding: 20px;\">");
-        if(name == null){
-            
+        if(name == null || name == ""){
             messageBuilder.append("<p>Dear ").append(name).append(",</p>");
         }else{
             messageBuilder.append("<p>Dear ").append(user.getName()).append(",</p>");
